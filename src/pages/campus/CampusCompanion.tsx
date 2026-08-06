@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import CampusShell from "@/components/campus/CampusShell";
 import AIOutput from "@/components/campus/ai/AIOutput";
+import PremiumGate from "@/components/campus/ai/PremiumGate";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -138,10 +139,12 @@ const CampusCompanion = () => {
     setSessions((prev) => prev.filter((s) => s.id !== id));
   };
 
+  const locked = quota ? !quota.isPremium : false;
+
   const quotaBadge = quota && (
-    <Badge variant={quota.remaining > 0 ? "secondary" : "destructive"} className="text-[11px]">
-      {quota.isPremium && <Crown className="mr-1 h-3 w-3" />}
-      {quota.remaining} left today
+    <Badge variant={quota.isPremium ? "secondary" : "outline"} className="text-[11px]">
+      <Crown className="mr-1 h-3 w-3" />
+      {quota.isPremium ? `${quota.remaining} left today` : "Premium"}
     </Badge>
   );
 
@@ -151,7 +154,9 @@ const CampusCompanion = () => {
       subtitle="Explanations, practice questions and exam predictions — grounded in your own courses."
       action={quotaBadge}
     >
-      {courses.length === 0 ? (
+      {locked ? (
+        <PremiumGate />
+      ) : courses.length === 0 ? (
         <Card><CardContent className="p-10 text-center">
           <BookOpen className="mx-auto h-6 w-6 text-muted-foreground" />
           <p className="mt-3 text-sm text-muted-foreground">
@@ -361,10 +366,9 @@ const CampusCompanion = () => {
                 )
               }
             />
-            {quota && !quota.isPremium && quota.remaining <= 1 && (
+            {quota?.isPremium && quota.remaining <= 5 && (
               <p className="mt-3 rounded-xl border border-border bg-card p-3 text-xs text-muted-foreground">
-                You're on the free allowance ({quota.limit} AI actions a day). Edura Premium members get {""}
-                far more each day.
+                {quota.remaining} Campus AI actions left today — your allowance resets tomorrow.
               </p>
             )}
           </div>

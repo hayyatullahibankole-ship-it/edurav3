@@ -53,9 +53,11 @@ export const fetchCampusAIQuota = async (): Promise<CampusAIQuota | null> => {
 
 export class CampusAIError extends Error {
   limitReached: boolean;
-  constructor(message: string, limitReached = false) {
+  requiresUpgrade: boolean;
+  constructor(message: string, limitReached = false, requiresUpgrade = false) {
     super(message);
     this.limitReached = limitReached;
+    this.requiresUpgrade = requiresUpgrade;
   }
 }
 
@@ -79,14 +81,16 @@ export const runCampusAI = async (
   if (!res.ok || !res.body) {
     let message = "Campus AI is unavailable right now. Please try again.";
     let limitReached = false;
+    let requiresUpgrade = false;
     try {
       const parsed = await res.json();
       if (parsed?.error) message = String(parsed.error);
       limitReached = Boolean(parsed?.limitReached);
+      requiresUpgrade = Boolean(parsed?.requiresUpgrade);
     } catch {
       /* keep default */
     }
-    throw new CampusAIError(message, limitReached);
+    throw new CampusAIError(message, limitReached, requiresUpgrade);
   }
 
   const reader = res.body.getReader();
