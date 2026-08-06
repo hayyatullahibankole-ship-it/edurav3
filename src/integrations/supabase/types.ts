@@ -4235,6 +4235,8 @@ export type Database = {
           name: string
           price: number
           resource_access_level: string | null
+          scope: string
+          tier: string
         }
         Insert: {
           created_at?: string | null
@@ -4248,6 +4250,8 @@ export type Database = {
           name: string
           price?: number
           resource_access_level?: string | null
+          scope?: string
+          tier?: string
         }
         Update: {
           created_at?: string | null
@@ -4261,6 +4265,8 @@ export type Database = {
           name?: string
           price?: number
           resource_access_level?: string | null
+          scope?: string
+          tier?: string
         }
         Relationships: []
       }
@@ -5699,6 +5705,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      has_scope_access: {
+        Args: { _auth_user_id: string; _scope: string }
         Returns: boolean
       }
       increment_students_added: {

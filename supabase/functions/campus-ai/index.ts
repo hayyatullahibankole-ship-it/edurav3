@@ -163,7 +163,7 @@ Deno.serve(async (req) => {
     const today = new Date().toISOString().slice(0, 10);
     let isPremium = false;
     try {
-      const { data } = await admin.rpc("has_premium_access", { _auth_user_id: user.id });
+      const { data } = await admin.rpc("has_scope_access", { _auth_user_id: user.id, _scope: "campus" });
       isPremium = Boolean(data);
     } catch (_) {
       isPremium = false;

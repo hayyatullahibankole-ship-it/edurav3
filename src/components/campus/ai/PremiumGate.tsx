@@ -20,7 +20,7 @@ export const PremiumGate = ({ title = "Campus AI is a Premium feature" }: { titl
       </div>
       <h3 className="mt-4 text-lg font-semibold">{title}</h3>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-        Subscribe to Edura Premium to unlock the AI Course Companion and Project Assistant, grounded in your
+        Subscribe to Edura Campus Premium to unlock the AI Course Companion and Project Assistant, grounded in your
         own courses, materials and final-year project.
       </p>
 
@@ -34,8 +34,8 @@ export const PremiumGate = ({ title = "Campus AI is a Premium feature" }: { titl
       </ul>
 
       <Button asChild className="mt-6 gap-2">
-        <Link to="/payment">
-          <Crown className="h-4 w-4" /> Upgrade to Premium
+        <Link to="/payment?scope=campus">
+          <Crown className="h-4 w-4" /> View Campus plans
         </Link>
       </Button>
     </CardContent>

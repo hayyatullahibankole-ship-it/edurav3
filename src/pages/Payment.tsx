@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Check, ArrowRight, Star, Crown, Zap, CreditCard, Loader2, Wallet as WalletIcon } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { useWallet } from "@/hooks/useWallet";
@@ -18,6 +18,8 @@ const Payment = () => {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [payingPlan, setPayingPlan] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  const scope = (searchParams.get("scope") === "campus" ? "campus" : "cbt") as "cbt" | "campus";
 
   const handleWalletPayment = async (plan: any) => {
     if (!user) return;
@@ -58,7 +60,7 @@ const Payment = () => {
 
   useEffect(() => {
     fetchPlans();
-  }, []);
+  }, [scope]);
 
   const fetchPlans = async () => {
     try {
@@ -66,12 +68,13 @@ const Payment = () => {
         .from('subscription_plans')
         .select('*')
         .eq('is_active', true)
+        .in('scope', [scope, 'all'])
         .order('price', { ascending: true });
 
       if (error) throw error;
 
       // Process plans and add UI-specific data
-      const processedPlans = data.map((plan: any) => ({
+      const processedPlans = (data || []).map((plan: any) => ({
         ...plan,
         displayPrice: plan.price === 0 ? '₦0' : `₦${plan.price.toLocaleString()}`,
         period: plan.price === 0 ? 'forever' : `per ${Math.floor(plan.duration_days / 30) === 1 ? 'month' : Math.floor(plan.duration_days / 30) + ' months'}`,
