@@ -34,7 +34,9 @@ const getAccessToken = async (): Promise<string | null> => {
     if (token) return token;
     await new Promise((r) => setTimeout(r, 400));
   }
-  return null;
+  // Last resort: force a refresh in case the stored session was stale.
+  const { data } = await supabase.auth.refreshSession();
+  return data.session?.access_token ?? null;
 };
 
 const authHeaders = async () => {
@@ -44,8 +46,10 @@ const authHeaders = async () => {
     "Content-Type": "application/json",
     apikey: ANON_KEY,
     Authorization: `Bearer ${token}`,
+    "x-campus-token": token,
   };
 };
+
 
 /** Current daily allowance for the signed-in student. */
 export const fetchCampusAIQuota = async (): Promise<CampusAIQuota | null> => {
