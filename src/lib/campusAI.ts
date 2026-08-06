@@ -26,13 +26,24 @@ export type CampusAIQuota = {
   remaining: number;
 };
 
+/** Wait briefly for the session to be restored (avoids a 401 race on page load). */
+const getAccessToken = async (): Promise<string | null> => {
+  for (let i = 0; i < 6; i++) {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (token) return token;
+    await new Promise((r) => setTimeout(r, 400));
+  }
+  return null;
+};
+
 const authHeaders = async () => {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
+  const token = await getAccessToken();
+  if (!token) throw new CampusAIError("Please sign in to use Campus AI.");
   return {
     "Content-Type": "application/json",
     apikey: ANON_KEY,
-    Authorization: `Bearer ${token || ANON_KEY}`,
+    Authorization: `Bearer ${token}`,
   };
 };
 
@@ -50,6 +61,7 @@ export const fetchCampusAIQuota = async (): Promise<CampusAIQuota | null> => {
     return null;
   }
 };
+
 
 export class CampusAIError extends Error {
   limitReached: boolean;
