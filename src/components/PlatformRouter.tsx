@@ -32,6 +32,8 @@ const ServicesLanding = lazy(() => import("@/pages/ServicesLanding"));
 const CampusLanding = lazy(() => import("@/pages/CampusLanding"));
 const Payment = lazy(() => import("@/pages/Payment"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
+const BetaTest = lazy(() => import("@/pages/BetaTest"));
+
 const Privacy = lazy(() => import("@/pages/Privacy"));
 const DeleteAccount = lazy(() => import("@/pages/DeleteAccount"));
 const Terms = lazy(() => import("@/pages/Terms"));
