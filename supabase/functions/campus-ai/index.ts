@@ -18,7 +18,13 @@ type Task =
   | "chapter"
   | "abstract"
   | "feedback"
-  | "references";
+  | "references"
+  | "logbook"
+  | "weekly_report"
+  | "cv_summary"
+  | "cv_bullets"
+  | "roadmap"
+  | "interview";
 
 const TASKS: Task[] = [
   "explain", "questions", "summarise", "predict",
