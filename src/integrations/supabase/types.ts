@@ -781,6 +781,125 @@ export type Database = {
           },
         ]
       }
+      beta_reports: {
+        Row: {
+          created_at: string
+          day_number: number
+          device_info: string | null
+          id: string
+          issues: string | null
+          rating: number
+          screenshots: string[]
+          suggestions: string | null
+          tester_id: string
+          updated_at: string
+          what_worked: string | null
+        }
+        Insert: {
+          created_at?: string
+          day_number: number
+          device_info?: string | null
+          id?: string
+          issues?: string | null
+          rating?: number
+          screenshots?: string[]
+          suggestions?: string | null
+          tester_id: string
+          updated_at?: string
+          what_worked?: string | null
+        }
+        Update: {
+          created_at?: string
+          day_number?: number
+          device_info?: string | null
+          id?: string
+          issues?: string | null
+          rating?: number
+          screenshots?: string[]
+          suggestions?: string | null
+          tester_id?: string
+          updated_at?: string
+          what_worked?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beta_reports_tester_id_fkey"
+            columns: ["tester_id"]
+            isOneToOne: false
+            referencedRelation: "beta_testers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beta_settings: {
+        Row: {
+          created_at: string
+          day_number: number
+          focus_note: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_number: number
+          focus_note?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_number?: number
+          focus_note?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      beta_testers: {
+        Row: {
+          code: string
+          created_at: string
+          device_fingerprint: string | null
+          email: string | null
+          id: string
+          last_active_at: string | null
+          name: string | null
+          notes: string | null
+          phone: string | null
+          redeemed_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          device_fingerprint?: string | null
+          email?: string | null
+          id?: string
+          last_active_at?: string | null
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          redeemed_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          device_fingerprint?: string | null
+          email?: string | null
+          id?: string
+          last_active_at?: string | null
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          redeemed_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string | null
