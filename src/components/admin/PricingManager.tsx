@@ -40,6 +40,8 @@ interface SubscriptionPlan {
   description: string;
   features: any;
   resource_access_level: string;
+  scope?: string;
+  tier?: string;
   max_attempts: number;
   is_active: boolean;
   created_at: string;
@@ -86,6 +88,8 @@ const PricingManager = () => {
     description: '',
     features: '',
     resource_access_level: 'basic',
+    scope: 'cbt',
+    tier: 'premium',
     max_attempts: '',
     is_active: true
   });
@@ -285,6 +289,8 @@ const PricingManager = () => {
         description: formData.description,
         features: features,
         resource_access_level: formData.resource_access_level,
+        scope: formData.scope,
+        tier: formData.tier,
         max_attempts: formData.max_attempts ? parseInt(formData.max_attempts) : null,
         is_active: formData.is_active
       };
@@ -336,6 +342,8 @@ const PricingManager = () => {
       description: plan.description || '',
       features: Array.isArray(plan.features) ? plan.features.join('\n') : '',
       resource_access_level: plan.resource_access_level,
+      scope: plan.scope || 'cbt',
+      tier: plan.tier || 'premium',
       max_attempts: plan.max_attempts?.toString() || '',
       is_active: plan.is_active
     });
@@ -429,6 +437,8 @@ const PricingManager = () => {
       description: '',
       features: '',
       resource_access_level: 'basic',
+      scope: 'cbt',
+      tier: 'premium',
       max_attempts: '',
       is_active: true
     });
@@ -584,6 +594,34 @@ const PricingManager = () => {
                         <SelectItem value="basic">Basic</SelectItem>
                         <SelectItem value="premium">Premium</SelectItem>
                         <SelectItem value="enterprise">Enterprise</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-white">Product</Label>
+                    <Select value={formData.scope} onValueChange={(value) => setFormData({...formData, scope: value})}>
+                      <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cbt">CBT (JAMB/WAEC)</SelectItem>
+                        <SelectItem value="campus">Campus (Higher institution)</SelectItem>
+                        <SelectItem value="all">All-Access bundle</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-white">Tier</Label>
+                    <Select value={formData.tier} onValueChange={(value) => setFormData({...formData, tier: value})}>
+                      <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="premium">Premium</SelectItem>
+                        <SelectItem value="pro">Pro</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -745,6 +783,9 @@ const PricingManager = () => {
                         <div className="flex items-center space-x-2">
                           <Badge variant={plan.is_active ? "default" : "secondary"}>
                             {plan.is_active ? "Active" : "Inactive"}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs uppercase">
+                            {plan.scope || 'cbt'}
                           </Badge>
                           <Badge variant="outline" className="text-xs">
                             {plan.resource_access_level}
