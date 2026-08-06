@@ -107,14 +107,21 @@ const CampusCareer = () => {
     </div>
   );
 
+  if (quota && !quota.isPremium) {
+    return (
+      <CampusShell title="Career Centre" subtitle="CV builder, skills roadmap and interview prep.">
+        <PremiumGate title="The Career Centre is a Premium feature" />
+      </CampusShell>
+    );
+  }
+
   return (
     <CampusShell
       title="Career Centre"
       subtitle="Build a CV that gets replies, plan the skills to get there, and rehearse the interview."
       action={quota ? <Badge variant="secondary">{quota.remaining} AI actions left today</Badge> : undefined}
     >
-      <PremiumGate quota={quota}>
-        <Tabs defaultValue="cv">
+      <Tabs defaultValue="cv">
           <TabsList className="w-full justify-start overflow-x-auto">
             <TabsTrigger value="cv" className="gap-1.5"><FileText className="h-3.5 w-3.5" />CV builder</TabsTrigger>
             <TabsTrigger value="bullets" className="gap-1.5"><Sparkles className="h-3.5 w-3.5" />Experience</TabsTrigger>
@@ -269,8 +276,7 @@ const CampusCareer = () => {
               </div>
             )}
           </TabsContent>
-        </Tabs>
-      </PremiumGate>
+      </Tabs>
     </CampusShell>
   );
 };
