@@ -112,11 +112,13 @@ const NAV: NavSection[] = [
   {
     label: 'System',
     items: [
+      { key: 'beta-testing', label: 'Beta Testing', icon: ClipboardList },
       { key: 'security', label: 'Security', icon: Lock },
       { key: 'settings', label: 'Settings', icon: Settings },
     ],
   },
 ];
+
 
 export default function AdminPortal() {
   const { user, isAdmin, signOut } = useAuth();
