@@ -32,6 +32,8 @@ const ServicesLanding = lazy(() => import("@/pages/ServicesLanding"));
 const CampusLanding = lazy(() => import("@/pages/CampusLanding"));
 const Payment = lazy(() => import("@/pages/Payment"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
+const BetaTest = lazy(() => import("@/pages/BetaTest"));
+
 const Privacy = lazy(() => import("@/pages/Privacy"));
 const DeleteAccount = lazy(() => import("@/pages/DeleteAccount"));
 const Terms = lazy(() => import("@/pages/Terms"));
@@ -217,6 +219,11 @@ const EduraRoutes = () => {
       
       <Route path="/install-app" element={<Layout><InstallApp /></Layout>} />
       <Route path="/mobile-preview" element={<Navigate to="/mobile-splash" replace />} />
+
+      {/* Beta testing portal - standalone, no auth */}
+      <Route path="/test" element={<BetaTest />} />
+      <Route path="/test/:code" element={<BetaTest />} />
+
       
       <Route path="/auth" element={<Layout showNavbar={false}><Auth /></Layout>} />
       <Route path="/choose" element={<Navigate to="/dashboard" replace />} />

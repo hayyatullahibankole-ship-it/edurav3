@@ -42,6 +42,8 @@ import MockResultsManager from '@/components/admin/MockResultsManager';
 import SubjectManager from '@/components/admin/SubjectManager';
 import { MockExamDashboard } from '@/components/admin/MockExamDashboard';
 import { ExamDayVerification } from '@/components/admin/ExamDayVerification';
+import BetaTestingManager from '@/components/admin/BetaTestingManager';
+
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -110,11 +112,13 @@ const NAV: NavSection[] = [
   {
     label: 'System',
     items: [
+      { key: 'beta-testing', label: 'Beta Testing', icon: ClipboardList },
       { key: 'security', label: 'Security', icon: Lock },
       { key: 'settings', label: 'Settings', icon: Settings },
     ],
   },
 ];
+
 
 export default function AdminPortal() {
   const { user, isAdmin, signOut } = useAuth();
@@ -208,7 +212,9 @@ export default function AdminPortal() {
       case 'study-hub': return <StudyHubManager />;
       case 'forum': return <ForumManager />;
       case 'challenges': return <ChallengeManager />;
+      case 'beta-testing': return <BetaTestingManager />;
       case 'settings': return <SystemConfig />;
+
       case 'akboy-services': return <AkboyServicesManager />;
       case 'akboy-portfolio': return <AkboyPortfolioManager />;
       case 'akboy-events': return <AkboyEventsManager />;
