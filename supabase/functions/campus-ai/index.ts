@@ -126,6 +126,56 @@ Turn it into a clear, numbered action list the student can work through, ordered
     case "references":
       return `${head}\n\nFormat these sources in ${input.style || "APA"} style, alphabetically, and flag any missing details:\n"""${input.sources}"""`;
 
+    case "logbook":
+      return `${head}\n\nThe student is on ${input.kind === "teaching_practice" ? "Teaching Practice" : "SIWES / Industrial Training"} at "${input.organisation || "their placement"}"${input.role ? ` as ${input.role}` : ""}.
+Turn these rough notes for ${input.date || "the day"} into a professional logbook entry a supervisor will accept:
+"""${input.notes}"""
+Return exactly:
+## Title
+one short line
+## Activities carried out
+4–6 concise past-tense bullets, technical and specific
+## Skills / knowledge gained
+3 bullets
+## Challenges and how they were handled
+2 bullets
+Keep it truthful to the notes — do not invent tasks that were not mentioned.`;
+
+    case "weekly_report":
+      return `${head}\n\nHere are the student's ${input.kind === "teaching_practice" ? "Teaching Practice" : "SIWES"} logbook entries for week ${input.week || ""}:
+"""${input.entries}"""
+Write the weekly summary report page: a short overview paragraph, a bulleted list of the week's main work,
+skills developed, and one paragraph of reflection. Professional, first person, Nigerian institution style.`;
+
+    case "cv_summary":
+      return `${head}\n\nWrite a strong 3–4 sentence CV professional summary for this Nigerian graduate/undergraduate.
+Target role: ${input.target || "graduate trainee"}.
+Details: """${input.profile}"""
+No clichés, no "hardworking team player". Lead with field, level, strongest evidence and what they want next.
+Return only the summary paragraph.`;
+
+    case "cv_bullets":
+      return `${head}\n\nRewrite these experience notes into 3–5 achievement-focused CV bullets (action verb + what was done + result/scale).
+Role: ${input.role || ""} at ${input.organisation || ""}.
+Notes: """${input.notes}"""
+Return only the bullets, one per line, starting with "- ". Keep every claim consistent with the notes.`;
+
+    case "roadmap":
+      return `${head}\n\nBuild a practical ${input.months || 6}-month skills roadmap for a Nigerian student targeting "${input.goal}".
+Return:
+## Where you are now (assumptions)
+## Month-by-month plan
+For each month: focus skill, what to learn, a free/affordable resource type, and one portfolio deliverable.
+## Portfolio projects to show employers
+## How to get your first paid work or internship in Nigeria
+Be concrete about tools and realistic about data cost, electricity and time around lectures.`;
+
+    case "interview":
+      return `${head}\n\nPrepare this student for interviews for "${input.target || "a graduate role"}".
+Return: 8 likely questions with a model answer skeleton each (STAR where relevant), 3 questions they should ask
+the panel, and a short checklist for the day. Ground the answers in their background: """${input.profile || "not supplied"}"""`;
+
+
     default:
       return head;
   }
