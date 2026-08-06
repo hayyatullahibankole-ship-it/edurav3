@@ -29,6 +29,7 @@ type Task =
 const TASKS: Task[] = [
   "explain", "questions", "summarise", "predict",
   "topics", "outline", "chapter", "abstract", "feedback", "references",
+  "logbook", "weekly_report", "cv_summary", "cv_bullets", "roadmap", "interview",
 ];
 
 const BASE_SYSTEM = `You are the Edura Campus academic assistant for Nigerian higher-institution students
