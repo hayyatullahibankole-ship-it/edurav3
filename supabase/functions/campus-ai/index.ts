@@ -1,8 +1,8 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-campus-token",
 };
 
 const FREE_DAILY_LIMIT = 0; // Campus AI is a premium feature
@@ -138,21 +138,22 @@ Deno.serve(async (req) => {
     if (!LOVABLE_API_KEY) return json({ error: "AI is not configured." }, 500);
 
     const authHeader = req.headers.get("Authorization") || "";
-    if (!authHeader.startsWith("Bearer ")) return json({ error: "Please sign in to use Campus AI." }, 401);
-
-    const userClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      { global: { headers: { Authorization: authHeader } } },
-    );
-    const { data: userData, error: userErr } = await userClient.auth.getUser();
-    const user = userData?.user;
-    if (userErr || !user) return json({ error: "Please sign in to use Campus AI." }, 401);
+    const token = (authHeader.startsWith("Bearer ")
+      ? authHeader.slice(7)
+      : req.headers.get("x-campus-token") || "").trim();
+    if (!token) return json({ error: "Please sign in to use Campus AI." }, 401);
 
     const admin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
+
+    const { data: userData, error: userErr } = await admin.auth.getUser(token);
+    const user = userData?.user;
+    if (userErr || !user) {
+      console.error("campus-ai auth failed:", userErr?.message);
+      return json({ error: "Please sign in to use Campus AI." }, 401);
+    }
 
     const body = await req.json().catch(() => ({}));
     const task = body?.task as Task;
