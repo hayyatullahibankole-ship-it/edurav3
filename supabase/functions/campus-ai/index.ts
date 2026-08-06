@@ -138,6 +138,7 @@ Deno.serve(async (req) => {
     if (!LOVABLE_API_KEY) return json({ error: "AI is not configured." }, 500);
 
     const authHeader = req.headers.get("Authorization") || "";
+    console.log("campus-ai auth header present:", authHeader ? authHeader.slice(0, 12) : "NONE");
     if (!authHeader.startsWith("Bearer ")) return json({ error: "Please sign in to use Campus AI." }, 401);
 
     const admin = createClient(
