@@ -20,3 +20,7 @@
 Only one item here is code work: turning push notifications on. That means adding `google-services.json`, flipping `PUSH_ENABLED` to `true`, and confirming the `send-push-notification` edge function is wired to the stored device tokens. Everything else on the list is dashboard or Play Console work you do outside the codebase.
 
 Tell me if you want push enabled now (you'll need to supply the Firebase `google-services.json`), or if you'd rather ship the first release without it.
+
+&nbsp;
+
+No I don't want to for now until I test the app with different users and get feedback 
