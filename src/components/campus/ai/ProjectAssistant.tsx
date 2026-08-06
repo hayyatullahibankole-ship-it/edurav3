@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AIOutput from "@/components/campus/ai/AIOutput";
+import PremiumGate from "@/components/campus/ai/PremiumGate";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -108,6 +109,14 @@ export const ProjectAssistant = ({ project, onMilestonesChanged }: ProjectAssist
     onMilestonesChanged?.();
   };
 
+  if (quota && !quota.isPremium) {
+    return (
+      <div className="md:col-span-12">
+        <PremiumGate title="Project Assistant is a Premium feature" />
+      </div>
+    );
+  }
+
   return (
     <Card className="md:col-span-12">
       <CardContent className="p-4 sm:p-5">
@@ -117,7 +126,7 @@ export const ProjectAssistant = ({ project, onMilestonesChanged }: ProjectAssist
           </h3>
           {quota && (
             <Badge variant={quota.remaining > 0 ? "secondary" : "destructive"} className="text-[11px]">
-              {quota.isPremium && <Crown className="mr-1 h-3 w-3" />}
+              <Crown className="mr-1 h-3 w-3" />
               {quota.remaining} left today
             </Badge>
           )}
