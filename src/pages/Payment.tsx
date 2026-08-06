@@ -73,8 +73,13 @@ const Payment = () => {
 
       if (error) throw error;
 
+      // CBT and Campus plans are fully separate. Only the free plan is shared.
+      const scoped = (data || []).filter(
+        (plan: any) => plan.scope === scope || Number(plan.price) === 0
+      );
+
       // Process plans and add UI-specific data
-      const processedPlans = (data || []).map((plan: any) => ({
+      const processedPlans = scoped.map((plan: any) => ({
         ...plan,
         displayPrice: plan.price === 0 ? '₦0' : `₦${plan.price.toLocaleString()}`,
         period: plan.price === 0 ? 'forever' : `per ${Math.floor(plan.duration_days / 30) === 1 ? 'month' : Math.floor(plan.duration_days / 30) + ' months'}`,
