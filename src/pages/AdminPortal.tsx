@@ -42,6 +42,8 @@ import MockResultsManager from '@/components/admin/MockResultsManager';
 import SubjectManager from '@/components/admin/SubjectManager';
 import { MockExamDashboard } from '@/components/admin/MockExamDashboard';
 import { ExamDayVerification } from '@/components/admin/ExamDayVerification';
+import BetaTestingManager from '@/components/admin/BetaTestingManager';
+
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
