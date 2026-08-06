@@ -1046,6 +1046,63 @@ export type Database = {
         }
         Relationships: []
       }
+      campus_cv_profiles: {
+        Row: {
+          certifications: Json
+          created_at: string
+          education: Json
+          email: string | null
+          experience: Json
+          full_name: string | null
+          headline: string | null
+          id: string
+          links: Json
+          location: string | null
+          phone: string | null
+          projects: Json
+          skills: Json
+          summary: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          certifications?: Json
+          created_at?: string
+          education?: Json
+          email?: string | null
+          experience?: Json
+          full_name?: string | null
+          headline?: string | null
+          id?: string
+          links?: Json
+          location?: string | null
+          phone?: string | null
+          projects?: Json
+          skills?: Json
+          summary?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          certifications?: Json
+          created_at?: string
+          education?: Json
+          email?: string | null
+          experience?: Json
+          full_name?: string | null
+          headline?: string | null
+          id?: string
+          links?: Json
+          location?: string | null
+          phone?: string | null
+          projects?: Json
+          skills?: Json
+          summary?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       campus_generated_questions: {
         Row: {
           answer: string | null
@@ -1162,6 +1219,65 @@ export type Database = {
         }
         Relationships: []
       }
+      campus_logbook_entries: {
+        Row: {
+          activities: string
+          challenges: string | null
+          created_at: string
+          entry_date: string
+          hours: number | null
+          id: string
+          kind: string
+          placement_id: string | null
+          skills_learned: string | null
+          supervisor_comment: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
+          week_number: number | null
+        }
+        Insert: {
+          activities?: string
+          challenges?: string | null
+          created_at?: string
+          entry_date?: string
+          hours?: number | null
+          id?: string
+          kind?: string
+          placement_id?: string | null
+          skills_learned?: string | null
+          supervisor_comment?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+          week_number?: number | null
+        }
+        Update: {
+          activities?: string
+          challenges?: string | null
+          created_at?: string
+          entry_date?: string
+          hours?: number | null
+          id?: string
+          kind?: string
+          placement_id?: string | null
+          skills_learned?: string | null
+          supervisor_comment?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+          week_number?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campus_logbook_entries_placement_id_fkey"
+            columns: ["placement_id"]
+            isOneToOne: false
+            referencedRelation: "campus_placements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campus_materials: {
         Row: {
           course_code: string | null
@@ -1243,6 +1359,42 @@ export type Database = {
           },
         ]
       }
+      campus_nysc_tasks: {
+        Row: {
+          created_at: string
+          due_date: string | null
+          id: string
+          is_done: boolean
+          label: string
+          notes: string | null
+          phase: string
+          position: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          is_done?: boolean
+          label: string
+          notes?: string | null
+          phase?: string
+          position?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          is_done?: boolean
+          label?: string
+          notes?: string | null
+          phase?: string
+          position?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       campus_opportunities: {
         Row: {
           amount: string | null
@@ -1303,6 +1455,63 @@ export type Database = {
           title?: string
           updated_at?: string
           view_count?: number
+        }
+        Relationships: []
+      }
+      campus_placements: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          kind: string
+          location: string | null
+          notes: string | null
+          organisation: string
+          role_title: string | null
+          school_supervisor: string | null
+          start_date: string | null
+          status: string
+          supervisor_email: string | null
+          supervisor_name: string | null
+          supervisor_phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          kind?: string
+          location?: string | null
+          notes?: string | null
+          organisation: string
+          role_title?: string | null
+          school_supervisor?: string | null
+          start_date?: string | null
+          status?: string
+          supervisor_email?: string | null
+          supervisor_name?: string | null
+          supervisor_phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          kind?: string
+          location?: string | null
+          notes?: string | null
+          organisation?: string
+          role_title?: string | null
+          school_supervisor?: string | null
+          start_date?: string | null
+          status?: string
+          supervisor_email?: string | null
+          supervisor_name?: string | null
+          supervisor_phone?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

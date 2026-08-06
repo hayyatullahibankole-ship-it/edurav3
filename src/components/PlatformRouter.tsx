@@ -72,6 +72,9 @@ const CampusOpportunities = lazy(() => import("@/pages/campus/CampusOpportunitie
 const CampusJourney = lazy(() => import("@/pages/campus/CampusJourney"));
 const CampusTools = lazy(() => import("@/pages/campus/CampusTools"));
 const CampusCompanion = lazy(() => import("@/pages/campus/CampusCompanion"));
+const CampusLogbook = lazy(() => import("@/pages/campus/CampusLogbook"));
+const CampusNysc = lazy(() => import("@/pages/campus/CampusNysc"));
+const CampusCareer = lazy(() => import("@/pages/campus/CampusCareer"));
 
 
 
@@ -310,6 +313,22 @@ const EduraRoutes = () => {
 
         <ProtectedRoute>
           <CampusOnly><CampusTools /></CampusOnly>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/campus/logbook" element={
+        <ProtectedRoute>
+          <CampusOnly><CampusLogbook /></CampusOnly>
+        </ProtectedRoute>
+      } />
+      <Route path="/campus/nysc" element={
+        <ProtectedRoute>
+          <CampusOnly><CampusNysc /></CampusOnly>
+        </ProtectedRoute>
+      } />
+      <Route path="/campus/career" element={
+        <ProtectedRoute>
+          <CampusOnly><CampusCareer /></CampusOnly>
         </ProtectedRoute>
       } />
 

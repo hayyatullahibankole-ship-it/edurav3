@@ -17,7 +17,13 @@ export type CampusAITask =
   | "chapter"
   | "abstract"
   | "feedback"
-  | "references";
+  | "references"
+  | "logbook"
+  | "weekly_report"
+  | "cv_summary"
+  | "cv_bullets"
+  | "roadmap"
+  | "interview";
 
 export type CampusAIQuota = {
   isPremium: boolean;
