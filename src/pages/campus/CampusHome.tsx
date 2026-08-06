@@ -30,11 +30,11 @@ import {
 const naira = (v: number) =>
   new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(v || 0);
 
-const COMING_SOON = [
-  { label: "SIWES / IT logbook", icon: ClipboardList },
-  { label: "Teaching Practice", icon: GraduationCap },
-  { label: "NYSC Hub", icon: Compass },
-  { label: "Career & CV", icon: Briefcase },
+const JOURNEY_TILES = [
+  { label: "SIWES / IT logbook", icon: ClipboardList, to: "/campus/logbook?kind=siwes" },
+  { label: "Teaching Practice", icon: GraduationCap, to: "/campus/logbook?kind=teaching_practice" },
+  { label: "NYSC Hub", icon: Compass, to: "/campus/nysc" },
+  { label: "Career & CV", icon: Briefcase, to: "/campus/career" },
 ];
 
 const CampusHome = () => {
@@ -242,6 +242,28 @@ const CampusHome = () => {
             <Button variant="ghost" size="sm" className="mt-3 gap-1 px-0" onClick={() => navigate("/campus/tools")}>
               Open study tools <ArrowRight className="h-3.5 w-3.5" />
             </Button>
+          </div>
+
+          {/* Placement, service & career */}
+          <div className="bg-card border border-border rounded-2xl p-5 col-span-2 md:col-span-12">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <Briefcase className="h-4 w-4 text-primary" /> Placement, service & career
+            </div>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Keep your logbook supervisor-ready, tick off every NYSC step, and build a CV that gets replies.
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-4">
+              {JOURNEY_TILES.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => navigate(item.to)}
+                  className="flex items-center gap-2 rounded-xl border p-3 text-left text-xs font-medium transition-colors hover:border-primary/50 hover:bg-accent"
+                >
+                  <item.icon className="h-4 w-4 shrink-0 text-primary" />
+                  <span className="truncate">{item.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Opportunities */}
