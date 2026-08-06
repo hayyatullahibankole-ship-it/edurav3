@@ -217,6 +217,11 @@ const EduraRoutes = () => {
       
       <Route path="/install-app" element={<Layout><InstallApp /></Layout>} />
       <Route path="/mobile-preview" element={<Navigate to="/mobile-splash" replace />} />
+
+      {/* Beta testing portal - standalone, no auth */}
+      <Route path="/test" element={<BetaTest />} />
+      <Route path="/test/:code" element={<BetaTest />} />
+
       
       <Route path="/auth" element={<Layout showNavbar={false}><Auth /></Layout>} />
       <Route path="/choose" element={<Navigate to="/dashboard" replace />} />
