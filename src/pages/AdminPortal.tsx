@@ -208,7 +208,9 @@ export default function AdminPortal() {
       case 'study-hub': return <StudyHubManager />;
       case 'forum': return <ForumManager />;
       case 'challenges': return <ChallengeManager />;
+      case 'beta-testing': return <BetaTestingManager />;
       case 'settings': return <SystemConfig />;
+
       case 'akboy-services': return <AkboyServicesManager />;
       case 'akboy-portfolio': return <AkboyPortfolioManager />;
       case 'akboy-events': return <AkboyEventsManager />;
