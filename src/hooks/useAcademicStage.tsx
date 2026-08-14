@@ -125,15 +125,18 @@ export const useAcademicStage = () => {
       }
       return { error };
     },
-    [userProfile?.id, profile.academic_stage]
+    [userProfile?.id, user?.id, profile.academic_stage]
   );
 
   return {
     ...profile,
     stage: profile.academic_stage,
     isCampus: isCampusStage(profile.academic_stage),
-    loading,
+    loading: loading || authLoading,
+    /** Only true once the profile row has really been read for this user. */
+    resolved,
     reload: load,
     updateProfile,
+
   };
 };
