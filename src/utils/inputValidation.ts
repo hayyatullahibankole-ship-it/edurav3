@@ -18,10 +18,38 @@ export const nameSchema = z.string()
   .max(100, { message: "Name must be less than 100 characters" })
   .regex(/^[a-zA-Z\s'-]+$/, { message: "Name can only contain letters, spaces, hyphens and apostrophes" });
 
-export const phoneSchema = z.string()
+// Nigerian phone numbers: accepts 08012345678, 2348012345678, +2348012345678
+// (spaces, dashes and brackets are ignored). Also accepts other international
+// numbers written in full E.164 form.
+export const PHONE_FORMAT_MESSAGE =
+  "Enter a valid Nigerian number, e.g. 08012345678 or +2348012345678";
+
+/** Strips formatting and returns the number in +234... form when possible. */
+export function normalizePhone(input: string): string {
+  const raw = (input || "").replace(/[\s()\-.]/g, "");
+  if (!raw) return "";
+  const digits = raw.replace(/^\+/, "");
+  if (/^0\d{10}$/.test(digits)) return `+234${digits.slice(1)}`;
+  if (/^234\d{10}$/.test(digits)) return `+${digits}`;
+  if (/^\d{10}$/.test(digits) && !digits.startsWith("0")) return `+234${digits}`;
+  return raw.startsWith("+") ? raw : `+${digits}`;
+}
+
+export function isValidPhone(input: string): boolean {
+  const normalized = normalizePhone(input);
+  if (/^\+234[789]\d{9}$/.test(normalized)) return true;
+  // Allow other countries in strict E.164 form
+  return /^\+[1-9]\d{7,14}$/.test(normalized);
+}
+
+export const phoneSchema = z
+  .string()
   .trim()
-  .regex(/^\+?[1-9]\d{1,14}$/, { message: "Invalid phone number format" })
-  .max(20, { message: "Phone number too long" });
+  .min(1, { message: "Phone number is required" })
+  .max(20, { message: "Phone number too long" })
+  .refine(isValidPhone, { message: PHONE_FORMAT_MESSAGE })
+  .transform(normalizePhone);
+
 
 export const textContentSchema = z.string()
   .trim()

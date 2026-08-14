@@ -462,16 +462,22 @@ export default function AuthForm() {
                       <Input
                         id="phone"
                         type="tel"
-                        placeholder="+234 800 000 0000"
+                        inputMode="tel"
+                        placeholder="08012345678"
                         className={`pl-10 ${errors.phone ? 'border-destructive' : ''}`}
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       />
                     </div>
-                    {errors.phone && (
+                    {errors.phone ? (
                       <p className="text-xs text-destructive">{errors.phone}</p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        Use 08012345678 or +2348012345678
+                      </p>
                     )}
                   </div>
+
 
                   {/* Academic stage */}
                   <div className="space-y-2">

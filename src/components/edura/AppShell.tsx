@@ -263,7 +263,11 @@ export const AppShell = ({ side, title, subtitle, meta, action, nav, children }:
           className="rounded-full ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <Avatar className="h-8 w-8 border">
-            <AvatarImage src={(userProfile as any)?.avatar_url || undefined} alt={displayName} />
+            <AvatarImage
+              src={(userProfile as any)?.profile_image_url || (userProfile as any)?.avatar_url || undefined}
+              alt={displayName}
+            />
+
             <AvatarFallback className="text-[11px] font-semibold">{initials}</AvatarFallback>
           </Avatar>
         </button>
