@@ -275,13 +275,20 @@ export default function MobileAuthForm() {
               <div className="relative">
                 <Input
                   id="phone"
-                  placeholder="08101234567"
+                  type="tel"
+                  inputMode="tel"
+                  placeholder="08012345678"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className={`h-12 rounded-xl border-2 transition-all ${errors.phone ? 'border-destructive' : 'border-border hover:border-primary focus:border-primary'}`}
                 />
               </div>
-              {errors.phone && <p className="text-xs text-destructive font-medium">{errors.phone}</p>}
+              {errors.phone ? (
+                <p className="text-xs text-destructive font-medium">{errors.phone}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">Use 08012345678 or +2348012345678</p>
+              )}
+
             </div>
           )}
 
