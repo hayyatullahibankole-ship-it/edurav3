@@ -82,11 +82,12 @@ const CampusCareer = lazy(() => import("@/pages/campus/CampusCareer"));
 
 // Journey-aware home: candidates get the unified home, campus students go to Campus
 const DashboardBySide = ({ isInstalledApp }: { isInstalledApp: boolean }) => {
-  const { stage, isCampus, loading } = useAcademicStage();
+  const { stage, isCampus, loading, resolved } = useAcademicStage();
 
-  // Journey first: no stage yet → onboarding
+  // Journey first: only send genuinely new users to onboarding, never during a
+  // session restore.
   if (loading) return <LoadingAnimation />;
-  if (!stage) return <Navigate to="/campus/journey" replace />;
+  if (!stage && resolved) return <Navigate to="/campus/journey" replace />;
 
   // Higher institution students live on Campus only
   if (isCampus) return <Navigate to="/campus" replace />;
@@ -97,21 +98,22 @@ const DashboardBySide = ({ isInstalledApp }: { isInstalledApp: boolean }) => {
 
 /** Campus routes are for undergraduates & graduates only */
 const CampusOnly = ({ children }: { children: JSX.Element }) => {
-  const { stage, isCampus, loading } = useAcademicStage();
+  const { stage, isCampus, loading, resolved } = useAcademicStage();
   if (loading) return <LoadingAnimation />;
-  if (!stage) return <Navigate to="/campus/journey" replace />;
-  if (!isCampus) return <Navigate to="/dashboard" replace />;
+  if (!stage && resolved) return <Navigate to="/campus/journey" replace />;
+  if (!isCampus && stage) return <Navigate to="/dashboard" replace />;
   return children;
 };
 
 /** CBT & Services routes are for SS3 / WAEC / JAMB candidates only */
 const CoreOnly = ({ children }: { children: JSX.Element }) => {
-  const { stage, isCampus, loading } = useAcademicStage();
+  const { stage, isCampus, loading, resolved } = useAcademicStage();
   if (loading) return <LoadingAnimation />;
-  if (!stage) return <Navigate to="/campus/journey" replace />;
+  if (!stage && resolved) return <Navigate to="/campus/journey" replace />;
   if (isCampus) return <Navigate to="/campus" replace />;
   return children;
 };
+
 
 
 
