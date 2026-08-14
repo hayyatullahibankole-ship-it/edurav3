@@ -42,13 +42,25 @@ export const readCachedStage = (): string | null => {
  * graduates use Edura Campus.
  */
 export const useAcademicStage = () => {
-  const { user, userProfile } = useAuth();
-  const [profile, setProfile] = useState<CampusProfile>(EMPTY);
+  const { user, userProfile, loading: authLoading } = useAuth();
+  const [profile, setProfile] = useState<CampusProfile>(() => ({
+    ...EMPTY,
+    academic_stage: (readCachedStage() as AcademicStage) ?? null,
+  }));
   const [loading, setLoading] = useState(true);
+  // True only once we have actually read the profile row for a signed-in user.
+  const [resolved, setResolved] = useState(false);
 
   const load = useCallback(async () => {
+    // Wait for auth to finish restoring: a null user during restore must not be
+    // mistaken for "this student has no journey yet".
+    if (authLoading) {
+      setLoading(true);
+      return;
+    }
     if (!user) {
       setProfile(EMPTY);
+      setResolved(false);
       setLoading(false);
       return;
     }
@@ -62,14 +74,21 @@ export const useAcademicStage = () => {
 
     if (!error && data) {
       setProfile(data as CampusProfile);
+      setResolved(true);
       try {
         if (data.academic_stage) localStorage.setItem(STAGE_CACHE_KEY, data.academic_stage);
       } catch {
         /* ignore */
       }
+    } else if (error) {
+      // Network/RLS hiccup — keep whatever we know and don't force onboarding.
+      setResolved(false);
+    } else {
+      setResolved(true);
     }
     setLoading(false);
-  }, [user]);
+  }, [user, authLoading]);
+
 
   useEffect(() => {
     load();
