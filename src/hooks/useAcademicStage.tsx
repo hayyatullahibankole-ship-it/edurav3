@@ -96,12 +96,18 @@ export const useAcademicStage = () => {
 
   const updateProfile = useCallback(
     async (patch: Partial<CampusProfile>) => {
-      if (!userProfile?.id) return { error: new Error("No profile") };
+      if (!userProfile?.id && !user?.id) {
+        return { error: new Error("Your profile is still loading. Please try again in a moment.") };
+      }
       const payload: Record<string, unknown> = { ...patch };
       if (patch.academic_stage && profile.academic_stage && patch.academic_stage !== profile.academic_stage) {
         payload.previous_stage = profile.academic_stage;
       }
-      const { error } = await supabase.from("users").update(payload).eq("id", userProfile.id);
+      const query = supabase.from("users").update(payload);
+      const { error } = userProfile?.id
+        ? await query.eq("id", userProfile.id)
+        : await query.eq("auth_user_id", user!.id);
+
       if (!error) {
         setProfile((prev) => ({ ...prev, ...(payload as Partial<CampusProfile>) }));
         if (patch.academic_stage) {
