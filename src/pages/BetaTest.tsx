@@ -435,19 +435,19 @@ export default function BetaTest() {
             </div>
 
             <Button type="submit" className="w-full" disabled={saving}>
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : todaySubmitted ? "Update today's report" : "Submit report"}
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : daySubmitted ? `Update day ${selectedDay} report` : `Submit day ${selectedDay} report`}
             </Button>
           </form>
         </Card>
 
         {state.reports.length > 0 && (
           <div className="space-y-3">
-            <h2 className="text-sm font-bold">Your past reports</h2>
+            <h2 className="text-sm font-bold">Your other reports</h2>
             {state.reports
-              .filter((r) => r.day_number !== state.currentDay)
+              .filter((r) => r.day_number !== selectedDay)
               .sort((a, b) => b.day_number - a.day_number)
               .map((r) => (
-                <Card key={r.id} className="p-4">
+                <Card key={r.id} className="p-4 cursor-pointer" onClick={() => selectDay(r.day_number)}>
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-semibold">Day {r.day_number}</p>
                     <div className="flex items-center gap-0.5">
