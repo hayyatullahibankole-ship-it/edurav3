@@ -101,15 +101,23 @@ export default function BetaTest() {
 
   const savedCode = useMemo(() => localStorage.getItem(CODE_KEY) || "", []);
 
-  const hydrateForm = useCallback((s: State) => {
-    const today = s.reports.find((r) => r.day_number === s.currentDay);
-    setRating(today?.rating ?? 5);
-    setWhatWorked(today?.what_worked ?? "");
-    setIssues(today?.issues ?? "");
-    setSuggestions(today?.suggestions ?? "");
-    setDeviceInfo(today?.device_info ?? navigator.userAgent.slice(0, 120));
-    setShots(today?.screenshots ?? []);
+  const hydrateForm = useCallback((s: State, day: number) => {
+    const report = s.reports.find((r) => r.day_number === day);
+    setRating(report?.rating ?? 5);
+    setWhatWorked(report?.what_worked ?? "");
+    setIssues(report?.issues ?? "");
+    setSuggestions(report?.suggestions ?? "");
+    setDeviceInfo(report?.device_info ?? navigator.userAgent.slice(0, 120));
+    setShots(report?.screenshots ?? []);
   }, []);
+
+  const selectDay = useCallback((day: number) => {
+    setSelectedDay(day);
+    setState((s) => {
+      if (s) hydrateForm(s, day);
+      return s;
+    });
+  }, [hydrateForm]);
 
   useEffect(() => {
     const boot = async () => {
@@ -119,7 +127,8 @@ export default function BetaTest() {
         const s = await call({ action: "state", code: existing });
         localStorage.setItem(CODE_KEY, existing);
         setState(s);
-        hydrateForm(s);
+        setSelectedDay(s.currentDay);
+        hydrateForm(s, s.currentDay);
       } catch {
         localStorage.removeItem(CODE_KEY);
         setCode(codeParam?.toUpperCase() || "");
@@ -129,6 +138,21 @@ export default function BetaTest() {
     };
     boot();
   }, [savedCode, codeParam, hydrateForm]);
+
+  // Keep state fresh when the tester comes back to the tab / app
+  useEffect(() => {
+    const refresh = async () => {
+      if (document.visibilityState !== "visible") return;
+      const existing = localStorage.getItem(CODE_KEY);
+      if (!existing) return;
+      try {
+        const s = await call({ action: "state", code: existing });
+        setState(s);
+      } catch { /* ignore */ }
+    };
+    document.addEventListener("visibilitychange", refresh);
+    return () => document.removeEventListener("visibilitychange", refresh);
+  }, []);
 
   const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
