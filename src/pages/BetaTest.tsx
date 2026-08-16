@@ -335,31 +335,44 @@ export default function BetaTest() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          {Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1).map((d) => {
-            const done = submittedDays.has(d);
-            const isToday = d === state.currentDay;
-            return (
-              <div
-                key={d}
-                className={`flex-1 rounded-lg border px-2 py-2 text-center text-xs font-semibold ${
-                  done
-                    ? "border-primary/40 bg-primary/10 text-primary"
-                    : isToday
-                    ? "border-foreground/30 text-foreground"
-                    : "border-border text-muted-foreground"
-                }`}
-              >
-                {done ? <CheckCircle2 className="mx-auto h-4 w-4" /> : `D${d}`}
-              </div>
-            );
-          })}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            {Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1).map((d) => {
+              const done = submittedDays.has(d);
+              const isSelected = d === selectedDay;
+              return (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => selectDay(d)}
+                  aria-label={`Day ${d}${done ? " (submitted)" : ""}`}
+                  className={`flex-1 rounded-lg border px-2 py-2 text-center text-xs font-semibold transition-colors ${
+                    isSelected
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : done
+                      ? "border-primary/40 bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground"
+                  }`}
+                >
+                  {done && !isSelected ? <CheckCircle2 className="mx-auto h-4 w-4" /> : `D${d}`}
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Tap any day to write or update that day&apos;s report.
+            {selectedDay !== state.currentDay && (
+              <button type="button" onClick={() => selectDay(state.currentDay)} className="ml-1.5 underline">
+                Back to today
+              </button>
+            )}
+          </p>
         </div>
 
         {focus && (
           <Card className="border-l-4 border-l-primary p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Focus for day {state.currentDay}
+              Focus for day {selectedDay}
             </p>
             <p className="mt-1 text-sm">{focus}</p>
           </Card>
@@ -369,7 +382,7 @@ export default function BetaTest() {
           <div className="mb-4 flex items-center gap-2">
             <ClipboardList className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-bold">
-              Day {state.currentDay} report {todaySubmitted && <span className="text-muted-foreground font-medium">(editing)</span>}
+              Day {selectedDay} report {daySubmitted && <span className="text-muted-foreground font-medium">(editing)</span>}
             </h2>
           </div>
 
