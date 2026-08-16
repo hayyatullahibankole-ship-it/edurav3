@@ -169,7 +169,8 @@ export default function BetaTest() {
       });
       localStorage.setItem(CODE_KEY, s.tester.code);
       setState(s);
-      hydrateForm(s);
+      setSelectedDay(s.currentDay);
+      hydrateForm(s, s.currentDay);
     } catch (err: any) {
       setUnlockError(err.message || "Could not verify that code.");
     } finally {
