@@ -194,7 +194,7 @@ export default function BetaTest() {
           continue;
         }
         const ext = file.name.split(".").pop() || "png";
-        const path = `${state.tester.id}/day-${state.currentDay}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const path = `${state.tester.id}/day-${selectedDay}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
         const { error } = await supabase.storage.from("beta-screenshots").upload(path, file, {
           contentType: file.type || "image/png",
         });
