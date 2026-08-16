@@ -222,6 +222,7 @@ export default function BetaTest() {
       const s = await call({
         action: "submit",
         code: state.tester.code,
+        day_number: selectedDay,
         rating,
         what_worked: whatWorked,
         issues,
@@ -230,7 +231,8 @@ export default function BetaTest() {
         screenshots: shots,
       });
       setState(s);
-      toast({ title: "Report sent", description: `Day ${s.currentDay} report saved. Thank you!` });
+      hydrateForm(s, selectedDay);
+      toast({ title: "Report sent", description: `Day ${selectedDay} report saved. Thank you!` });
     } catch (err: any) {
       toast({ title: "Could not save", description: err.message, variant: "destructive" });
     } finally {
