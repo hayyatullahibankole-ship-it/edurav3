@@ -131,7 +131,10 @@ Deno.serve(async (req) => {
         return json(await loadState(tester.id));
       }
 
-      const day = currentDay(tester.redeemed_at);
+      const requestedDay = Number(body.day_number);
+      const day = Number.isFinite(requestedDay) && requestedDay >= 1
+        ? Math.min(Math.max(Math.floor(requestedDay), 1), TOTAL_DAYS)
+        : currentDay(tester.redeemed_at);
       const rating = Math.min(Math.max(Number(body.rating) || 0, 1), 5);
       const payload = {
         tester_id: tester.id,
