@@ -52,5 +52,14 @@ export const registerAppServiceWorker = async () => {
     onNeedRefresh() {
       window.location.reload();
     },
+    onRegisteredSW(_url, registration) {
+      if (!registration) return;
+      const check = () => {
+        if (document.visibilityState === "visible") registration.update().catch(() => undefined);
+      };
+      document.addEventListener("visibilitychange", check);
+      window.addEventListener("focus", check);
+      setInterval(check, 60 * 60 * 1000);
+    },
   });
 };
