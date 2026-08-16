@@ -307,8 +307,8 @@ export default function BetaTest() {
   }
 
   const submittedDays = new Set(state.reports.map((r) => r.day_number));
-  const todaySubmitted = submittedDays.has(state.currentDay);
-  const focus = state.focusNotes.find((f) => f.day_number === state.currentDay)?.focus_note;
+  const daySubmitted = submittedDays.has(selectedDay);
+  const focus = state.focusNotes.find((f) => f.day_number === selectedDay)?.focus_note;
 
   return (
     <div className="min-h-screen bg-background pb-16">
