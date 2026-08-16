@@ -97,6 +97,7 @@ export default function BetaTest() {
   const [shots, setShots] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(1);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const savedCode = useMemo(() => localStorage.getItem(CODE_KEY) || "", []);
