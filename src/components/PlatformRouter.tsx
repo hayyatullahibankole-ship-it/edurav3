@@ -40,6 +40,8 @@ const Terms = lazy(() => import("@/pages/Terms"));
 const AnswerReview = lazy(() => import("@/pages/AnswerReview"));
 const PaymentSuccess = lazy(() => import("@/pages/PaymentSuccess"));
 const StudyHub = lazy(() => import("@/pages/StudyHub"));
+const StudyDecks = lazy(() => import("@/pages/StudyDecks"));
+const StudyDeckView = lazy(() => import("@/pages/StudyDeckView"));
 const AITutor = lazy(() => import("@/pages/AITutor"));
 const StudyTopic = lazy(() => import("@/pages/StudyTopic"));
 const LessonView = lazy(() => import("@/pages/LessonView"));
@@ -374,6 +376,12 @@ const EduraRoutes = () => {
       
       <Route path="/ai-tutor" element={
         <ProtectedRoute><AITutor /></ProtectedRoute>
+      } />
+      <Route path="/decks" element={
+        <ProtectedRoute><StudyDecks /></ProtectedRoute>
+      } />
+      <Route path="/decks/:deckId" element={
+        <ProtectedRoute><StudyDeckView /></ProtectedRoute>
       } />
       <Route path="/ai-tutor/:threadId" element={
         <ProtectedRoute><AITutor /></ProtectedRoute>

@@ -1,3 +1,4 @@
+import TwoFactorSettings from '@/components/security/TwoFactorSettings';
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -348,20 +349,7 @@ export default function ProfileSettings() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="font-medium">Two-Factor Authentication</h4>
-              <p className="text-sm text-muted-foreground">
-                Add an extra layer of security to your account
-              </p>
-            </div>
-            <Switch
-              checked={formData.two_fa_enabled}
-              onCheckedChange={(checked) => 
-                setFormData({ ...formData, two_fa_enabled: checked })
-              }
-            />
-          </div>
+          <TwoFactorSettings />
 
           <div className="border-t pt-6 space-y-6">
             <div className="flex items-center justify-between">

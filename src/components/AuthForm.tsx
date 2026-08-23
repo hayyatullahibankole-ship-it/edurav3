@@ -1,3 +1,4 @@
+import MfaChallenge, { needsMfaChallenge } from '@/components/security/MfaChallenge';
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -91,6 +92,7 @@ export default function AuthForm() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [mfaOpen, setMfaOpen] = useState(false);
 
   const examTypes = [
     { value: "JAMB", label: "JAMB (Joint Admissions and Matriculation Board)" },
@@ -193,6 +195,12 @@ export default function AuthForm() {
         // If sign-in succeeds, we treat the user as allowed to proceed.
 
         if (data.user) {
+          // Accounts with an authenticator app must clear the second step first
+          if (await needsMfaChallenge()) {
+            setMfaOpen(true);
+            return;
+          }
+
           // Generate and store new session token (invalidates other sessions)
           const newSessionToken = generateSessionToken();
           storeSessionToken(newSessionToken);
@@ -352,6 +360,14 @@ export default function AuthForm() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <MfaChallenge
+        open={mfaOpen}
+        onCancel={() => setMfaOpen(false)}
+        onVerified={() => {
+          setMfaOpen(false);
+          toast({ title: "Welcome back!", description: "You have successfully signed in." });
+        }}
+      />
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-4">

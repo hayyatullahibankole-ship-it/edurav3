@@ -1,3 +1,4 @@
+import MfaChallenge, { needsMfaChallenge } from '@/components/security/MfaChallenge';
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -67,6 +68,7 @@ export default function MobileAuthForm() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [mfaOpen, setMfaOpen] = useState(false);
 
   const handleHaptic = async () => {
     if (Capacitor.isNativePlatform()) {
@@ -136,6 +138,10 @@ export default function MobileAuthForm() {
         // Note: Avoid checking `data.user.email_confirmed_at` here; it may be omitted in the response.
 
         if (data.user) {
+          if (await needsMfaChallenge()) {
+            setMfaOpen(true);
+            return;
+          }
           const newSessionToken = generateSessionToken();
           storeSessionToken(newSessionToken);
           await setSessionToken(data.user.id, newSessionToken);
@@ -229,6 +235,11 @@ export default function MobileAuthForm() {
 
   return (
     <div className="min-h-screen bg-primary/10 flex flex-col relative overflow-hidden">
+      <MfaChallenge
+        open={mfaOpen}
+        onCancel={() => setMfaOpen(false)}
+        onVerified={() => setMfaOpen(false)}
+      />
       {/* Enhanced Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 -right-20 w-80 h-80 bg-primary/20 rounded-full blur-3xl animate-float" />
