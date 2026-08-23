@@ -2016,6 +2016,139 @@ export type Database = {
           },
         ]
       }
+      deck_questions: {
+        Row: {
+          correct_index: number
+          created_at: string
+          explanation: string | null
+          id: string
+          options: Json
+          order_index: number
+          question: string
+          section_id: string
+        }
+        Insert: {
+          correct_index?: number
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          options?: Json
+          order_index?: number
+          question: string
+          section_id: string
+        }
+        Update: {
+          correct_index?: number
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          options?: Json
+          order_index?: number
+          question?: string
+          section_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deck_questions_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "deck_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deck_section_attempts: {
+        Row: {
+          answers: Json
+          created_at: string
+          deck_id: string
+          id: string
+          passed: boolean
+          percentage: number
+          score: number
+          section_id: string
+          total: number
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          created_at?: string
+          deck_id: string
+          id?: string
+          passed?: boolean
+          percentage?: number
+          score?: number
+          section_id: string
+          total?: number
+          user_id?: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          deck_id?: string
+          id?: string
+          passed?: boolean
+          percentage?: number
+          score?: number
+          section_id?: string
+          total?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deck_section_attempts_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "study_decks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deck_section_attempts_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "deck_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deck_sections: {
+        Row: {
+          content: string
+          created_at: string
+          deck_id: string
+          id: string
+          order_index: number
+          summary: string | null
+          title: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          deck_id: string
+          id?: string
+          order_index: number
+          summary?: string | null
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          deck_id?: string
+          id?: string
+          order_index?: number
+          summary?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deck_sections_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "study_decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ebook_access: {
         Row: {
           code_used: string | null
@@ -4236,6 +4369,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      study_decks: {
+        Row: {
+          created_at: string
+          description: string | null
+          error_message: string | null
+          id: string
+          page_count: number
+          pass_mark: number
+          section_count: number
+          source_path: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          error_message?: string | null
+          id?: string
+          page_count?: number
+          pass_mark?: number
+          section_count?: number
+          source_path?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          error_message?: string | null
+          id?: string
+          page_count?: number
+          pass_mark?: number
+          section_count?: number
+          source_path?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       study_goals: {
         Row: {
