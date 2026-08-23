@@ -183,11 +183,10 @@ const StudyDecks = () => {
           {loading ? (
             <p className="text-sm text-muted-foreground">Loading…</p>
           ) : decks.length === 0 ? (
-            <EmptyState
-              icon={Layers}
-              title="No decks yet"
-              description="Upload your first PDF above and Edura will break it into sections with quizzes."
-            />
+            <EmptyState>
+              No decks yet — upload your first PDF above and Edura will break it into sections with
+              quizzes.
+            </EmptyState>
           ) : (
             <div className="space-y-2">
               {decks.map((deck) => (
