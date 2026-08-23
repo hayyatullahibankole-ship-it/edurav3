@@ -1,3 +1,4 @@
+import TwoFactorSettings from '@/components/security/TwoFactorSettings';
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
