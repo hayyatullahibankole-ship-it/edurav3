@@ -233,6 +233,11 @@ export default function MobileAuthForm() {
 
   return (
     <div className="min-h-screen bg-primary/10 flex flex-col relative overflow-hidden">
+      <MfaChallenge
+        open={mfaOpen}
+        onCancel={() => setMfaOpen(false)}
+        onVerified={() => setMfaOpen(false)}
+      />
       {/* Enhanced Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 -right-20 w-80 h-80 bg-primary/20 rounded-full blur-3xl animate-float" />
