@@ -717,25 +717,27 @@ export default function AccountSettings() {
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label>Default Exam Type</Label>
-              <Select
-                value={preferences.default_exam_type}
-                onValueChange={(value) => 
-                  setPreferences(prev => ({ ...prev, default_exam_type: value }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="jamb">JAMB</SelectItem>
-                  <SelectItem value="waec">WAEC</SelectItem>
-                  <SelectItem value="neco">NECO</SelectItem>
-                  <SelectItem value="post-utme">Post-UTME</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {!isCampus && (
+              <div className="space-y-2">
+                <Label>Default Exam Type</Label>
+                <Select
+                  value={preferences.default_exam_type}
+                  onValueChange={(value) => 
+                    setPreferences(prev => ({ ...prev, default_exam_type: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="jamb">JAMB</SelectItem>
+                    <SelectItem value="waec">WAEC</SelectItem>
+                    <SelectItem value="neco">NECO</SelectItem>
+                    <SelectItem value="post-utme">Post-UTME</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label>Test Duration Preference</Label>
