@@ -31,6 +31,7 @@ The candidate home shows too much at once and never explains itself. Rework it i
 - Empty states carry plain instructions ("You haven't practised yet — start with 20 questions") instead of blank cards.
 - Tab labels and icons made literal (Practice, Services, Study, Me).
 - Progressive reveal: streak, XP, leaderboard and advanced tiles only appear once the student has taken their first test.
+  &nbsp;
 
 ## 4. Study Decks (PDF → sections → gated quizzes)
 
