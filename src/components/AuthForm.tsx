@@ -193,6 +193,12 @@ export default function AuthForm() {
         // If sign-in succeeds, we treat the user as allowed to proceed.
 
         if (data.user) {
+          // Accounts with an authenticator app must clear the second step first
+          if (await needsMfaChallenge()) {
+            setMfaOpen(true);
+            return;
+          }
+
           // Generate and store new session token (invalidates other sessions)
           const newSessionToken = generateSessionToken();
           storeSessionToken(newSessionToken);
