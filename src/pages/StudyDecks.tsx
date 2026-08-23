@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileUp, Layers, Loader2, Trash2 } from "lucide-react";
+import { FileUp, Loader2, Trash2 } from "lucide-react";
 import AppShell from "@/components/edura/AppShell";
 import { Panel, EmptyState } from "@/components/edura/tiles";
 import { Button } from "@/components/ui/button";
