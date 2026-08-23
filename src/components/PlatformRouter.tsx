@@ -377,6 +377,12 @@ const EduraRoutes = () => {
       <Route path="/ai-tutor" element={
         <ProtectedRoute><AITutor /></ProtectedRoute>
       } />
+      <Route path="/decks" element={
+        <ProtectedRoute><StudyDecks /></ProtectedRoute>
+      } />
+      <Route path="/decks/:deckId" element={
+        <ProtectedRoute><StudyDeckView /></ProtectedRoute>
+      } />
       <Route path="/ai-tutor/:threadId" element={
         <ProtectedRoute><AITutor /></ProtectedRoute>
       } />
