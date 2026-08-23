@@ -1,3 +1,4 @@
+import MfaChallenge, { needsMfaChallenge } from '@/components/security/MfaChallenge';
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -67,6 +68,7 @@ export default function MobileAuthForm() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [mfaOpen, setMfaOpen] = useState(false);
 
   const handleHaptic = async () => {
     if (Capacitor.isNativePlatform()) {
