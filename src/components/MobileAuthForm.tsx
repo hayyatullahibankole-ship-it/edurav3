@@ -136,6 +136,10 @@ export default function MobileAuthForm() {
         // Note: Avoid checking `data.user.email_confirmed_at` here; it may be omitted in the response.
 
         if (data.user) {
+          if (await needsMfaChallenge()) {
+            setMfaOpen(true);
+            return;
+          }
           const newSessionToken = generateSessionToken();
           storeSessionToken(newSessionToken);
           await setSessionToken(data.user.id, newSessionToken);
