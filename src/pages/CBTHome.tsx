@@ -10,6 +10,7 @@ import {
   Sword,
   Target,
   Trophy,
+  Layers,
 } from "lucide-react";
 import AppShell from "@/components/edura/AppShell";
 import { ListRow, Panel, EmptyState } from "@/components/edura/tiles";
