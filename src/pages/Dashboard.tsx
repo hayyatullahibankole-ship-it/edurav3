@@ -27,6 +27,7 @@ import OnboardingTour from "@/components/OnboardingTour";
 import { AIAssistant } from "@/components/AIAssistant";
 import { FreeAccessBanner } from "@/components/dashboard/FreeAccessBanner";
 import StreakHero from "@/components/edura/gamify/StreakHero";
+import GetStartedGuide from "@/components/edura/GetStartedGuide";
 import BadgeStrip from "@/components/edura/gamify/BadgeStrip";
 import CountUp from "@/components/edura/gamify/CountUp";
 import { Badge } from "@/components/ui/badge";
