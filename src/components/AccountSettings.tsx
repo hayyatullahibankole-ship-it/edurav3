@@ -1,3 +1,4 @@
+import { useAcademicStage } from '@/hooks/useAcademicStage';
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -105,6 +106,7 @@ export default function AccountSettings() {
     data_collection_personalization: true
   });
 
+  const { isCampus } = useAcademicStage();
   const [preferences, setPreferences] = useState<PreferenceSettings>({
     language: 'en',
     timezone: 'Africa/Lagos',
