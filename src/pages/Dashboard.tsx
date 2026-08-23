@@ -193,6 +193,8 @@ const Dashboard = () => {
             <FreeAccessBanner expiryDate={freeAccessExpiry} isExpired />
           )}
 
+          <GetStartedGuide />
+
           {/* 1. Progress hero */}
           <StreakHero
             name={firstName}
