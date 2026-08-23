@@ -1,3 +1,4 @@
+import MfaChallenge, { needsMfaChallenge } from '@/components/security/MfaChallenge';
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -91,6 +92,7 @@ export default function AuthForm() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [mfaOpen, setMfaOpen] = useState(false);
 
   const examTypes = [
     { value: "JAMB", label: "JAMB (Joint Admissions and Matriculation Board)" },
