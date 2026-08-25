@@ -155,9 +155,14 @@ const AITutor = () => {
     </div>
   );
 
-  return (
-    <AppShell side={isCampus ? "campus" : "cbt"} title="AI Tutor" subtitle="Ask questions and continue saved chats">
-    <div className="-mx-4 -my-4 flex h-[calc(100dvh-8.5rem)] w-full overflow-hidden bg-background sm:-mx-6 sm:-my-7 lg:mx-0 lg:my-0 lg:h-[calc(100dvh-11rem)] lg:rounded-2xl lg:border">
+  const body = (
+    <div
+      className={
+        isMobile
+          ? "fixed inset-0 z-50 flex w-full flex-col overflow-hidden bg-background"
+          : "flex h-[calc(100dvh-11rem)] w-full overflow-hidden rounded-2xl border bg-background"
+      }
+    >
       {/* Desktop thread sidebar */}
       {!isMobile && (
         <aside className="hidden w-72 shrink-0 flex-col border-r border-border bg-card/40 p-3 md:flex">
@@ -166,7 +171,10 @@ const AITutor = () => {
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-2 border-b border-border px-3 py-2.5 sm:px-5">
+        <header
+          className="flex items-center gap-2 border-b border-border bg-card/60 px-3 py-2.5 sm:px-5"
+          style={isMobile ? { paddingTop: "calc(env(safe-area-inset-top) + 0.625rem)" } : undefined}
+        >
           <Button size="icon" variant="ghost" className="h-9 w-9" onClick={() => navigate(-1)} aria-label="Go back">
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -198,7 +206,10 @@ const AITutor = () => {
           )}
         </header>
 
-        <div className="min-h-0 flex-1">
+        <div
+          className="min-h-0 flex-1"
+          style={isMobile ? { paddingBottom: "env(safe-area-inset-bottom)" } : undefined}
+        >
           <AITutorChat
             key={threadId ?? "new"}
             threadId={threadId ?? null}
@@ -208,6 +219,13 @@ const AITutor = () => {
         </div>
       </div>
     </div>
+  );
+
+  if (isMobile) return body;
+
+  return (
+    <AppShell side={isCampus ? "campus" : "cbt"} title="AI Tutor" subtitle="Ask questions and continue saved chats">
+      {body}
     </AppShell>
   );
 };
