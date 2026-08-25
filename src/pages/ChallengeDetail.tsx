@@ -218,7 +218,7 @@ export default function ChallengeDetail() {
 
   if (loading || !attemptId || questions.length === 0) {
     return (
-      <Layout>
+      <Layout showNavbar={false} showMobileNav={false}>
         <div className="flex items-center justify-center min-h-screen">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
@@ -227,7 +227,7 @@ export default function ChallengeDetail() {
   }
 
   return (
-    <Layout showNavbar={false}>
+    <Layout showNavbar={false} showMobileNav={false}>
       <CleanCBTInterface
         questions={questions.map((q, idx) => ({
           id: q.id,

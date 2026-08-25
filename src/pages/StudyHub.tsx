@@ -10,7 +10,6 @@ import Layout from '@/components/Layout';
 import { SubjectButton } from '@/components/dashboard/SubjectButton';
 import { useIsMobile } from '@/hooks/use-mobile';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import { MobileTabBar } from '@/components/edura/AppShell';
 
 interface Subject {
   id: string;
@@ -130,7 +129,7 @@ useEffect(() => {
 
   if (subLoading || loading) {
     return (
-      <Layout>
+      <Layout showNavbar={false} showMobileNav={false}>
         <div className="flex items-center justify-center min-h-screen">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
@@ -140,7 +139,7 @@ useEffect(() => {
 
 if (accessDenied) {
   return (
-    <Layout>
+    <Layout showNavbar={false} showMobileNav={false}>
       <div className="container mx-auto px-4 py-16 text-center">
         <div className="mx-auto max-w-md">
           <Book className="h-12 w-12 mx-auto text-primary mb-4" />
@@ -248,7 +247,6 @@ if (isMobile) {
           </div>
         )}
       </div>
-      <MobileTabBar />
       <WhatsAppButton />
     </>
   );
@@ -256,7 +254,7 @@ if (isMobile) {
 
   // Desktop view
   return (
-    <Layout>
+    <Layout showNavbar={false} showMobileNav={false}>
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
           {/* Header Section */}
