@@ -43,16 +43,23 @@ export function useSubscription() {
       try {
         setLoading(true);
         
-        // First check for free promo access
+        // First check for free promo / trial access
         const { data: userData } = await supabase
           .from('users')
-          .select('free_practice_access, free_access_expiry_date')
+          .select('free_practice_access, free_access_expiry_date, trial_started_at, trial_source')
           .eq('id', userProfile.id)
           .single();
         
         const hasFreeAccess = userData?.free_practice_access === true;
         const freeAccessExpiry = userData?.free_access_expiry_date;
         const freeAccessValid = hasFreeAccess && freeAccessExpiry && new Date(freeAccessExpiry) >= new Date();
+        setTrialInfo({
+          startedAt: (userData as any)?.trial_started_at || null,
+          source: (userData as any)?.trial_source || null,
+          expiry: freeAccessExpiry || null,
+        });
+        
+
         
         // Use the new function that checks both school and personal subscriptions
         const { data, error } = await supabase
