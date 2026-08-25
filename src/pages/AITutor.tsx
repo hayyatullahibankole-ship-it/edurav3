@@ -171,7 +171,10 @@ const AITutor = () => {
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-2 border-b border-border px-3 py-2.5 sm:px-5">
+        <header
+          className="flex items-center gap-2 border-b border-border bg-card/60 px-3 py-2.5 sm:px-5"
+          style={isMobile ? { paddingTop: "calc(env(safe-area-inset-top) + 0.625rem)" } : undefined}
+        >
           <Button size="icon" variant="ghost" className="h-9 w-9" onClick={() => navigate(-1)} aria-label="Go back">
             <ArrowLeft className="h-4 w-4" />
           </Button>
