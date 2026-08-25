@@ -15,27 +15,13 @@ type Slide = {
   image?: string;
 };
 
-const slides: Slide[] = [
+const sharedSlides: Slide[] = [
   {
     eyebrow: 'Welcome to Edura',
-    title: 'Everything you need to pass and move up',
+    title: 'Your next step starts here',
     description:
-      'One app for exam practice, results, admission services and your student wallet.',
+      'Choose where you are in your education and Edura will set up the right workspace for you.',
     image: onbWelcome,
-  },
-  {
-    eyebrow: 'Practice',
-    title: 'Real CBT for JAMB, WAEC, NECO & Post-UTME',
-    description:
-      'Timed, exam-accurate practice with instant scoring, answer review and progress tracking.',
-    image: onbPractice,
-  },
-  {
-    eyebrow: 'Services',
-    title: 'Results, applications and your wallet',
-    description:
-      'Check results, get admission support and keep one balance for every service you use.',
-    image: onbServices,
   },
   {
     eyebrow: 'Your journey',
@@ -43,6 +29,37 @@ const slides: Slide[] = [
     description: 'We will set up the right workspace for you.',
   },
 ];
+
+const journeySlides: Record<'candidate' | 'campus', Slide[]> = {
+  candidate: [
+    {
+      eyebrow: 'Practice',
+      title: 'Prepare with real exam conditions',
+      description: 'Practise JAMB, WAEC, NECO and Post-UTME with instant scoring, review and progress tracking.',
+      image: onbPractice,
+    },
+    {
+      eyebrow: 'Services',
+      title: 'Applications, results and payments in one place',
+      description: 'Use verified education services and manage every payment from your Edura wallet.',
+      image: onbServices,
+    },
+  ],
+  campus: [
+    {
+      eyebrow: 'Campus workspace',
+      title: 'Organise courses, materials and deadlines',
+      description: 'Keep your academic work together and get explanations that match your course and level.',
+      image: onbPractice,
+    },
+    {
+      eyebrow: 'Career readiness',
+      title: 'Build projects, your CV and your next move',
+      description: 'Get support for projects, SIWES, NYSC, opportunities and graduate career planning.',
+      image: onbServices,
+    },
+  ],
+};
 
 const haptic = async (style: ImpactStyle = ImpactStyle.Light) => {
   if (Capacitor.isNativePlatform()) {
@@ -59,8 +76,10 @@ const MobileOnboarding = () => {
   const [index, setIndex] = useState(0);
   const [journey, setJourney] = useState<'candidate' | 'campus' | null>(null);
   const startX = useRef<number | null>(null);
+  const slides = journey ? [...sharedSlides, ...journeySlides[journey]] : sharedSlides;
 
   const isLast = index === slides.length - 1;
+  const isJourneyStep = index === 1;
   const slide = slides[index];
 
   const finish = async (choice?: 'candidate' | 'campus') => {
@@ -72,6 +91,7 @@ const MobileOnboarding = () => {
 
   const goTo = (next: number) => {
     if (next < 0 || next > slides.length - 1) return;
+    if (index === 1 && next > index && !journey) return;
     haptic();
     setIndex(next);
   };
@@ -141,7 +161,7 @@ const MobileOnboarding = () => {
           {slide.description}
         </p>
 
-        {isLast && (
+        {isJourneyStep && (
           <div className="mt-7 space-y-3">
             {[
               {
@@ -194,13 +214,13 @@ const MobileOnboarding = () => {
       <footer className="px-6 pb-8 pt-4">
         <Button
           onClick={() => (isLast ? finish(journey ?? 'candidate') : goTo(index + 1))}
-          disabled={isLast && !journey}
+          disabled={isJourneyStep && !journey}
           className="press h-14 w-full rounded-2xl text-base font-bold"
         >
-          {isLast ? 'Create my account' : 'Continue'}
+          {isLast ? 'Create my account' : isJourneyStep ? 'Set up my workspace' : 'Continue'}
           <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
-        {isLast && (
+        {(isLast || isJourneyStep) && (
           <button
             onClick={() => finish(journey ?? undefined)}
             className="mt-3 w-full text-center text-sm font-medium text-muted-foreground"
