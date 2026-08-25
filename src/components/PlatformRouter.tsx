@@ -389,22 +389,22 @@ const EduraRoutes = () => {
       } />
       <Route path="/study-hub" element={
         <ProtectedRoute>
-          <CoreOnly><DashboardLayout><StudyHub /></DashboardLayout></CoreOnly>
+          <ComingSoon />
         </ProtectedRoute>
       } />
       <Route path="/study-hub/topic/:topicId" element={
         <ProtectedRoute>
-          <DashboardLayout><StudyTopic /></DashboardLayout>
+          <ComingSoon />
         </ProtectedRoute>
       } />
       <Route path="/study-hub/lesson/:lessonId" element={
         <ProtectedRoute>
-          <DashboardLayout><LessonView /></DashboardLayout>
+          <ComingSoon />
         </ProtectedRoute>
       } />
       <Route path="/study-hub/lesson/:lessonId/quiz" element={
         <ProtectedRoute>
-          <LessonQuiz />
+          <ComingSoon />
         </ProtectedRoute>
       } />
       
