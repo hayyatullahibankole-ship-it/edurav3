@@ -191,7 +191,10 @@ const Dashboard = () => {
             </div>
           </div>
 
+          <TrialStatusCard />
+
           <PrimaryActionCard
+
             eyebrow="Your next action"
             title={lastTest ? `Keep going with ${lastTest.subject}` : "Start your first practice"}
             description={lastTest ? `Your last score was ${lastTest.score}%. A short session now keeps your momentum going.` : "Choose your exam and complete a focused 10-minute practice session."}
