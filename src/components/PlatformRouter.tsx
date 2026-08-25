@@ -410,17 +410,17 @@ const EduraRoutes = () => {
       
       <Route path="/forum" element={
         <ProtectedRoute>
-          <DashboardLayout><Forum /></DashboardLayout>
+          <Forum />
         </ProtectedRoute>
       } />
       <Route path="/forum/new" element={
         <ProtectedRoute>
-          <DashboardLayout><ForumNewPost /></DashboardLayout>
+          <ForumNewPost />
         </ProtectedRoute>
       } />
       <Route path="/forum/post/:postId" element={
         <ProtectedRoute>
-          <DashboardLayout><ForumPost /></DashboardLayout>
+          <ForumPost />
         </ProtectedRoute>
       } />
       

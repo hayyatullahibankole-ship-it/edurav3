@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ArrowLeft, ThumbsUp, MessageSquare, CheckCircle2, Pin } from 'lucide-react';
 import { toast } from 'sonner';
-import Layout from '@/components/Layout';
+import AppShell from '@/components/edura/AppShell';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ForumPost {
@@ -278,27 +278,27 @@ export default function ForumPost() {
 
   if (loading) {
     return (
-      <Layout showNavbar={false} showMobileNav={false}>
-        <div className="flex items-center justify-center min-h-screen">
+      <AppShell side="cbt" title="Discussion" subtitle="Answers from the Edura community">
+        <div className="flex items-center justify-center py-24">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
-      </Layout>
+      </AppShell>
     );
   }
 
   if (!post) {
     return (
-      <Layout showNavbar={false} showMobileNav={false}>
-        <div className="container mx-auto px-4 py-8">
+      <AppShell side="cbt" title="Discussion" subtitle="Answers from the Edura community">
+        <div className="mx-auto w-full max-w-4xl">
           <p>Post not found</p>
         </div>
-      </Layout>
+      </AppShell>
     );
   }
 
   return (
-    <Layout showNavbar={false} showMobileNav={false}>
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <AppShell side="cbt" title="Discussion" subtitle="Answers from the Edura community">
+      <div className="mx-auto w-full max-w-4xl">
         <Button
           variant="ghost"
           onClick={() => navigate('/forum')}
@@ -454,6 +454,6 @@ export default function ForumPost() {
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </AppShell>
   );
 }
