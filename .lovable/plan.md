@@ -1,42 +1,52 @@
-# Playful Mobile Nav + Exam Brand Marks
+# Mobile UI Redesign — "Bright & Playful" for Secondary School Students
 
-Goal: kill the boring flat tab bar and the "Explore" pill, bring back a real circular center button in a modern floating dock, and make the app feel lighter and more fun — closer to the reference designs, without gradients or AI-generic styling.
+Goal: make the Edura mobile app feel like an app teenagers *want* to open — colourful, friendly, rewarding — without changing any features, data, payments or routing.
 
-## 1. New bottom navigation (the main change)
+## Design direction (locked)
 
-Replace the current full-width bordered bar with a **floating dock**:
+- **Base**: light, soft white/near-white canvas, generous rounding (20–28px), no gradients (keeping your rule), soft ambient shadows instead.
+- **Accent system**: Edura Green stays primary. Add four soft pastel tints used only as *card backgrounds* — mint (practice), sky (learning), butter (rewards/streak), lilac (services). Each tint gets a matching deep text colour for contrast in light and dark mode.
+- **Type**: Sora for headings and big numbers, Manrope for body — larger, friendlier sizes; short, plain-English labels ("Practice now", "My results", not "CBT engine").
+- **Motion**: spring press on every tap target, count-up numbers, gentle card entry stagger, confetti-free but celebratory streak/level moments. All respect reduced motion.
 
-- Rounded (28px) white/dark card floating above the safe area with a soft ambient shadow, not a hard top border.
-- A **notched circular center button**: a true circle (60px), dark ink fill, lifted above the dock with a curved cut-out behind it, exactly like the first reference image.
-- Center button opens Explore (candidate) / More (campus) — same actions as today, new shape.
-- Four tabs around it, icon-first. Labels stay but shrink and only the active tab shows its label in full weight.
-- Active tab gets a filled pill behind the icon plus a small dot indicator that **slides** between tabs (spring motion), instead of the static tint.
-- Haptic/press feedback and reduced-motion fallback preserved.
+## 1. New floating dock navigation (the reference image)
 
-## 2. Lighter, friendlier surface styling
+- Replace the flat bottom bar with a **floating rounded dock** that sits above the safe area with a soft shadow.
+- **Raised circular centre button** with the curved notch cut out of the dock behind it, exactly like your reference: dark circle, white icon, springs on press.
+- Two labelled tabs left, two right; the active tab gets a filled pill + colour, inactive stays quiet grey.
+- Same dock shape for candidates and campus students, only the tabs differ.
 
-Adopt the "soft card" feel from the reference without breaking the Edura palette:
+## 2. Home screen (candidate)
 
-- Softer radii (20-28px) and tinted pastel card backgrounds derived from existing tokens (green, blue, amber, violet accents at low opacity) for the home tool tiles — currently everything is white on white and reads as "serious".
-- Larger, rounder section headings (Sora), more breathing room, and a friendlier greeting header row (avatar left, greeting + date center-left, action icon right) matching the reference home.
-- Still no gradients; flat tinted fills only.
+- **Friendly greeting header**: avatar, "Hi, Tobi 👋", today's date, notification bell — the personal top row from your reference.
+- **Hero card**: one big soft-tinted card with the single next action ("Continue practice" or "Start a quick practice"), a small progress ring, and streak flame.
+- **Week strip**: a horizontal day row (Sun–Sat) showing which days were studied — visual streak proof, taps to that day's activity summary.
+- **"Your tools" bento**: four large tinted cards — Practice, Study decks, AI tutor, Services — each with a real icon, one-line description and a mini stat.
+- Metrics (tests taken, average, wallet) become a compact 3-up strip lower down, not the headline.
 
-## 3. Real exam brand marks instead of generic icons
+## 3. Real exam brand marks
 
-- Add a shared `ExamBadge` component that renders each exam as a **branded wordmark tile** (JAMB, WAEC, NECO, Post-UTME) with its own accent colour and typography, instead of the current Lucide glyphs.
-- Use it everywhere exams appear: CBT home cards, Explore sheet practice row, results, and exam selection.
-- Marks are original typographic badges (not copies of the official logos) so there is no trademark risk in the Play Store listing.
+- New `ExamBadge` component rendering **JAMB / WAEC / NECO / Post-UTME** as typographic brand tiles (bold wordmark on branded tint) instead of generic Lucide icons — used in CBT home, explore sheet, and schedule modal.
 
-## 4. Scope of files
+## 4. Other screens brought in line
 
-- `src/components/edura/AppShell.tsx` — new dock + circular center button + sliding indicator.
-- `src/components/edura/ExploreSheet.tsx` — exam row uses the new badges, softer tiles.
-- New `src/components/edura/ExamBadge.tsx`.
-- `src/pages/Dashboard.tsx`, `src/pages/CBTHome.tsx` — greeting header, tinted tool tiles, exam badges.
-- `src/index.css` / `tailwind.config.ts` — add the pastel accent tokens and dock shadow token.
+- **CBT home**: exam picker as brand tiles, then a clear "Start practice" primary card; practice tools as a tinted grid; recent result card with a friendly score ring.
+- **Services / Wallet**: same header, tinted status cards, larger tap targets, balance-first wallet.
+- **Campus home**: same structure and dock, campus-specific tools.
+- **Explore sheet**: reworked as a colourful, sectioned grid matching the new tiles.
 
-Frontend-only; no data, routing, or payment logic changes.
+## 5. Consistency pass
+
+- Shared mobile primitives updated once (page header, hero card, tool tile, section heading, empty/loading skeletons) so every screen inherits the new look.
+- 44px minimum tap targets, safe-area padding, no horizontal scroll at 360px width, dark-mode contrast checked.
+
+## Technical notes
+
+- Frontend only: tokens in `index.css` / `tailwind.config.ts`, `AppShell.tsx` (dock), `MobilePrimitives.tsx`, `Dashboard.tsx`, `CBTHome.tsx`, `ServicesHome.tsx`, `Wallet.tsx`, `CampusHome.tsx`, `ExploreSheet.tsx`, plus new `ExamBadge.tsx`.
+- Dock notch drawn with an inline SVG mask so the curve is crisp on all widths.
+- No database, payment, routing or business-logic changes; desktop and Akboy branding untouched.
 
 ## Validation
 
-Check at 360px and 430px widths: dock does not overlap content, center circle is tappable, active indicator animates, dark mode contrast holds, and no horizontal scroll.
+- Check candidate and campus flows at 360px and 430px widths, light and dark, with reduced motion on.
+- Confirm every tab, centre action and tool tile navigates correctly and the build stays clean.
