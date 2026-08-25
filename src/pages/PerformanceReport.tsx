@@ -127,7 +127,7 @@ const PerformanceReport = () => {
 
   if (loading) {
     return (
-      <Layout>
+      <Layout showNavbar={false} showMobileNav={false}>
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <p className="text-center text-muted-foreground py-12">Loading report...</p>
@@ -139,7 +139,7 @@ const PerformanceReport = () => {
 
   if (!reportData) {
     return (
-      <Layout>
+      <Layout showNavbar={false} showMobileNav={false}>
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             {/* Back Navigation */}
@@ -171,7 +171,7 @@ const PerformanceReport = () => {
 
   if (!showReport) {
     return (
-      <Layout>
+      <Layout showNavbar={false} showMobileNav={false}>
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             {/* Back Navigation */}
@@ -227,7 +227,7 @@ const PerformanceReport = () => {
   }
 
   return (
-    <Layout>
+    <Layout showNavbar={false} showMobileNav={false}>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <Button 

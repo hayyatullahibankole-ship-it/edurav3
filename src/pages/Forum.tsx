@@ -90,7 +90,7 @@ export default function Forum() {
 
   if (loading) {
     return (
-      <Layout>
+      <Layout showNavbar={false} showMobileNav={false}>
         <div className="flex items-center justify-center min-h-screen">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
@@ -99,7 +99,7 @@ export default function Forum() {
   }
 
   return (
-    <Layout>
+    <Layout showNavbar={false} showMobileNav={false}>
       <div className="min-h-screen bg-primary/5 relative overflow-hidden">
         {/* Background Elements */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">

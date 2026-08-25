@@ -158,7 +158,7 @@ useEffect(() => {
 
   if (subLoading || loading) {
     return (
-      <Layout>
+      <Layout showNavbar={false} showMobileNav={false}>
         <div className="flex items-center justify-center min-h-screen">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
@@ -168,7 +168,7 @@ useEffect(() => {
 
 if (accessDenied) {
   return (
-    <Layout>
+    <Layout showNavbar={false} showMobileNav={false}>
       <div className="container mx-auto px-4 py-16 text-center">
         <div className="mx-auto max-w-md">
           <Trophy className="h-12 w-12 mx-auto text-primary mb-4" />
@@ -503,7 +503,7 @@ if (isMobile) {
 
 // Desktop Layout
 return (
-  <Layout>
+  <Layout showNavbar={false} showMobileNav={false}>
     <div className="container mx-auto px-4 py-8 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold flex items-center gap-2">
