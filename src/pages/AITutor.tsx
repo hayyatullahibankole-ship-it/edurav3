@@ -206,7 +206,10 @@ const AITutor = () => {
           )}
         </header>
 
-        <div className="min-h-0 flex-1">
+        <div
+          className="min-h-0 flex-1"
+          style={isMobile ? { paddingBottom: "env(safe-area-inset-bottom)" } : undefined}
+        >
           <AITutorChat
             key={threadId ?? "new"}
             threadId={threadId ?? null}
@@ -216,6 +219,13 @@ const AITutor = () => {
         </div>
       </div>
     </div>
+  );
+
+  if (isMobile) return body;
+
+  return (
+    <AppShell side={isCampus ? "campus" : "cbt"} title="AI Tutor" subtitle="Ask questions and continue saved chats">
+      {body}
     </AppShell>
   );
 };
