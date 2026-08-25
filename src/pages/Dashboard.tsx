@@ -19,6 +19,8 @@ import { Panel, EmptyState } from "@/components/edura/tiles";
 import UpgradeToCampus from "@/components/edura/UpgradeToCampus";
 import OnboardingTour from "@/components/OnboardingTour";
 import StreakHero from "@/components/edura/gamify/StreakHero";
+import TrialStatusCard from "@/components/edura/TrialStatusCard";
+
 import BadgeStrip from "@/components/edura/gamify/BadgeStrip";
 import CountUp from "@/components/edura/gamify/CountUp";
 import { MobileSection, MobileToolCard, PrimaryActionCard } from "@/components/edura/MobilePrimitives";
@@ -191,7 +193,10 @@ const Dashboard = () => {
             </div>
           </div>
 
+          <TrialStatusCard />
+
           <PrimaryActionCard
+
             eyebrow="Your next action"
             title={lastTest ? `Keep going with ${lastTest.subject}` : "Start your first practice"}
             description={lastTest ? `Your last score was ${lastTest.score}%. A short session now keeps your momentum going.` : "Choose your exam and complete a focused 10-minute practice session."}

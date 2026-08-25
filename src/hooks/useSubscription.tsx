@@ -22,7 +22,13 @@ interface SubscriptionData {
 export function useSubscription() {
   const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [trialInfo, setTrialInfo] = useState<{ startedAt: string | null; source: string | null; expiry: string | null }>({
+    startedAt: null,
+    source: null,
+    expiry: null,
+  });
   const { user, userProfile } = useAuth();
+
 
   useEffect(() => {
     const fetchSubscription = async () => {
@@ -43,16 +49,23 @@ export function useSubscription() {
       try {
         setLoading(true);
         
-        // First check for free promo access
+        // First check for free promo / trial access
         const { data: userData } = await supabase
           .from('users')
-          .select('free_practice_access, free_access_expiry_date')
+          .select('free_practice_access, free_access_expiry_date, trial_started_at, trial_source')
           .eq('id', userProfile.id)
           .single();
         
         const hasFreeAccess = userData?.free_practice_access === true;
         const freeAccessExpiry = userData?.free_access_expiry_date;
         const freeAccessValid = hasFreeAccess && freeAccessExpiry && new Date(freeAccessExpiry) >= new Date();
+        setTrialInfo({
+          startedAt: (userData as any)?.trial_started_at || null,
+          source: (userData as any)?.trial_source || null,
+          expiry: freeAccessExpiry || null,
+        });
+        
+
         
         // Use the new function that checks both school and personal subscriptions
         const { data, error } = await supabase
@@ -260,7 +273,15 @@ export function useSubscription() {
     });
   }
 
+  // Trial state (signup / backfill granted free window)
+  const trialExpiry = trialInfo.expiry ? new Date(trialInfo.expiry) : null;
+  const msLeft = trialExpiry ? trialExpiry.getTime() - Date.now() : 0;
+  const isOnTrial = Boolean(trialInfo.startedAt && trialExpiry && msLeft >= 0);
+  const trialDaysLeft = isOnTrial ? Math.max(0, Math.ceil(msLeft / 86400000)) : 0;
+  const trialExpired = Boolean(trialInfo.startedAt && trialExpiry && msLeft < 0);
+
   return {
+
     subscription,
     loading,
     hasPremiumAccess: !!hasPremiumAccess,
@@ -272,5 +293,11 @@ export function useSubscription() {
     hasFreePromoAccess: !!hasFreePromoAccess,
     freeAccessExpiry: subscription?.freeAccessExpiry || null,
     freeAccessExpired: !!freeAccessExpired,
+    // Trial fields
+    isOnTrial,
+    trialDaysLeft,
+    trialExpired,
+    trialExpiry: trialInfo.expiry,
   };
+
 }

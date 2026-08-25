@@ -51,6 +51,8 @@ import UserManagement from '@/components/admin/UserManagement';
 import ExamControl from '@/components/admin/ExamControl';
 import PricingManager from '@/components/admin/PricingManager';
 import NotificationManager from '@/components/admin/NotificationManager';
+import TrialsAndAutomation from '@/components/admin/TrialsAndAutomation';
+
 import ReferralManager from '@/components/admin/ReferralManager';
 import { CouponManager } from '@/components/admin/CouponManager';
 
@@ -761,8 +763,10 @@ export default function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="notifications" className="space-y-6">
+            <TrialsAndAutomation />
             <NotificationManager />
           </TabsContent>
+
 
           <TabsContent value="security" className="space-y-6">
             <Tabs defaultValue="monitor" className="space-y-6">
