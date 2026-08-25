@@ -50,3 +50,5 @@ Goal: make the Edura mobile app feel like an app teenagers *want* to open — co
 
 - Check candidate and campus flows at 360px and 430px widths, light and dark, with reduced motion on.
 - Confirm every tab, centre action and tool tile navigates correctly and the build stays clean.
+
+NOTE: no useless gradients whatsoever
