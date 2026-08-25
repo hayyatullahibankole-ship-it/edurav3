@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.edura.app',
+  appId: 'com.akboy.edura',
   appName: 'Edura',
   webDir: 'dist',
   plugins: {

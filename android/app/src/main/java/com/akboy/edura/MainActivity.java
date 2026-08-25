@@ -1,4 +1,4 @@
-package com.edura.app;
+package com.akboy.edura;
 
 import com.getcapacitor.BridgeActivity;
 
