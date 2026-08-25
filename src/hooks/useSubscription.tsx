@@ -293,5 +293,11 @@ export function useSubscription() {
     hasFreePromoAccess: !!hasFreePromoAccess,
     freeAccessExpiry: subscription?.freeAccessExpiry || null,
     freeAccessExpired: !!freeAccessExpired,
+    // Trial fields
+    isOnTrial,
+    trialDaysLeft,
+    trialExpired,
+    trialExpiry: trialInfo.expiry,
   };
+
 }
