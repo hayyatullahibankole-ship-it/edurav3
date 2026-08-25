@@ -54,6 +54,16 @@ export default function MobileAuthForm() {
       setIsLogin(false); // Switch to signup if there's a referral code
     }
   }, [searchParams]);
+  useEffect(() => {
+    const preferred = localStorage.getItem("preferredJourney");
+    if (preferred && !formData.academicStage) {
+      setFormData(prev => ({
+        ...prev,
+        academicStage: preferred === "campus" ? "undergraduate" : "jamb_candidate"
+      }));
+    }
+  }, []);
+
 
   const [formData, setFormData] = useState({
     firstName: '',
