@@ -50,7 +50,15 @@ const CampusJourney = () => {
 
   useEffect(() => {
     if (loading) return;
-    setSelected((stage as AcademicStage) ?? null);
+    let initialSelected = (stage as AcademicStage) ?? null;
+
+    if (!initialSelected) {
+      const preferred = localStorage.getItem("preferredJourney");
+      if (preferred === "campus") initialSelected = "undergraduate";
+      else if (preferred === "candidate") initialSelected = "jamb_candidate";
+    }
+
+    setSelected(initialSelected);
     setDetails({
       institution_name: institution_name ?? "",
       faculty: faculty ?? "",
