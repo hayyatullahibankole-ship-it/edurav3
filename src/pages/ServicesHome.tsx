@@ -615,8 +615,16 @@ const ServicesHome = () => {
       <main className="space-y-5">
 
 
+        <section className="rounded-2xl bg-ink p-5 text-ink-foreground">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-primary">How it works</p>
+          <h2 className="mt-2 font-display text-xl font-bold">Choose, pay, send details, track</h2>
+          <p className="mt-2 text-xs leading-relaxed text-ink-foreground/70">
+            Prices and turnaround are shown before payment. Your request appears here until it is completed.
+          </p>
+        </section>
+
         {/* Stats */}
-        <section className="grid grid-cols-3 gap-3">
+        <section className="grid grid-cols-3 gap-2 sm:gap-3">
           {[
             { label: "Requests", value: counts.total, icon: ClipboardList },
             { label: "In progress", value: counts.pending, icon: Clock },
@@ -624,7 +632,7 @@ const ServicesHome = () => {
           ].map((stat) => {
             const Icon = stat.icon;
             return (
-              <Card key={stat.label} className="p-3 sm:p-4 border">
+              <Card key={stat.label} className="rounded-2xl border p-3 sm:p-4">
                 <div className="mb-2 w-fit rounded-md border bg-muted p-1.5">
                   <Icon className="h-3.5 w-3.5 text-primary" />
                 </div>
@@ -636,17 +644,19 @@ const ServicesHome = () => {
         </section>
 
         {/* View switch */}
-        <div className="inline-flex rounded-lg border bg-muted p-1">
+        <div className="grid w-full grid-cols-2 rounded-xl border bg-muted p-1">
           {(["services", "requests"] as const).map((key) => (
-            <button
+            <Button
               key={key}
+              type="button"
+              variant="ghost"
               onClick={() => setView(key)}
-              className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
-                view === key ? "bg-background shadow-sm" : "text-muted-foreground"
+              className={`min-h-10 rounded-lg px-4 text-sm font-semibold ${
+                view === key ? "bg-card text-foreground shadow-sm hover:bg-card" : "text-muted-foreground"
               }`}
             >
-              {key === "services" ? "Services" : "My requests"}
-            </button>
+              {key === "services" ? "Browse services" : "My requests"}
+            </Button>
           ))}
         </div>
 

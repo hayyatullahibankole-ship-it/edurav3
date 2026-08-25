@@ -191,32 +191,32 @@ const Wallet = () => {
   return (
     <AppShell side="cbt" title="Wallet" subtitle="Fund once, pay instantly">
       <main className="mx-auto max-w-3xl space-y-5">
-        <Card className="border">
-          <CardContent className="space-y-4 p-5">
+        <Card className="overflow-hidden rounded-3xl border-0 bg-ink text-ink-foreground shadow-card">
+          <CardContent className="space-y-4 p-5 sm:p-6">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="rounded-lg border bg-muted p-2.5">
+                <div className="rounded-xl bg-primary/15 p-2.5">
                   <WalletIcon className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Available balance</p>
+                  <p className="text-xs text-ink-foreground/60">Available balance</p>
                   <p className="text-3xl font-bold">{loading ? "—" : naira(balance)}</p>
                 </div>
               </div>
-              <Button variant="ghost" size="icon" onClick={refresh} className="h-9 w-9">
+              <Button variant="ghost" size="icon" aria-label="Refresh wallet balance" onClick={refresh} className="h-10 w-10 text-ink-foreground hover:bg-ink-foreground/10 hover:text-ink-foreground">
                 <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
               </Button>
             </div>
 
-            <div className="rounded-lg border p-4">
+            <div className="rounded-2xl border border-ink-foreground/10 bg-ink-foreground/5 p-4">
               <div className="flex items-start gap-3">
-                <div className="rounded-md border bg-muted p-2">
+                <div className="rounded-xl bg-primary/15 p-2">
                   <Building2 className="h-4 w-4 text-primary" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold">Dedicated account number</p>
                   {accountLoading ? (
-                    <p className="mt-1 text-xs text-muted-foreground">Checking…</p>
+                    <p className="mt-1 text-xs text-ink-foreground/60">Checking…</p>
                   ) : account ? (
                     <div className="mt-2 space-y-1">
                       <div className="flex items-center gap-2">
@@ -225,10 +225,10 @@ const Wallet = () => {
                           <Copy className="h-3.5 w-3.5" />
                         </Button>
                       </div>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-ink-foreground/60">
                         {account.bank_name} • {account.account_name}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-ink-foreground/60">
                         Transfer to this account from any bank app and your wallet is funded
                         automatically.
                       </p>
@@ -236,7 +236,7 @@ const Wallet = () => {
 
                   ) : (
                     <div className="mt-2 space-y-2">
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-ink-foreground/60">
                         Generate a permanent account number in your name. Any transfer to it tops up
                         your wallet instantly.
                       </p>
