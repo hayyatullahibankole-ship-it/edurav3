@@ -40,6 +40,7 @@ const Terms = lazy(() => import("@/pages/Terms"));
 const AnswerReview = lazy(() => import("@/pages/AnswerReview"));
 const PaymentSuccess = lazy(() => import("@/pages/PaymentSuccess"));
 const StudyHub = lazy(() => import("@/pages/StudyHub"));
+const ComingSoon = lazy(() => import("@/pages/ComingSoon"));
 const StudyDecks = lazy(() => import("@/pages/StudyDecks"));
 const StudyDeckView = lazy(() => import("@/pages/StudyDeckView"));
 const AITutor = lazy(() => import("@/pages/AITutor"));
