@@ -1,3 +1,7 @@
+import jambAsset from "@/assets/exam-jamb.png.asset.json";
+import waecAsset from "@/assets/exam-waec.png.asset.json";
+import necoAsset from "@/assets/exam-neco.png.asset.json";
+import postUtmeAsset from "@/assets/exam-post-utme.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
