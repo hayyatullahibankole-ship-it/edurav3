@@ -147,19 +147,17 @@ export const MobileTabBar = ({
           <div className="relative flex h-full items-center px-1.5">
             {left.map(tab)}
             <div className="flex flex-1 justify-center">
-              <Button
+              <button
                 type="button"
-                variant="ghost"
                 aria-label={action.label}
                 onClick={action.onClick}
-                className="press flex h-14 min-h-14 w-full flex-col items-center justify-center gap-0.5 rounded-none px-0 text-primary hover:bg-transparent hover:text-primary"
+                className="press -mt-7 flex h-[58px] w-[58px] flex-col items-center justify-center gap-0.5 rounded-2xl border-4 border-background bg-primary text-primary-foreground shadow-lg shadow-primary/30"
               >
-                <span className="flex h-8 w-10 items-center justify-center rounded-xl bg-ink text-primary">
-                  <action.icon className="h-5 w-5" />
-                </span>
-                <span className="text-[9px] font-bold">{action.label}</span>
-              </Button>
+                <action.icon className="h-6 w-6" strokeWidth={2.3} />
+                <span className="text-[9px] font-bold leading-none">{action.label}</span>
+              </button>
             </div>
+
             {right.map(tab)}
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, History, Plus, Trash2, Pencil, MessageSquare, GraduationCap } from "lucide-react";
+import { ArrowLeft, History, Plus, Trash2, Pencil, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
@@ -157,7 +157,7 @@ const AITutor = () => {
 
   return (
     <AppShell side={isCampus ? "campus" : "cbt"} title="AI Tutor" subtitle="Ask questions and continue saved chats">
-    <div className="flex h-[calc(100dvh-9.5rem)] min-h-[32rem] w-full overflow-hidden rounded-lg border bg-background lg:h-[calc(100dvh-10rem)]">
+    <div className="-mx-4 -my-4 flex h-[calc(100dvh-8.5rem)] w-full overflow-hidden bg-background sm:-mx-6 sm:-my-7 lg:mx-0 lg:my-0 lg:h-[calc(100dvh-11rem)] lg:rounded-2xl lg:border">
       {/* Desktop thread sidebar */}
       {!isMobile && (
         <aside className="hidden w-72 shrink-0 flex-col border-r border-border bg-card/40 p-3 md:flex">
@@ -166,18 +166,13 @@ const AITutor = () => {
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-2 border-t-0 border-b border-border px-3 py-3 sm:px-5">
+        <header className="flex items-center gap-2 border-b border-border px-3 py-2.5 sm:px-5">
           <Button size="icon" variant="ghost" className="h-9 w-9" onClick={() => navigate(-1)} aria-label="Go back">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className="flex min-w-0 flex-1 items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-              <GraduationCap className="h-5 w-5" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="truncate text-sm font-bold leading-tight">Edura AI Tutor</h1>
-              <p className="text-[11px] text-muted-foreground">Always available to explain</p>
-            </div>
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-sm font-bold leading-tight">Edura Tutor</h1>
+            <p className="text-[11px] text-muted-foreground">Always available to explain</p>
           </div>
 
           {isMobile ? (

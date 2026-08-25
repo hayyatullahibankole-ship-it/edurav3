@@ -1,35 +1,24 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  ArrowRight,
-  Award,
   Briefcase,
   ChevronRight,
   Crown,
-  FileText,
   GraduationCap,
-  Library,
   Loader2,
-  Newspaper,
   Play,
   Sparkles,
-  Target,
   Ticket,
-  Trophy,
   Bot,
   Layers,
   Flame,
 } from "lucide-react";
 import AppShell from "@/components/edura/AppShell";
-import { ListRow, Panel, EmptyState } from "@/components/edura/tiles";
-import { EDUCATION_NEWS_URL } from "@/lib/openExternal";
+import { Panel, EmptyState } from "@/components/edura/tiles";
 
 import UpgradeToCampus from "@/components/edura/UpgradeToCampus";
 import OnboardingTour from "@/components/OnboardingTour";
-import { AIAssistant } from "@/components/AIAssistant";
-import { FreeAccessBanner } from "@/components/dashboard/FreeAccessBanner";
 import StreakHero from "@/components/edura/gamify/StreakHero";
-import GetStartedGuide from "@/components/edura/GetStartedGuide";
 import BadgeStrip from "@/components/edura/gamify/BadgeStrip";
 import CountUp from "@/components/edura/gamify/CountUp";
 import { MobileSection, MobileToolCard, PrimaryActionCard } from "@/components/edura/MobilePrimitives";
@@ -190,13 +179,6 @@ const Dashboard = () => {
         <HomeSkeleton />
       ) : (
         <div className="space-y-4">
-          {hasFreePromoAccess && freeAccessExpiry && (
-            <FreeAccessBanner expiryDate={freeAccessExpiry} />
-          )}
-          {freeAccessExpired && freeAccessExpiry && (
-            <FreeAccessBanner expiryDate={freeAccessExpiry} isExpired />
-          )}
-
           <div className="flex items-center justify-between px-0.5 lg:hidden">
             <div>
               <p className="text-xs font-medium text-muted-foreground">Welcome back,</p>
@@ -218,8 +200,6 @@ const Dashboard = () => {
             progress={gamify.level.progress}
             icon={Play}
           />
-
-          <GetStartedGuide />
 
           <MobileSection title="Your tools">
             <div className="grid grid-cols-2 gap-3">
@@ -322,8 +302,9 @@ const Dashboard = () => {
             </CollapsibleContent>
           </Collapsible>
 
-          {/* 8. Recent results + discover */}
-          <div className="grid gap-3 lg:grid-cols-2">
+          {/* 8. Recent results */}
+          <div className="grid gap-3">
+
             <Panel
               title="Recent results"
               action={
@@ -365,21 +346,10 @@ const Dashboard = () => {
               )}
             </Panel>
 
-            <Panel title="Discover">
-              <div className="grid gap-2 sm:grid-cols-2">
-                <ListRow to="/study-hub" icon={Target} title="Study hub" meta="Planner & materials" />
-                <ListRow to="/resources" icon={FileText} title="Past questions" meta="Downloadables" />
-                <ListRow to="/ebooks" icon={Library} title="Ebook library" meta="Read online" />
-                <ListRow href={EDUCATION_NEWS_URL} icon={Newspaper} title="Education news" meta="Admissions, scholarships & updates" />
-                <ListRow to="/leaderboard" icon={Trophy} title="Leaderboard" meta="See your standing" />
-                <ListRow to="/referral-program" icon={Award} title="Referrals" meta="Earn rewards" />
-              </div>
-            </Panel>
+
           </div>
         </div>
       )}
-
-      <AIAssistant />
     </AppShell>
   );
 };

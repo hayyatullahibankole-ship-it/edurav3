@@ -47,7 +47,6 @@ import ProfileSettings from '@/components/ProfileSettings';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import NotificationBell from '@/components/NotificationBell';
-import { AIAssistant } from '@/components/AIAssistant';
 import { MobilePromoCodeActivation } from '@/components/dashboard/MobilePromoCodeActivation';
 import { useInstalledApp } from '@/hooks/useInstalledApp';
 import { InstallRequiredModal } from '@/components/InstallRequiredModal';
@@ -567,7 +566,6 @@ const MobileHome = () => {
       <WhatsAppButton />
 
       {/* AI Assistant */}
-      <AIAssistant />
 
       {/* Install Required Modal for mobile browser users */}
       <InstallRequiredModal 
