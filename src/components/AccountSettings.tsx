@@ -588,20 +588,41 @@ export default function AccountSettings() {
           <div className="space-y-4">
             <h4 className="font-medium">Push Notifications</h4>
             <div className="space-y-3 pl-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3">
                 <div className="space-y-0.5">
-                  <Label className="text-sm font-medium">Browser notifications</Label>
-                  <p className="text-xs text-muted-foreground">Receive notifications in your browser</p>
+                  <Label className="text-sm font-medium">Device notifications</Label>
+                  <p className="text-xs text-muted-foreground">
+                    {!pushSupported
+                      ? 'Available in the installed Edura app'
+                      : pushStatus === 'granted'
+                        ? 'Enabled — alerts appear in your notification panel'
+                        : pushStatus === 'denied'
+                          ? 'Blocked — turn them on in your device settings'
+                          : 'Not enabled yet'}
+                  </p>
                 </div>
-                <Switch
-                  checked={notifications.push_notifications}
-                  onCheckedChange={(checked) => 
-                    setNotifications(prev => ({ ...prev, push_notifications: checked }))
-                  }
-                />
+                {pushSupported && pushStatus === 'granted' ? (
+                  <Switch
+                    checked={notifications.push_notifications}
+                    onCheckedChange={(checked) => {
+                      setNotifications(prev => ({ ...prev, push_notifications: checked }));
+                      if (!checked) void disableNotifications();
+                    }}
+                  />
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => (pushStatus === 'denied' ? openSystemSettings() : requestPermission())}
+                    disabled={!pushSupported}
+                  >
+                    {pushStatus === 'denied' ? 'Open settings' : 'Enable'}
+                  </Button>
+                )}
               </div>
             </div>
           </div>
+
         </CardContent>
       </Card>
 
