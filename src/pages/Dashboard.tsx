@@ -16,7 +16,9 @@ import {
   Target,
   Ticket,
   Trophy,
-
+  Bot,
+  Layers,
+  Flame,
 } from "lucide-react";
 import AppShell from "@/components/edura/AppShell";
 import { ListRow, Panel, EmptyState } from "@/components/edura/tiles";
@@ -30,6 +32,7 @@ import StreakHero from "@/components/edura/gamify/StreakHero";
 import GetStartedGuide from "@/components/edura/GetStartedGuide";
 import BadgeStrip from "@/components/edura/gamify/BadgeStrip";
 import CountUp from "@/components/edura/gamify/CountUp";
+import { MobileSection, MobileToolCard, PrimaryActionCard } from "@/components/edura/MobilePrimitives";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -194,41 +197,40 @@ const Dashboard = () => {
             <FreeAccessBanner expiryDate={freeAccessExpiry} isExpired />
           )}
 
-          <GetStartedGuide />
+          <div className="flex items-center justify-between px-0.5 lg:hidden">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground">Welcome back,</p>
+              <h1 className="font-display text-xl font-bold">{firstName}</h1>
+            </div>
+            <div className="flex min-h-10 items-center gap-1.5 rounded-xl bg-warning/10 px-3 text-warning">
+              <Flame className="h-4 w-4 fill-current" />
+              <span className="font-display text-sm font-bold tabular">{streakData?.current_streak || 0}</span>
+              <span className="sr-only">day streak</span>
+            </div>
+          </div>
 
-          {/* 1. Progress hero */}
-          <StreakHero
-            name={firstName}
-            streak={streakData?.current_streak || 0}
-            practisedToday={isToday(streakData?.last_practice_date)}
-            level={gamify.level.level}
-            levelTitle={gamify.level.title}
-            levelProgress={gamify.level.progress}
-            xp={gamify.level.xp}
+          <PrimaryActionCard
+            eyebrow="Your next action"
+            title={lastTest ? `Keep going with ${lastTest.subject}` : "Start your first practice"}
+            description={lastTest ? `Your last score was ${lastTest.score}%. A short session now keeps your momentum going.` : "Choose your exam and complete a focused 10-minute practice session."}
+            to="/cbt"
+            actionLabel={lastTest ? "Continue prep" : "Start quick practice"}
+            progress={gamify.level.progress}
+            icon={Play}
           />
 
-          {/* 2. One-tap practice */}
-          <Link
-            to="/cbt"
-            className="press flex items-center gap-4 rounded-[1.25rem] bg-primary p-5 text-primary-foreground animate-screen-in stagger-1"
-          >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary-foreground/15">
-              <Play className="h-5 w-5 fill-current" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="font-display text-base font-bold leading-tight">
-                {lastTest ? "Continue practising" : "Start your first test"}
-              </p>
-              <p className="mt-0.5 truncate text-xs opacity-85">
-                {lastTest
-                  ? `Last: ${lastTest.subject} · ${lastTest.score}%`
-                  : "Pick a subject and go — takes 10 minutes"}
-              </p>
-            </div>
-            <ArrowRight className="h-5 w-5 shrink-0 opacity-90" />
-          </Link>
+          <GetStartedGuide />
 
-          {/* 3. Bento metrics */}
+          <MobileSection title="Your tools">
+            <div className="grid grid-cols-2 gap-3">
+              <MobileToolCard to="/cbt" icon={GraduationCap} title="Exam prep" description="Practice JAMB, WAEC, NECO and Post-UTME" />
+              <MobileToolCard to="/decks" icon={Layers} title="Study decks" description="Turn your PDF notes into guided quizzes" tone="info" />
+              <MobileToolCard to="/ai-tutor" icon={Bot} title="AI tutor" description="Get a clear explanation when you are stuck" tone="warning" />
+              <MobileToolCard to="/services" icon={Briefcase} title="Services" description="Buy e-PINs and track admission requests" tone="neutral" />
+            </div>
+          </MobileSection>
+
+          <MobileSection title="Your progress">
           <div className="grid grid-cols-2 gap-3 animate-screen-in stagger-2 lg:grid-cols-4">
             <Metric
               label="Wallet"
@@ -250,39 +252,9 @@ const Dashboard = () => {
               className="col-span-2 lg:col-span-1"
             />
           </div>
+          </MobileSection>
 
-          {/* 4. Achievements */}
-          <Panel title="Achievements" className="animate-screen-in stagger-3">
-            <BadgeStrip badges={gamify.badges} />
-          </Panel>
-
-          {/* 5. Workspaces as rows */}
-          <div className="space-y-2 animate-screen-in stagger-4">
-            <Link to="/cbt" className="app-card press flex items-center gap-3 p-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <GraduationCap className="h-5 w-5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold">CBT Practice</p>
-                <p className="text-xs text-muted-foreground">JAMB, WAEC, NECO, Post-UTME</p>
-              </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </Link>
-            <Link to="/services" className="app-card press flex items-center gap-3 p-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Briefcase className="h-5 w-5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold">Educational Services</p>
-                <p className="text-xs text-muted-foreground">
-                  e-PINs, admissions, scholarships
-                </p>
-              </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </Link>
-          </div>
-
-          {/* 6. Plan + admitted */}
+          {/* Plan + admitted */}
           <div className="grid gap-3 lg:grid-cols-2">
             <div className="app-card flex items-center gap-3 p-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -310,6 +282,10 @@ const Dashboard = () => {
               <UpgradeToCampus />
             </div>
           </div>
+
+          <Panel title="Achievements" className="animate-screen-in stagger-3">
+            <BadgeStrip badges={gamify.badges} />
+          </Panel>
 
           {/* 7. Access code — occasional, so it stays folded */}
           <Collapsible open={codeOpen} onOpenChange={setCodeOpen}>

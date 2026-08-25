@@ -371,10 +371,8 @@ export const AppShell = ({ side, title, subtitle, meta, action, nav, children }:
         items={items}
         center={
           side === "campus"
-            ? { icon: Calculator, label: "Study tools", onClick: () => navigate("/campus/tools") }
-            : side === "campus"
-              ? { icon: MoreHorizontal, label: "More", onClick: () => setCampusMoreOpen(true) }
-              : { icon: Compass, label: "Explore", onClick: () => setExploreOpen(true) }
+            ? { icon: MoreHorizontal, label: "More", onClick: () => setCampusMoreOpen(true) }
+            : { icon: Compass, label: "Explore", onClick: () => setExploreOpen(true) }
         }
       />
       {side !== "campus" && <ExploreSheet open={exploreOpen} onOpenChange={setExploreOpen} />}
