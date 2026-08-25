@@ -3,6 +3,7 @@ import jambLogo from "@/assets/exam-jamb.png";
 import waecLogo from "@/assets/exam-waec.png";
 import necoLogo from "@/assets/exam-neco.png";
 import postUtmeLogo from "@/assets/exam-post-utme.jpg";
+import nabtebLogoAsset from "@/assets/exam-nabteb.png.asset.json";
 
 // Official marks we host ourselves — always preferred over remote favicons.
 const LOCAL_LOGOS: Record<string, string> = {
@@ -10,6 +11,7 @@ const LOCAL_LOGOS: Record<string, string> = {
   utme: jambLogo,
   waec: waecLogo,
   neco: necoLogo,
+  nabteb: nabtebLogoAsset.url,
   "post-utme": postUtmeLogo,
   post_utme: postUtmeLogo,
   admission: postUtmeLogo,
