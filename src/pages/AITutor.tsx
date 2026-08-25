@@ -159,11 +159,12 @@ const AITutor = () => {
     <div
       className={
         isMobile
-          ? "flex w-full flex-col overflow-hidden bg-background"
+          ? "fixed inset-x-0 top-0 z-50 flex w-full flex-col overflow-hidden bg-background"
           : "flex h-[calc(100dvh-11rem)] w-full overflow-hidden rounded-2xl border bg-background"
       }
       style={isMobile ? { height: "100dvh", maxHeight: "100dvh" } : undefined}
     >
+
 
       {/* Desktop thread sidebar */}
       {!isMobile && (
