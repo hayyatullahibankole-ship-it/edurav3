@@ -22,7 +22,13 @@ interface SubscriptionData {
 export function useSubscription() {
   const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [trialInfo, setTrialInfo] = useState<{ startedAt: string | null; source: string | null; expiry: string | null }>({
+    startedAt: null,
+    source: null,
+    expiry: null,
+  });
   const { user, userProfile } = useAuth();
+
 
   useEffect(() => {
     const fetchSubscription = async () => {
