@@ -1,4 +1,19 @@
 import { useState } from "react";
+import jambLogo from "@/assets/exam-jamb.png";
+import waecLogo from "@/assets/exam-waec.png";
+import necoLogo from "@/assets/exam-neco.png";
+import postUtmeLogo from "@/assets/exam-post-utme.jpg";
+
+// Official marks we host ourselves — always preferred over remote favicons.
+const LOCAL_LOGOS: Record<string, string> = {
+  jamb: jambLogo,
+  utme: jambLogo,
+  waec: waecLogo,
+  neco: necoLogo,
+  "post-utme": postUtmeLogo,
+  post_utme: postUtmeLogo,
+  admission: postUtmeLogo,
+};
 
 export const PROVIDER_INFO: Record<
   string,
@@ -26,6 +41,18 @@ type Props = {
 export const ProviderLogo = ({ provider, className = "h-10 w-10" }: Props) => {
   const info = providerInfo(provider);
   const [failed, setFailed] = useState(false);
+  const localLogo = LOCAL_LOGOS[String(provider).toLowerCase().trim()];
+
+  if (localLogo) {
+    return (
+      <img
+        src={localLogo}
+        alt={`${info.label} logo`}
+        loading="lazy"
+        className={`rounded-md border bg-white object-contain p-1 ${className}`}
+      />
+    );
+  }
 
   if (!info.domain || failed) {
     return (

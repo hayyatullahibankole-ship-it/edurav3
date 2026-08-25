@@ -1,3 +1,7 @@
+import jambLogo from "@/assets/exam-jamb.png";
+import waecLogo from "@/assets/exam-waec.png";
+import necoLogo from "@/assets/exam-neco.png";
+import postUtmeLogo from "@/assets/exam-post-utme.jpg";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -135,6 +139,25 @@ const Home = () => {
                   </Button>
                 </Link>
               </div>
+
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <span className="text-xs uppercase tracking-wide text-ink-foreground/50">Built for</span>
+                {[jambLogo, waecLogo, necoLogo, postUtmeLogo].map((src, i) => (
+                  <span
+                    key={src}
+                    className="flex h-11 w-11 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm"
+                  >
+                    <img
+                      src={src}
+                      alt={["JAMB", "WAEC", "NECO", "Post-UTME"][i] + " logo"}
+                      loading="lazy"
+                      className="h-full w-full object-contain"
+                    />
+                  </span>
+                ))}
+              </div>
+
+
 
               <div className="flex flex-wrap items-center gap-6 sm:gap-8 pt-6 border-t border-white/10">
                 {[

@@ -1,20 +1,29 @@
 import { cn } from "@/lib/utils";
+import jambLogo from "@/assets/exam-jamb.png";
+import waecLogo from "@/assets/exam-waec.png";
+import necoLogo from "@/assets/exam-neco.png";
+import postUtmeLogo from "@/assets/exam-post-utme.jpg";
 
 export type ExamKey = "jamb" | "waec" | "neco" | "post-utme" | "gce" | string;
 
-const MARKS: Record<string, { label: string; tint: string; text: string }> = {
-  jamb: { label: "JAMB", tint: "bg-mint", text: "text-mint-foreground" },
-  waec: { label: "WAEC", tint: "bg-sky", text: "text-sky-foreground" },
-  neco: { label: "NECO", tint: "bg-butter", text: "text-butter-foreground" },
-  "post-utme": { label: "PUTME", tint: "bg-lilac", text: "text-lilac-foreground" },
+type Mark = { label: string; tint: string; text: string; logo?: string };
+
+const MARKS: Record<string, Mark> = {
+  jamb: { label: "JAMB", tint: "bg-mint", text: "text-mint-foreground", logo: jambLogo },
+  utme: { label: "JAMB", tint: "bg-mint", text: "text-mint-foreground", logo: jambLogo },
+  waec: { label: "WAEC", tint: "bg-sky", text: "text-sky-foreground", logo: waecLogo },
+  neco: { label: "NECO", tint: "bg-butter", text: "text-butter-foreground", logo: necoLogo },
+  "post-utme": { label: "PUTME", tint: "bg-lilac", text: "text-lilac-foreground", logo: postUtmeLogo },
+  post_utme: { label: "PUTME", tint: "bg-lilac", text: "text-lilac-foreground", logo: postUtmeLogo },
+  "post utme": { label: "PUTME", tint: "bg-lilac", text: "text-lilac-foreground", logo: postUtmeLogo },
   gce: { label: "GCE", tint: "bg-peach", text: "text-peach-foreground" },
 };
 
-const fallback = { label: "EXAM", tint: "bg-muted", text: "text-foreground" };
+const fallback: Mark = { label: "EXAM", tint: "bg-muted", text: "text-foreground" };
 
 /**
- * Typographic exam brand mark. Students recognise the wordmark instantly, which
- * a generic icon never achieves.
+ * Exam brand mark. Official JAMB/WAEC/NECO/Post-UTME logos are used where we
+ * have them, with a typographic wordmark as the fallback.
  */
 export const ExamBadge = ({
   exam,
@@ -25,7 +34,8 @@ export const ExamBadge = ({
   size?: "sm" | "md" | "lg";
   className?: string;
 }) => {
-  const mark = MARKS[String(exam).toLowerCase()] ?? {
+  const key = String(exam).toLowerCase().trim();
+  const mark = MARKS[key] ?? {
     ...fallback,
     label: String(exam).toUpperCase().slice(0, 5),
   };
@@ -34,6 +44,25 @@ export const ExamBadge = ({
     md: "h-12 w-12 rounded-2xl text-[11px]",
     lg: "h-16 w-16 rounded-[1.25rem] text-[13px]",
   }[size];
+
+  if (mark.logo) {
+    return (
+      <span
+        className={cn(
+          "inline-flex shrink-0 items-center justify-center overflow-hidden bg-white p-1 shadow-sm ring-1 ring-black/5",
+          sizes,
+          className
+        )}
+      >
+        <img
+          src={mark.logo}
+          alt={`${mark.label} logo`}
+          loading="lazy"
+          className="h-full w-full object-contain"
+        />
+      </span>
+    );
+  }
 
   return (
     <span

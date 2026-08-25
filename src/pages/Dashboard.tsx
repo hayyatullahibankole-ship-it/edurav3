@@ -24,6 +24,7 @@ import TrialStatusCard from "@/components/edura/TrialStatusCard";
 import BadgeStrip from "@/components/edura/gamify/BadgeStrip";
 import CountUp from "@/components/edura/gamify/CountUp";
 import { MobileSection, MobileToolCard, PrimaryActionCard, WeekStrip } from "@/components/edura/MobilePrimitives";
+import ExamBadge from "@/components/edura/ExamBadge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -236,7 +237,25 @@ const Dashboard = () => {
             icon={Play}
           />
 
+          <MobileSection title="Exams we cover">
+            <div className="grid grid-cols-4 gap-2">
+              {(["jamb", "waec", "neco", "post-utme"] as const).map((exam) => (
+                <Link
+                  key={exam}
+                  to="/cbt"
+                  className="flex flex-col items-center gap-1.5 rounded-2xl border bg-card p-2.5 active:scale-[0.98]"
+                >
+                  <ExamBadge exam={exam} size="sm" />
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    {exam === "post-utme" ? "Post-UTME" : exam}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </MobileSection>
+
           <MobileSection title="Your tools">
+
             <div className="grid grid-cols-2 gap-3">
               <MobileToolCard
                 to="/cbt"
