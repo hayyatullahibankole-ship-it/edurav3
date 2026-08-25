@@ -79,8 +79,14 @@ export const AITutorChat = ({ threadId, onThreadCreated, onThreadTouched }: AITu
   }, [threadId, user]);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    const el = scrollRef.current;
+    if (!el) return;
+    // Only auto-follow when the reader is already near the bottom.
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 160;
+    if (!nearBottom && streaming) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: streaming ? "auto" : "smooth" });
   }, [messages, streaming]);
+
 
   useEffect(() => {
     textareaRef.current?.focus();
