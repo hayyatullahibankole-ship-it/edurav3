@@ -11,6 +11,8 @@ import {
   Target,
   Trophy,
   Layers,
+  Play,
+  Timer,
 } from "lucide-react";
 import AppShell from "@/components/edura/AppShell";
 import { ListRow, Panel, EmptyState } from "@/components/edura/tiles";
@@ -22,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { useStudentStats } from "@/hooks/useStudentStats";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useInstalledApp } from "@/hooks/useInstalledApp";
+import { MobileSection, PrimaryActionCard } from "@/components/edura/MobilePrimitives";
 
 const EXAM_TYPES = [
   { type: "jamb" as const, label: "JAMB", subtitle: "UTME practice", letter: "J" },
@@ -68,8 +71,33 @@ const CBTHome = () => {
       }
     >
       <div className="space-y-4">
+        <PrimaryActionCard
+          eyebrow="Recommended"
+          title="Take a 10-minute quick practice"
+          description="Build consistency with a short focused session, then review every answer immediately."
+          to="/study-hub"
+          actionLabel="Start quick practice"
+          icon={Play}
+        />
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="app-card p-4">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary"><Play className="h-4 w-4" /></span>
+            <p className="mt-3 text-sm font-bold">Quick practice</p>
+            <p className="mt-1 text-[11px] leading-snug text-muted-foreground">Short session for daily improvement</p>
+          </div>
+          <div className="app-card p-4">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-info/10 text-info"><Timer className="h-4 w-4" /></span>
+            <p className="mt-3 text-sm font-bold">Full mock</p>
+            <p className="mt-1 text-[11px] leading-snug text-muted-foreground">Timed practice under exam conditions</p>
+          </div>
+        </div>
+
         <section className="animate-screen-in">
-          <h2 className="mb-2 font-display text-sm font-bold">Choose your exam</h2>
+          <div className="mb-3">
+            <h2 className="font-display text-[15px] font-bold">Choose your exam</h2>
+            <p className="mt-1 text-xs text-muted-foreground">We will use your choice to show the right subjects and timing.</p>
+          </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {EXAM_TYPES.map((exam, i) => {
               const inner = (
@@ -110,6 +138,7 @@ const CBTHome = () => {
             ))}
           </div>
         ) : (
+          <MobileSection title="Your progress">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 animate-screen-in stagger-2">
             {[
               { label: "Tests taken", value: `${stats.testsTaken}` },
@@ -125,6 +154,7 @@ const CBTHome = () => {
               </div>
             ))}
           </div>
+          </MobileSection>
         )}
 
 
