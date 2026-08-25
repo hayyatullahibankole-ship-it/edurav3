@@ -1,28 +1,20 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  ArrowRight,
-  Award,
   Briefcase,
   ChevronRight,
   Crown,
-  FileText,
   GraduationCap,
-  Library,
   Loader2,
-  Newspaper,
   Play,
   Sparkles,
-  Target,
   Ticket,
-  Trophy,
   Bot,
   Layers,
   Flame,
 } from "lucide-react";
 import AppShell from "@/components/edura/AppShell";
-import { ListRow, Panel, EmptyState } from "@/components/edura/tiles";
-import { EDUCATION_NEWS_URL } from "@/lib/openExternal";
+import { Panel, EmptyState } from "@/components/edura/tiles";
 
 import UpgradeToCampus from "@/components/edura/UpgradeToCampus";
 import OnboardingTour from "@/components/OnboardingTour";
