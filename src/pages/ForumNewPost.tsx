@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
-import Layout from '@/components/Layout';
+import AppShell from '@/components/edura/AppShell';
 
 export default function ForumNewPost() {
   const navigate = useNavigate();
@@ -89,8 +89,8 @@ export default function ForumNewPost() {
   };
 
   return (
-    <Layout showNavbar={false} showMobileNav={false}>
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
+    <AppShell side="cbt" title="Ask a question" subtitle="Get help from other students">
+      <div className="mx-auto w-full max-w-3xl">
         <Button
           variant="ghost"
           onClick={() => navigate('/forum')}
@@ -185,6 +185,6 @@ export default function ForumNewPost() {
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </AppShell>
   );
 }
