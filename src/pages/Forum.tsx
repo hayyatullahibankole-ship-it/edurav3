@@ -2,13 +2,15 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { MessageSquare, ThumbsUp, Eye, Pin, CheckCircle2, Search, ArrowLeft } from 'lucide-react';
+import { MessageSquare, ThumbsUp, Eye, Pin, CheckCircle2, Search, Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import Layout from '@/components/Layout';
+import AppShell from '@/components/edura/AppShell';
+import { Panel, EmptyState } from '@/components/edura/tiles';
+import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ForumPost {
@@ -37,6 +39,7 @@ export default function Forum() {
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filter, setFilter] = useState<'all' | 'unsolved' | 'solved'>('all');
 
   useEffect(() => {
     if (!user) {
@@ -88,165 +91,105 @@ export default function Forum() {
     post.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) {
-    return (
-      <Layout showNavbar={false} showMobileNav={false}>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      </Layout>
-    );
-  }
+  const FILTERS = [
+    { value: 'all', label: 'All' },
+    { value: 'unsolved', label: 'Unsolved' },
+    { value: 'solved', label: 'Solved' },
+  ] as const;
+
+  const visiblePosts = filteredPosts.filter((post) =>
+    filter === 'all' ? true : filter === 'solved' ? post.is_solved : !post.is_solved
+  );
 
   return (
-    <Layout showNavbar={false} showMobileNav={false}>
-      <div className="min-h-screen bg-primary/5 relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 -right-20 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute -bottom-40 -left-20 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+    <AppShell side="cbt" title="Student forum" subtitle="Ask questions, help others, learn faster">
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search discussions"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-11 rounded-xl pl-10"
+            />
+          </div>
+          <Button onClick={() => navigate('/forum/new')} className="h-11 shrink-0 gap-1.5 rounded-xl px-4">
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">Ask</span>
+          </Button>
         </div>
 
-        <div className="container mx-auto px-4 py-4 sm:py-8 relative z-10">
-          <div className="mb-6">
-            <Button
-              variant="outline"
-              onClick={() => navigate('/dashboard')}
-              className="gap-2 rounded-xl border-2 hover:border-primary hover:bg-primary/5 transition-all"
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {FILTERS.map((f) => (
+            <button
+              key={f.value}
+              type="button"
+              onClick={() => setFilter(f.value)}
+              className={cn(
+                'shrink-0 rounded-full border px-4 py-1.5 text-xs font-medium transition-colors',
+                filter === f.value ? 'border-primary bg-primary text-primary-foreground' : 'bg-card hover:bg-muted/50'
+              )}
             >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
-            </Button>
-          </div>
-
-          {/* Vibrant Header */}
-          <div className="mb-6 sm:mb-8">
-            <div 
-              className="relative overflow-hidden rounded-[32px] bg-primary p-6 sm:p-8 shadow-2xl mb-6 animate-fade-in"
-              style={{ boxShadow: '0 20px 60px rgba(0, 123, 255, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.2)' }}
-            >
-              {/* Animated gradient orbs */}
-              <div className="absolute top-0 right-0 w-40 h-40 bg-white/20 rounded-full blur-3xl animate-pulse" />
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-secondary/30 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
-              
-              <div className="relative z-10">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="flex-1">
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-2 drop-shadow-lg">
-                      💬 Ask & Learn
-                    </h1>
-                    <p className="text-base sm:text-lg text-white/95 font-semibold drop-shadow-md">
-                      Get help from tutors and fellow students
-                    </p>
-                  </div>
-                  <Button 
-                    onClick={() => navigate('/forum/new')} 
-                    className="w-full sm:w-auto bg-white text-primary hover:bg-white/90 font-black rounded-2xl h-12 px-6 shadow-xl hover:scale-105 active:scale-95 transition-all"
-                    style={{ boxShadow: '0 10px 30px rgba(255, 255, 255, 0.3)' }}
-                  >
-                    Ask Question
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Enhanced Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary h-5 w-5" />
-              <Input
-                placeholder="Search discussions..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-14 rounded-2xl text-base border-2 border-border hover:border-primary focus:border-primary transition-all shadow-lg"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            {filteredPosts.map((post) => (
-              <Card 
-                key={post.id}
-                className="hover:shadow-2xl hover:scale-[1.02] transition-all cursor-pointer animate-fade-in backdrop-blur-sm bg-card/80 border-2 border-border hover:border-primary/50 rounded-[24px]"
-                onClick={() => navigate(`/forum/post/${post.id}`)}
-                style={{ boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)' }}
-              >
-                <CardHeader className="pb-3">
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      {post.is_pinned && (
-                        <Badge variant="default" className="text-xs font-bold rounded-full bg-primary">
-                          <Pin className="h-3 w-3 mr-1" />
-                          Pinned
-                        </Badge>
-                      )}
-                      {post.is_solved && (
-                        <Badge variant="default" className="bg-success text-xs font-bold rounded-full">
-                          <CheckCircle2 className="h-3 w-3 mr-1" />
-                          Solved
-                        </Badge>
-                      )}
-                      {post.subjects && (
-                        <Badge variant="secondary" className="text-xs font-semibold rounded-full">{post.subjects.name}</Badge>
-                      )}
-                    </div>
-                    <CardTitle className="text-lg sm:text-xl font-black leading-tight bg-foreground">
-                      {post.title}
-                    </CardTitle>
-                    <CardDescription className="line-clamp-2 text-sm font-medium">
-                      {post.content}
-                    </CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs sm:text-sm text-muted-foreground">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                      <span className="truncate font-semibold">
-                        by {post.users?.first_name} {post.users?.last_name}
-                      </span>
-                      <span className="text-xs font-medium">
-                        {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1.5 text-primary">
-                        <ThumbsUp className="h-4 w-4" />
-                        <span className="text-sm font-bold">{post.upvotes}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-info">
-                        <MessageSquare className="h-4 w-4" />
-                        <span className="text-sm font-bold">{post.reply_count}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-muted-foreground">
-                        <Eye className="h-4 w-4" />
-                        <span className="text-sm font-bold">{post.view_count}</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-
-            {filteredPosts.length === 0 && (
-              <Card 
-                className="animate-fade-in backdrop-blur-sm bg-card/80 border-2 border-dashed rounded-[24px]"
-                style={{ boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)' }}
-              >
-                <CardContent className="flex flex-col items-center justify-center py-12 sm:py-16 px-4">
-                  <div className="p-6 rounded-full bg-primary/20 mb-4">
-                    <MessageSquare className="h-12 w-12 sm:h-16 sm:w-16 text-primary" />
-                  </div>
-                  <p className="text-sm sm:text-base text-foreground font-semibold text-center mb-2">
-                    {searchQuery ? 'No posts found matching your search' : 'No discussions yet'}
-                  </p>
-                  <p className="text-xs sm:text-sm text-muted-foreground text-center">
-                    {!searchQuery && 'Be the first to ask a question!'}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+              {f.label}
+            </button>
+          ))}
         </div>
+
+        <Panel title="Discussions">
+          {loading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="h-24 rounded-xl" />
+              ))}
+            </div>
+          ) : visiblePosts.length === 0 ? (
+            <EmptyState>
+              {searchQuery ? 'No discussions match your search.' : 'No discussions yet. Be the first to ask a question.'}
+            </EmptyState>
+          ) : (
+            <div className="space-y-2">
+              {visiblePosts.map((post) => (
+                <button
+                  key={post.id}
+                  type="button"
+                  onClick={() => navigate(`/forum/post/${post.id}`)}
+                  className="press w-full rounded-xl border bg-card p-3.5 text-left transition-colors hover:border-primary/50"
+                >
+                  <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+                    {post.is_pinned && (
+                      <Badge variant="secondary" className="gap-1 rounded-full text-[10px]">
+                        <Pin className="h-3 w-3" /> Pinned
+                      </Badge>
+                    )}
+                    {post.is_solved && (
+                      <Badge className="gap-1 rounded-full bg-primary/10 text-[10px] text-primary hover:bg-primary/10">
+                        <CheckCircle2 className="h-3 w-3" /> Solved
+                      </Badge>
+                    )}
+                    {post.subjects && (
+                      <Badge variant="outline" className="rounded-full text-[10px]">{post.subjects.name}</Badge>
+                    )}
+                  </div>
+                  <p className="text-sm font-semibold leading-snug">{post.title}</p>
+                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{post.content}</p>
+                  <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+                    <span className="truncate">
+                      {post.users?.first_name} {post.users?.last_name} ·{' '}
+                      {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                    </span>
+                    <span className="ml-auto flex items-center gap-3 tabular-nums">
+                      <span className="flex items-center gap-1"><ThumbsUp className="h-3.5 w-3.5" />{post.upvotes}</span>
+                      <span className="flex items-center gap-1"><MessageSquare className="h-3.5 w-3.5" />{post.reply_count}</span>
+                      <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" />{post.view_count}</span>
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </Panel>
       </div>
-    </Layout>
+    </AppShell>
   );
 }
