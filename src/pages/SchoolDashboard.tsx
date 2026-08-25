@@ -38,7 +38,6 @@ import AlertsCenter from "@/components/school/AlertsCenter";
 import ExportTools from "@/components/school/ExportTools";
 import WelcomeManualModal from "@/components/school/WelcomeManualModal";
 import SchoolExamManager from "@/components/school/SchoolExamManagerEnhanced";
-import { AIAssistant } from "@/components/AIAssistant";
 import VideoTutorials from "@/components/school/VideoTutorials";
 import SchoolMockManager from "@/components/school/SchoolMockManager";
 import SchoolStaffManager from "@/components/school/SchoolStaffManager";
@@ -553,7 +552,6 @@ export default function SchoolDashboard() {
         schoolName={schoolData.name} />
 
       }
-      <AIAssistant />
     </SidebarProvider>);
 
 }
