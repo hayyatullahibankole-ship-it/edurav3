@@ -127,7 +127,7 @@ const CampusHome = () => {
             icon={nextMilestone ? FolderKanban : BookOpen}
           />
 
-          <MobileSection title="Study" description={`${courses.length} courses · ${totalUnits} units`}>
+          <MobileSection title={`Study · ${courses.length} courses, ${totalUnits} units`}>
             <div className="grid grid-cols-2 gap-3">
               <MobileToolCard title="My courses" description="Materials and classes" icon={BookOpen} to="/campus/academics" />
               <MobileToolCard title="AI companion" description="Explain and practise" icon={Sparkles} to="/campus/companion" />
@@ -136,14 +136,14 @@ const CampusHome = () => {
             </div>
           </MobileSection>
 
-          <MobileSection title="Build" description="Move your academic work forward">
+          <MobileSection title="Build your academic work">
             <div className="grid grid-cols-2 gap-3">
               <MobileToolCard title="Project hub" description={project ? "Continue your project" : "Plan from topic to defence"} icon={FolderKanban} to="/campus/projects" />
               <MobileToolCard title="SIWES logbook" description="Polish weekly entries" icon={ClipboardList} to="/campus/logbook?kind=siwes" />
             </div>
           </MobileSection>
 
-          <MobileSection title="Career" description="Prepare for work and national service">
+          <MobileSection title="Career and service">
             <div className="grid grid-cols-2 gap-3">
               <MobileToolCard title="Career & CV" description="Build a stronger profile" icon={Briefcase} to="/campus/career" />
               <MobileToolCard title="NYSC hub" description="Track every step" icon={GraduationCap} to="/campus/nysc" />
