@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import {
   ArrowLeft,
   Award,
+  ClipboardCheck,
+  GraduationCap,
+  School,
   BookOpen,
   Bot,
   FileText,
@@ -26,10 +29,10 @@ import { useInstalledApp } from "@/hooks/useInstalledApp";
 import { MobileSection, PrimaryActionCard } from "@/components/edura/MobilePrimitives";
 
 const EXAM_TYPES = [
-  { type: "jamb" as const, label: "JAMB", subtitle: "UTME practice", letter: "J" },
-  { type: "waec" as const, label: "WAEC", subtitle: "SSCE practice", letter: "W" },
-  { type: "neco" as const, label: "NECO", subtitle: "Senior secondary", letter: "N" },
-  { type: "post-utme" as const, label: "POST-UTME", subtitle: "University practice", letter: "P" },
+  { type: "jamb" as const, label: "JAMB", subtitle: "UTME practice", icon: GraduationCap },
+  { type: "waec" as const, label: "WAEC", subtitle: "SSCE practice", icon: FileText },
+  { type: "neco" as const, label: "NECO", subtitle: "Senior secondary", icon: ClipboardCheck },
+  { type: "post-utme" as const, label: "POST-UTME", subtitle: "University practice", icon: School },
 ];
 
 /**
@@ -90,8 +93,8 @@ const CBTHome = () => {
                 <div
                   className={`app-card press w-full p-4 text-left animate-pop-in stagger-${Math.min(i + 1, 5)}`}
                 >
-                  <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 font-display text-lg font-bold text-primary">
-                    {exam.letter}
+                  <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <exam.icon className="h-5 w-5" />
                   </div>
                   <span className="block font-display text-sm font-bold">{exam.label}</span>
                   <span className="text-[10px] text-muted-foreground">{exam.subtitle}</span>
