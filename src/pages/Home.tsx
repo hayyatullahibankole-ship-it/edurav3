@@ -1,7 +1,7 @@
-import jambAsset from "@/assets/exam-jamb.png.asset.json";
-import waecAsset from "@/assets/exam-waec.png.asset.json";
-import necoAsset from "@/assets/exam-neco.png.asset.json";
-import postUtmeAsset from "@/assets/exam-post-utme.png.asset.json";
+import jambLogo from "@/assets/exam-jamb.png";
+import waecLogo from "@/assets/exam-waec.png";
+import necoLogo from "@/assets/exam-neco.png";
+import postUtmeLogo from "@/assets/exam-post-utme.jpg";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -142,7 +142,7 @@ const Home = () => {
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <span className="text-xs uppercase tracking-wide text-ink-foreground/50">Built for</span>
-                {[jambAsset.url, waecAsset.url, necoAsset.url, postUtmeAsset.url].map((src, i) => (
+                {[jambLogo, waecLogo, necoLogo, postUtmeLogo].map((src, i) => (
                   <span
                     key={src}
                     className="flex h-11 w-11 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm"

@@ -1,18 +1,18 @@
 import { useState } from "react";
-import jambAsset from "@/assets/exam-jamb.png.asset.json";
-import waecAsset from "@/assets/exam-waec.png.asset.json";
-import necoAsset from "@/assets/exam-neco.png.asset.json";
-import postUtmeAsset from "@/assets/exam-post-utme.png.asset.json";
+import jambLogo from "@/assets/exam-jamb.png";
+import waecLogo from "@/assets/exam-waec.png";
+import necoLogo from "@/assets/exam-neco.png";
+import postUtmeLogo from "@/assets/exam-post-utme.jpg";
 
 // Official marks we host ourselves — always preferred over remote favicons.
 const LOCAL_LOGOS: Record<string, string> = {
-  jamb: jambAsset.url,
-  utme: jambAsset.url,
-  waec: waecAsset.url,
-  neco: necoAsset.url,
-  "post-utme": postUtmeAsset.url,
-  post_utme: postUtmeAsset.url,
-  admission: postUtmeAsset.url,
+  jamb: jambLogo,
+  utme: jambLogo,
+  waec: waecLogo,
+  neco: necoLogo,
+  "post-utme": postUtmeLogo,
+  post_utme: postUtmeLogo,
+  admission: postUtmeLogo,
 };
 
 export const PROVIDER_INFO: Record<

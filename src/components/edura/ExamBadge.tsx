@@ -1,21 +1,21 @@
 import { cn } from "@/lib/utils";
-import jambAsset from "@/assets/exam-jamb.png.asset.json";
-import waecAsset from "@/assets/exam-waec.png.asset.json";
-import necoAsset from "@/assets/exam-neco.png.asset.json";
-import postUtmeAsset from "@/assets/exam-post-utme.png.asset.json";
+import jambLogo from "@/assets/exam-jamb.png";
+import waecLogo from "@/assets/exam-waec.png";
+import necoLogo from "@/assets/exam-neco.png";
+import postUtmeLogo from "@/assets/exam-post-utme.jpg";
 
 export type ExamKey = "jamb" | "waec" | "neco" | "post-utme" | "gce" | string;
 
 type Mark = { label: string; tint: string; text: string; logo?: string };
 
 const MARKS: Record<string, Mark> = {
-  jamb: { label: "JAMB", tint: "bg-mint", text: "text-mint-foreground", logo: jambAsset.url },
-  utme: { label: "JAMB", tint: "bg-mint", text: "text-mint-foreground", logo: jambAsset.url },
-  waec: { label: "WAEC", tint: "bg-sky", text: "text-sky-foreground", logo: waecAsset.url },
-  neco: { label: "NECO", tint: "bg-butter", text: "text-butter-foreground", logo: necoAsset.url },
-  "post-utme": { label: "PUTME", tint: "bg-lilac", text: "text-lilac-foreground", logo: postUtmeAsset.url },
-  post_utme: { label: "PUTME", tint: "bg-lilac", text: "text-lilac-foreground", logo: postUtmeAsset.url },
-  "post utme": { label: "PUTME", tint: "bg-lilac", text: "text-lilac-foreground", logo: postUtmeAsset.url },
+  jamb: { label: "JAMB", tint: "bg-mint", text: "text-mint-foreground", logo: jambLogo },
+  utme: { label: "JAMB", tint: "bg-mint", text: "text-mint-foreground", logo: jambLogo },
+  waec: { label: "WAEC", tint: "bg-sky", text: "text-sky-foreground", logo: waecLogo },
+  neco: { label: "NECO", tint: "bg-butter", text: "text-butter-foreground", logo: necoLogo },
+  "post-utme": { label: "PUTME", tint: "bg-lilac", text: "text-lilac-foreground", logo: postUtmeLogo },
+  post_utme: { label: "PUTME", tint: "bg-lilac", text: "text-lilac-foreground", logo: postUtmeLogo },
+  "post utme": { label: "PUTME", tint: "bg-lilac", text: "text-lilac-foreground", logo: postUtmeLogo },
   gce: { label: "GCE", tint: "bg-peach", text: "text-peach-foreground" },
 };
 
