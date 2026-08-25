@@ -116,6 +116,30 @@ const Dashboard = () => {
 
   const firstName = userProfile?.first_name || user?.email?.split("@")[0] || "Student";
 
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const todayLabel = new Date().toLocaleDateString("en-NG", {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+  });
+
+  /** Days of this week that already have activity, derived from the streak run. */
+  const activeDays = useMemo(() => {
+    const last = streakData?.last_activity_date ? new Date(streakData.last_activity_date) : null;
+    const run = streakData?.current_streak || 0;
+    if (!last || run <= 0) return [];
+    const days: number[] = [];
+    for (let i = 0; i < Math.min(run, 7); i++) {
+      const d = new Date(last);
+      d.setDate(last.getDate() - i);
+      const diff = Math.floor((Date.now() - d.getTime()) / 86400000);
+      if (diff <= new Date().getDay()) days.push(d.getDay());
+    }
+    return days;
+  }, [streakData]);
+
+
   const gamify = useMemo(() => {
     const bestScore = recentTests.reduce((m, t) => Math.max(m, t.score || 0), 0);
     const input = {
