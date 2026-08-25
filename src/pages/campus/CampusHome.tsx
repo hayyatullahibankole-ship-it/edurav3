@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MobileSection, MobileToolCard, PrimaryActionCard } from "@/components/edura/MobilePrimitives";
 import {
   BookOpen,
   FolderKanban,
@@ -105,7 +106,57 @@ const CampusHome = () => {
           {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-32 rounded-xl" />)}
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-12 gap-3 md:gap-4 auto-rows-min">
+        <>
+        <div className="space-y-6 md:hidden">
+          <section>
+            <p className="text-sm text-muted-foreground">Welcome back, {firstName}</p>
+            <h2 className="mt-1 font-display text-2xl font-bold">What needs your attention?</h2>
+            {(institution_name || study_level) && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {[institution_name, department, study_level].filter(Boolean).join(" · ")}
+              </p>
+            )}
+          </section>
+
+          <PrimaryActionCard
+            eyebrow={nextMilestone ? "Next deadline" : "Start here"}
+            title={nextMilestone?.title || (courses.length ? "Continue with your courses" : "Add this semester's courses")}
+            description={nextMilestone?.due_date ? `Due ${new Date(nextMilestone.due_date).toLocaleDateString()}` : "Keep course materials, explanations and practice in one place."}
+            to={nextMilestone ? "/campus/projects" : "/campus/academics"}
+            actionLabel={nextMilestone ? "Open project" : courses.length ? "Open academics" : "Add courses"}
+            icon={nextMilestone ? FolderKanban : BookOpen}
+          />
+
+          <MobileSection title="Study" description={`${courses.length} courses · ${totalUnits} units`}>
+            <div className="grid grid-cols-2 gap-3">
+              <MobileToolCard title="My courses" description="Materials and classes" icon={BookOpen} to="/campus/academics" />
+              <MobileToolCard title="AI companion" description="Explain and practise" icon={Sparkles} to="/campus/companion" />
+              <MobileToolCard title="Study tools" description="CGPA and timetable" icon={Calculator} to="/campus/tools" />
+              <MobileToolCard title="Opportunities" description="Scholarships and roles" icon={Compass} to="/campus/opportunities" />
+            </div>
+          </MobileSection>
+
+          <MobileSection title="Build" description="Move your academic work forward">
+            <div className="grid grid-cols-2 gap-3">
+              <MobileToolCard title="Project hub" description={project ? "Continue your project" : "Plan from topic to defence"} icon={FolderKanban} to="/campus/projects" />
+              <MobileToolCard title="SIWES logbook" description="Polish weekly entries" icon={ClipboardList} to="/campus/logbook?kind=siwes" />
+            </div>
+          </MobileSection>
+
+          <MobileSection title="Career" description="Prepare for work and national service">
+            <div className="grid grid-cols-2 gap-3">
+              <MobileToolCard title="Career & CV" description="Build a stronger profile" icon={Briefcase} to="/campus/career" />
+              <MobileToolCard title="NYSC hub" description="Track every step" icon={GraduationCap} to="/campus/nysc" />
+            </div>
+          </MobileSection>
+
+          <button type="button" onClick={() => navigate("/wallet")} className="press flex min-h-14 w-full items-center justify-between rounded-2xl border bg-card px-4 text-left">
+            <span className="flex items-center gap-3"><WalletIcon className="h-5 w-5 text-primary" /><span><span className="block text-xs text-muted-foreground">Wallet</span><span className="block font-bold">{naira(balance)}</span></span></span>
+            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+          </button>
+        </div>
+
+        <div className="hidden grid-cols-2 gap-3 auto-rows-min md:grid md:grid-cols-12 md:gap-4">
           {/* Row 1: Stats — same bento tiles as the CBT dashboard */}
           <div className="bg-card border border-border rounded-2xl p-5 col-span-1 md:col-span-3">
             <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">Courses</span>
@@ -295,6 +346,7 @@ const CampusHome = () => {
             )}
           </div>
         </div>
+        </>
 
       )}
     </CampusShell>
