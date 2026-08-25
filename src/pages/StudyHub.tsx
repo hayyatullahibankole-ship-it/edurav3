@@ -10,7 +10,6 @@ import Layout from '@/components/Layout';
 import { SubjectButton } from '@/components/dashboard/SubjectButton';
 import { useIsMobile } from '@/hooks/use-mobile';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import { MobileTabBar } from '@/components/edura/AppShell';
 
 interface Subject {
   id: string;
@@ -248,7 +247,6 @@ if (isMobile) {
           </div>
         )}
       </div>
-      <MobileTabBar />
       <WhatsAppButton />
     </>
   );

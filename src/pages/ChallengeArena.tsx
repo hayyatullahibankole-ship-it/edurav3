@@ -14,7 +14,6 @@ import Layout from '@/components/Layout';
 import { formatDistanceToNow } from 'date-fns';
 import { useIsMobile } from '@/hooks/use-mobile';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import { MobileTabBar } from '@/components/edura/AppShell';
 
 interface Challenge {
   id: string;
@@ -497,7 +496,6 @@ if (isMobile) {
           </Card>
         </div>
       </div>
-      <MobileTabBar />
       <WhatsAppButton />
     </>
   );
