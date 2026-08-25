@@ -26,7 +26,9 @@ import { Button } from "@/components/ui/button";
 import { useStudentStats } from "@/hooks/useStudentStats";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useInstalledApp } from "@/hooks/useInstalledApp";
-import { MobileSection, PrimaryActionCard } from "@/components/edura/MobilePrimitives";
+import { MobileSection, PrimaryActionCard, MobileToolCard } from "@/components/edura/MobilePrimitives";
+import ExamBadge from "@/components/edura/ExamBadge";
+
 
 const EXAM_TYPES = [
   { type: "jamb" as const, label: "JAMB", subtitle: "UTME practice", icon: GraduationCap },
