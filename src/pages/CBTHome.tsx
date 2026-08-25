@@ -26,7 +26,9 @@ import { Button } from "@/components/ui/button";
 import { useStudentStats } from "@/hooks/useStudentStats";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useInstalledApp } from "@/hooks/useInstalledApp";
-import { MobileSection, PrimaryActionCard } from "@/components/edura/MobilePrimitives";
+import { MobileSection, PrimaryActionCard, MobileToolCard } from "@/components/edura/MobilePrimitives";
+import ExamBadge from "@/components/edura/ExamBadge";
+
 
 const EXAM_TYPES = [
   { type: "jamb" as const, label: "JAMB", subtitle: "UTME practice", icon: GraduationCap },
@@ -91,15 +93,16 @@ const CBTHome = () => {
             {EXAM_TYPES.map((exam, i) => {
               const inner = (
                 <div
-                  className={`app-card press w-full p-4 text-left animate-pop-in stagger-${Math.min(i + 1, 5)}`}
+                  className={`app-card press flex w-full items-center gap-3 p-3.5 text-left animate-pop-in stagger-${Math.min(i + 1, 5)}`}
                 >
-                  <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <exam.icon className="h-5 w-5" />
-                  </div>
-                  <span className="block font-display text-sm font-bold">{exam.label}</span>
-                  <span className="text-[10px] text-muted-foreground">{exam.subtitle}</span>
+                  <ExamBadge exam={exam.type} />
+                  <span className="min-w-0">
+                    <span className="block font-display text-sm font-extrabold">{exam.label}</span>
+                    <span className="block truncate text-[10px] text-muted-foreground">{exam.subtitle}</span>
+                  </span>
                 </div>
               );
+
               return isMobileBrowser ? (
                 <button
                   key={exam.type}
@@ -209,17 +212,19 @@ const CBTHome = () => {
           <SchoolAvailableExams />
         </Panel>
 
-        <Panel title="Practice tools">
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            <ListRow to="/study-hub" icon={Target} title="Study hub" meta="Plan your sessions" />
-            <ListRow to="/decks" icon={Layers} title="Study decks" meta="Turn a PDF into quizzes" />
-            <ListRow to="/resources" icon={FileText} title="Past questions" meta="Browse by exam" />
-            <ListRow to="/challenge-arena" icon={Sword} title="Challenge arena" meta="Compete in live challenges" />
-            <ListRow to="/forum" icon={MessageSquare} title="Forum" meta="Ask and answer" />
-            <ListRow to="/ai-tutor" icon={Bot} title="AI tutor" meta="Instant explanations" />
-            <ListRow to="/leaderboard" icon={Trophy} title="Leaderboard" meta="Compare scores" />
+        <MobileSection title="Practice tools">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <MobileToolCard to="/study-hub" icon={Target} title="Study hub" description="Plan your sessions" tone="mint" />
+            <MobileToolCard to="/decks" icon={Layers} title="Study decks" description="Turn a PDF into quizzes" tone="sky" />
+            <MobileToolCard to="/resources" icon={FileText} title="Past questions" description="Browse by exam" tone="butter" />
+            <MobileToolCard to="/challenge-arena" icon={Sword} title="Challenge arena" description="Compete live with friends" tone="lilac" />
+            <MobileToolCard to="/forum" icon={MessageSquare} title="Forum" description="Ask and answer" tone="peach" />
+            <MobileToolCard to="/ai-tutor" icon={Bot} title="Ask a tutor" description="Instant explanations" tone="sky" />
+            <MobileToolCard to="/leaderboard" icon={Trophy} title="Leaderboard" description="Compare your scores" tone="butter" />
+            <MobileToolCard to="/performance-report" icon={Award} title="My report" description="See where you improve" tone="mint" />
           </div>
-        </Panel>
+        </MobileSection>
+
       </div>
 
       <InstallRequiredModal

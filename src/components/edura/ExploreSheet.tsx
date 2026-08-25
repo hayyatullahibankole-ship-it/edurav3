@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import ScheduleTestModal from "@/components/ScheduleTestModal";
+import ExamBadge from "@/components/edura/ExamBadge";
+
 import {
   Sheet,
   SheetContent,
@@ -102,54 +104,52 @@ export const ExploreSheet = ({ open, onOpenChange }: ExploreSheetProps) => {
         </SheetHeader>
 
         <div className="space-y-6 p-6">
-          <section className="flex items-center justify-between gap-3 rounded-xl border bg-card p-3">
-            <div className="min-w-0">
-              <p className="text-sm font-medium">Switch experience</p>
-              <p className="text-xs text-muted-foreground">CBT practice or educational services</p>
-            </div>
-          </section>
-
           <section className="space-y-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <h3 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
               Start a practice test
             </h3>
             <div className="grid grid-cols-4 gap-2">
               {tests.map((test) => (
                 <ScheduleTestModal key={test.examType} defaultExamType={test.examType}>
-                  <button className="flex flex-col items-center gap-2 rounded-xl border bg-card p-3 transition-colors active:scale-[0.98] hover:border-primary/60">
-                    <test.icon className="h-5 w-5 text-foreground" />
-                    <span className="text-[11px] font-medium leading-tight">{test.label}</span>
+                  <button className="press flex flex-col items-center gap-2 rounded-2xl border bg-card p-3">
+                    <ExamBadge exam={test.examType} size="sm" />
+                    <span className="text-[11px] font-bold leading-tight">{test.label}</span>
                   </button>
                 </ScheduleTestModal>
               ))}
             </div>
           </section>
 
-          {groups.map((group) => (
+          {groups.map((group, gi) => (
             <section key={group.title} className="space-y-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <h3 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
                 {group.title}
               </h3>
               <div className="grid grid-cols-2 gap-3">
-                {group.items.map((item) => (
-                  <button
-                    key={item.label}
-                    onClick={() => go(item.path)}
-                    className="flex flex-col gap-2 rounded-xl border bg-card p-4 text-left transition-colors active:scale-[0.98] hover:border-primary/60"
-                  >
-                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                      <item.icon className="h-5 w-5 text-foreground" />
-                    </span>
-                    <span className="text-sm font-semibold leading-tight">{item.label}</span>
-                    <span className="text-xs text-muted-foreground leading-snug">
-                      {item.description}
-                    </span>
-                  </button>
-                ))}
+                {group.items.map((item, i) => {
+                  const tones = ["bg-mint text-mint-foreground", "bg-sky text-sky-foreground", "bg-butter text-butter-foreground", "bg-lilac text-lilac-foreground", "bg-peach text-peach-foreground"];
+                  const tone = tones[(gi + i) % tones.length];
+                  return (
+                    <button
+                      key={item.label}
+                      onClick={() => go(item.path)}
+                      className={`press flex min-h-32 flex-col rounded-[1.25rem] p-4 text-left ${tone}`}
+                    >
+                      <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-background/50">
+                        <item.icon className="h-5 w-5" strokeWidth={2.2} />
+                      </span>
+                      <span className="mt-auto pt-3 font-display text-sm font-extrabold leading-tight">{item.label}</span>
+                      <span className="mt-1 text-[11px] font-medium leading-snug opacity-75">
+                        {item.description}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </section>
           ))}
         </div>
+
       </SheetContent>
     </Sheet>
   );

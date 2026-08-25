@@ -112,25 +112,25 @@ export const MobileTabBar = ({
       key={item.to}
       to={item.to}
       end={item.end}
-      className="press flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 py-1.5"
+      className="press flex min-h-[52px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl py-1"
     >
       {({ isActive }) => (
         <>
           <span
             className={cn(
-              "flex h-7 w-10 items-center justify-center rounded-xl transition-colors duration-200",
-              isActive ? "bg-primary/10 text-primary" : "text-muted-foreground"
+              "flex h-8 w-11 items-center justify-center rounded-full transition-all duration-300",
+              isActive ? "bg-primary/12 text-primary" : "text-muted-foreground"
             )}
           >
             <item.icon
-              className={cn("h-[18px] w-[18px] transition-transform", isActive && "scale-110")}
-              strokeWidth={isActive ? 2.4 : 1.9}
+              className={cn("h-[19px] w-[19px] transition-transform duration-300", isActive && "scale-110")}
+              strokeWidth={isActive ? 2.5 : 1.9}
             />
           </span>
           <span
             className={cn(
-              "max-w-full truncate px-0.5 text-[9px] transition-colors",
-              isActive ? "font-bold text-primary" : "font-medium text-muted-foreground"
+              "max-w-full truncate px-0.5 text-[10px] transition-colors",
+              isActive ? "font-extrabold text-primary" : "font-semibold text-muted-foreground"
             )}
           >
             {item.label}
@@ -142,31 +142,39 @@ export const MobileTabBar = ({
 
   return (
     <>
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 pb-safe backdrop-blur-xl lg:hidden">
-        <div className="relative mx-auto h-[64px] max-w-md">
-          <div className="relative flex h-full items-center px-1.5">
-            {left.map(tab)}
-            <div className="flex flex-1 justify-center">
-              <button
-                type="button"
-                aria-label={action.label}
-                onClick={action.onClick}
-                className="press -mt-7 flex h-[58px] w-[58px] flex-col items-center justify-center gap-0.5 rounded-2xl border-4 border-background bg-primary text-primary-foreground shadow-lg shadow-primary/30"
-              >
-                <action.icon className="h-6 w-6" strokeWidth={2.3} />
-                <span className="text-[9px] font-bold leading-none">{action.label}</span>
-              </button>
-            </div>
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.6rem)] lg:hidden">
+        <nav className="pointer-events-auto relative mx-auto w-full max-w-md">
+          {/* Dock surface with a circular notch punched out behind the centre action */}
+          <div className="dock-notch relative h-[70px] rounded-[26px] border border-border/60 bg-card shadow-float" />
 
+          <div className="absolute inset-0 flex items-center px-2">
+            {left.map(tab)}
+            <div className="w-[76px] shrink-0" aria-hidden />
             {right.map(tab)}
           </div>
-        </div>
-      </nav>
+
+          {/* Raised centre action */}
+          <div className="pointer-events-none absolute inset-x-0 -top-7 flex justify-center">
+            <button
+              type="button"
+              aria-label={action.label}
+              onClick={action.onClick}
+              className="press pointer-events-auto flex h-14 w-14 items-center justify-center rounded-full bg-ink text-ink-foreground shadow-float"
+            >
+              <action.icon className="h-6 w-6" strokeWidth={2.3} />
+            </button>
+          </div>
+          <span className="pointer-events-none absolute inset-x-0 top-[34px] text-center text-[10px] font-bold text-muted-foreground">
+            {action.label}
+          </span>
+        </nav>
+      </div>
 
       {!center && <ExploreSheet open={exploreOpen} onOpenChange={setExploreOpen} />}
     </>
   );
 };
+
 
 interface AppShellProps {
   side: ShellSide;
@@ -348,7 +356,7 @@ export const AppShell = ({ side, title, subtitle, meta, action, nav, children }:
           </div>
         </header>
 
-        <main className="w-full flex-1 px-4 py-4 pb-24 sm:px-6 sm:py-7 lg:pb-10">
+        <main className="w-full flex-1 px-4 py-4 pb-32 sm:px-6 sm:py-7 lg:pb-10">
           <div className="mx-auto w-full max-w-6xl animate-screen-in">
             <div className="mb-4 hidden flex-wrap items-start justify-between gap-3 lg:flex">
               <div className="min-w-0">

@@ -37,6 +37,12 @@ export default {
           soft: "hsl(var(--ink-soft))",
           foreground: "hsl(var(--ink-foreground))",
         },
+        mint: { DEFAULT: "hsl(var(--tint-mint))", foreground: "hsl(var(--tint-mint-foreground))" },
+        sky: { DEFAULT: "hsl(var(--tint-sky))", foreground: "hsl(var(--tint-sky-foreground))" },
+        butter: { DEFAULT: "hsl(var(--tint-butter))", foreground: "hsl(var(--tint-butter-foreground))" },
+        lilac: { DEFAULT: "hsl(var(--tint-lilac))", foreground: "hsl(var(--tint-lilac-foreground))" },
+        peach: { DEFAULT: "hsl(var(--tint-peach))", foreground: "hsl(var(--tint-peach-foreground))" },
+
         surface: "hsl(var(--surface))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

@@ -23,7 +23,7 @@ import TrialStatusCard from "@/components/edura/TrialStatusCard";
 
 import BadgeStrip from "@/components/edura/gamify/BadgeStrip";
 import CountUp from "@/components/edura/gamify/CountUp";
-import { MobileSection, MobileToolCard, PrimaryActionCard } from "@/components/edura/MobilePrimitives";
+import { MobileSection, MobileToolCard, PrimaryActionCard, WeekStrip } from "@/components/edura/MobilePrimitives";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -116,6 +116,31 @@ const Dashboard = () => {
 
   const firstName = userProfile?.first_name || user?.email?.split("@")[0] || "Student";
 
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const todayLabel = new Date().toLocaleDateString("en-NG", {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+  });
+
+  /** Days of this week that already have activity, derived from the streak run. */
+  const activeDays = useMemo(() => {
+    const last = streakData?.last_practice_date ? new Date(streakData.last_practice_date) : null;
+    const run = streakData?.current_streak || 0;
+
+    if (!last || run <= 0) return [];
+    const days: number[] = [];
+    for (let i = 0; i < Math.min(run, 7); i++) {
+      const d = new Date(last);
+      d.setDate(last.getDate() - i);
+      const diff = Math.floor((Date.now() - d.getTime()) / 86400000);
+      if (diff <= new Date().getDay()) days.push(d.getDay());
+    }
+    return days;
+  }, [streakData]);
+
+
   const gamify = useMemo(() => {
     const bestScore = recentTests.reduce((m, t) => Math.max(m, t.score || 0), 0);
     const input = {
@@ -181,17 +206,22 @@ const Dashboard = () => {
         <HomeSkeleton />
       ) : (
         <div className="space-y-4">
-          <div className="flex items-center justify-between px-0.5 lg:hidden">
-            <div>
-              <p className="text-xs font-medium text-muted-foreground">Welcome back,</p>
-              <h1 className="font-display text-xl font-bold">{firstName}</h1>
+          <div className="flex items-center justify-between gap-3 px-0.5 lg:hidden">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-muted-foreground">
+                {greeting} 👋
+              </p>
+              <h1 className="truncate font-display text-[22px] font-extrabold leading-tight">{firstName}</h1>
+              <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">{todayLabel}</p>
             </div>
-            <div className="flex min-h-10 items-center gap-1.5 rounded-xl bg-warning/10 px-3 text-warning">
+            <div className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-2xl bg-butter px-3 text-butter-foreground">
               <Flame className="h-4 w-4 fill-current" />
-              <span className="font-display text-sm font-bold tabular">{streakData?.current_streak || 0}</span>
+              <span className="font-display text-sm font-extrabold tabular">{streakData?.current_streak || 0}</span>
               <span className="sr-only">day streak</span>
             </div>
           </div>
+
+          <WeekStrip activeDays={activeDays} className="lg:hidden" />
 
           <TrialStatusCard />
 
@@ -208,11 +238,37 @@ const Dashboard = () => {
 
           <MobileSection title="Your tools">
             <div className="grid grid-cols-2 gap-3">
-              <MobileToolCard to="/cbt" icon={GraduationCap} title="Exam prep" description="Practice JAMB, WAEC, NECO and Post-UTME" />
-              <MobileToolCard to="/decks" icon={Layers} title="Study decks" description="Turn your PDF notes into guided quizzes" tone="info" />
-              <MobileToolCard to="/ai-tutor" icon={Bot} title="AI tutor" description="Get a clear explanation when you are stuck" tone="warning" />
-              <MobileToolCard to="/services" icon={Briefcase} title="Services" description="Buy e-PINs and track admission requests" tone="neutral" />
+              <MobileToolCard
+                to="/cbt"
+                icon={GraduationCap}
+                title="Practice"
+                description="JAMB, WAEC, NECO & Post-UTME questions"
+                stat={stats.testsTaken ? `${stats.testsTaken} done` : undefined}
+                tone="mint"
+              />
+              <MobileToolCard
+                to="/decks"
+                icon={Layers}
+                title="Study decks"
+                description="Turn your notes into quick quizzes"
+                tone="sky"
+              />
+              <MobileToolCard
+                to="/ai-tutor"
+                icon={Bot}
+                title="Ask a tutor"
+                description="Stuck? Get it explained simply"
+                tone="butter"
+              />
+              <MobileToolCard
+                to="/services"
+                icon={Briefcase}
+                title="Services"
+                description="Buy e-PINs & track admissions"
+                tone="lilac"
+              />
             </div>
+
           </MobileSection>
 
           <MobileSection title="Your progress">

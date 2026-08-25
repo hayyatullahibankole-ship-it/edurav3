@@ -129,24 +129,24 @@ const CampusHome = () => {
 
           <MobileSection title={`Study · ${courses.length} courses, ${totalUnits} units`}>
             <div className="grid grid-cols-2 gap-3">
-              <MobileToolCard title="My courses" description="Materials and classes" icon={BookOpen} to="/campus/academics" />
-              <MobileToolCard title="AI companion" description="Explain and practise" icon={Sparkles} to="/campus/companion" />
-              <MobileToolCard title="Study tools" description="CGPA and timetable" icon={Calculator} to="/campus/tools" />
-              <MobileToolCard title="Opportunities" description="Scholarships and roles" icon={Compass} to="/campus/opportunities" />
+              <MobileToolCard title="My courses" description="Materials and classes" icon={BookOpen} to="/campus/academics" tone="mint" />
+              <MobileToolCard title="AI companion" description="Explain and practise" icon={Sparkles} to="/campus/companion" tone="sky" />
+              <MobileToolCard title="Study tools" description="CGPA and timetable" icon={Calculator} to="/campus/tools" tone="butter" />
+              <MobileToolCard title="Opportunities" description="Scholarships and roles" icon={Compass} to="/campus/opportunities" tone="lilac" />
             </div>
           </MobileSection>
 
           <MobileSection title="Build your academic work">
             <div className="grid grid-cols-2 gap-3">
-              <MobileToolCard title="Project hub" description={project ? "Continue your project" : "Plan from topic to defence"} icon={FolderKanban} to="/campus/projects" />
-              <MobileToolCard title="SIWES logbook" description="Polish weekly entries" icon={ClipboardList} to="/campus/logbook?kind=siwes" />
+              <MobileToolCard title="Project hub" description={project ? "Continue your project" : "Plan from topic to defence"} icon={FolderKanban} to="/campus/projects" tone="peach" />
+              <MobileToolCard title="SIWES logbook" description="Polish weekly entries" icon={ClipboardList} to="/campus/logbook?kind=siwes" tone="mint" />
             </div>
           </MobileSection>
 
           <MobileSection title="Career and service">
             <div className="grid grid-cols-2 gap-3">
-              <MobileToolCard title="Career & CV" description="Build a stronger profile" icon={Briefcase} to="/campus/career" />
-              <MobileToolCard title="NYSC hub" description="Track every step" icon={GraduationCap} to="/campus/nysc" />
+              <MobileToolCard title="Career & CV" description="Build a stronger profile" icon={Briefcase} to="/campus/career" tone="sky" />
+              <MobileToolCard title="NYSC hub" description="Track every step" icon={GraduationCap} to="/campus/nysc" tone="butter" />
             </div>
           </MobileSection>
 
