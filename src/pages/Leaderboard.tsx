@@ -103,7 +103,7 @@ const Leaderboard = () => {
               {!me?.qualified && (
                 <p className="mt-3 flex items-start gap-2 text-xs text-muted-foreground">
                   <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                  Complete at least 3 graded tests in this period to enter the ranking.
+                  Complete one graded test in this period to enter the ranking.
                 </p>
               )}
             </>
