@@ -154,6 +154,34 @@ const NotificationBell = () => {
           </SheetHeader>
 
           <div className="space-y-2 overflow-y-auto h-[calc(85vh-100px)]">
+            {hasFreePromoAccess && freeAccessExpiry && (
+              <Card className="border-0 shadow-md bg-primary/5 border-l-4 border-l-primary">
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-sm mb-1 flex items-center gap-2">
+                    <Gift className="h-4 w-4 text-primary" /> Complimentary access active
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    You have full Edura access until{" "}
+                    {new Date(freeAccessExpiry).toLocaleDateString("en-NG", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                    .
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+            {freeAccessExpired && freeAccessExpiry && (
+              <Card className="border-0 shadow-md">
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-sm mb-1">Complimentary access ended</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Upgrade to keep practising with all subjects and mocks.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
             {notifications.length === 0 ? (
               <Card className="border-0 shadow-md">
                 <CardContent className="p-8 text-center">
@@ -162,6 +190,7 @@ const NotificationBell = () => {
                 </CardContent>
               </Card>
             ) : (
+
               notifications.map((notification) => (
                 <Card 
                   key={notification.id}
