@@ -62,6 +62,19 @@ All colors MUST be HSL for consistency across light/dark modes.
 
     --radius: 0.875rem;
 
+    /* Soft pastel card tints (student-friendly bento) */
+    --tint-mint: 152 60% 92%;
+    --tint-mint-foreground: 158 72% 20%;
+    --tint-sky: 205 85% 92%;
+    --tint-sky-foreground: 212 70% 26%;
+    --tint-butter: 42 92% 88%;
+    --tint-butter-foreground: 30 70% 26%;
+    --tint-lilac: 265 70% 93%;
+    --tint-lilac-foreground: 265 45% 32%;
+    --tint-peach: 12 90% 92%;
+    --tint-peach-foreground: 12 60% 32%;
+
+
     /* Deep Ink surfaces (marketing / command-center) */
     --ink: 211 49% 8%;
     --ink-soft: 209 55% 16%;
