@@ -310,8 +310,9 @@ const Dashboard = () => {
             </CollapsibleContent>
           </Collapsible>
 
-          {/* 8. Recent results + discover */}
-          <div className="grid gap-3 lg:grid-cols-2">
+          {/* 8. Recent results */}
+          <div className="grid gap-3">
+
             <Panel
               title="Recent results"
               action={
