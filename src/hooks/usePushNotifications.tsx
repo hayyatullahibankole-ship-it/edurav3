@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { PushNotifications, Token, ActionPerformed, PushNotificationSchema } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,81 +8,67 @@ import { toast } from 'sonner';
 // Push registration calls Firebase natively. Without android/app/google-services.json
 // the Android app crashes on launch, so keep this off until Firebase is configured.
 const PUSH_ENABLED = false;
+const DEVICE_ID_KEY = 'edura_push_device_id';
+
+const getDeviceId = () => {
+  const existing = localStorage.getItem(DEVICE_ID_KEY);
+  if (existing) return existing;
+  const id = crypto.randomUUID();
+  localStorage.setItem(DEVICE_ID_KEY, id);
+  return id;
+};
 
 export const usePushNotifications = () => {
   const [permissionStatus, setPermissionStatus] = useState<'prompt' | 'granted' | 'denied'>('prompt');
   const { userProfile } = useAuth();
 
-  useEffect(() => {
-    if (!PUSH_ENABLED || !Capacitor.isNativePlatform()) {
-      return;
-    }
-
-    initializePushNotifications();
-  }, [userProfile]);
-
-  const initializePushNotifications = async () => {
+  const initializePushNotifications = useCallback(async () => {
     try {
-      // Request permission
-      const permission = await PushNotifications.requestPermissions();
-      
-      if (permission.receive === 'granted') {
-        setPermissionStatus('granted');
-        await PushNotifications.register();
-      } else {
-        setPermissionStatus('denied');
-      }
-
-      // On successful registration, save token to database
-      await PushNotifications.addListener('registration', async (token: Token) => {
-        console.log('Push registration success, token: ' + token.value);
-        
-        if (userProfile?.id) {
-          // Save token to user preferences
-          await supabase
-            .from('user_preferences')
-            .update({ 
-              push_token: token.value,
-              push_notifications_enabled: true 
-            })
-            .eq('user_id', userProfile.id);
-        }
-      });
-
-      // Registration error
-      await PushNotifications.addListener('registrationError', (error: any) => {
-        console.error('Error on registration: ' + JSON.stringify(error));
-        toast.error('Failed to register for push notifications');
-      });
-
-      // Show notification when app is in foreground
-      await PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
-        console.log('Push notification received: ' + JSON.stringify(notification));
-        toast.success(notification.title || 'New notification', {
-          description: notification.body
-        });
-      });
-
-      // Handle notification tap
-      await PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
-        console.log('Push notification action performed', JSON.stringify(notification));
-        
-        // Handle navigation based on notification data
-        const data = notification.notification.data;
-        if (data?.route) {
-          // Navigate to specific route based on notification
-          window.location.href = data.route;
-        }
-      });
-
+      const handles = await Promise.all([
+        PushNotifications.addListener('registration', async (token: Token) => {
+          if (!userProfile?.id) return;
+          const { error } = await supabase.from('push_devices').upsert({
+            user_id: userProfile.id,
+            token: token.value,
+            platform: Capacitor.getPlatform(),
+            device_id: getDeviceId(),
+            enabled: true,
+            last_seen_at: new Date().toISOString(),
+          }, { onConflict: 'user_id,device_id' });
+          if (error) toast.error('Could not save this device for notifications');
+        }),
+        PushNotifications.addListener('registrationError', () => {
+          toast.error('Failed to register for push notifications');
+        }),
+        PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
+          toast.success(notification.title || 'New notification', { description: notification.body });
+        }),
+        PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
+          const route = typeof notification.notification.data?.route === 'string'
+            ? notification.notification.data.route
+            : '';
+          if (route.startsWith('/') && !route.startsWith('//')) window.location.hash = `#${route}`;
+        }),
+      ]);
+      return () => handles.forEach((handle) => void handle.remove());
     } catch (error) {
       console.error('Error initializing push notifications:', error);
+      return undefined;
     }
-  };
+  }, [userProfile?.id]);
+
+  useEffect(() => {
+    if (!PUSH_ENABLED || !Capacitor.isNativePlatform()) return;
+    let cleanup: (() => void) | undefined;
+    void initializePushNotifications().then((removeListeners) => {
+      cleanup = removeListeners;
+    });
+    return () => cleanup?.();
+  }, [initializePushNotifications]);
 
   const requestPermission = async () => {
     if (!PUSH_ENABLED || !Capacitor.isNativePlatform()) {
-      toast.error('Push notifications are not available yet');
+      toast.error('Push notifications will be available after Firebase setup');
       return;
     }
 
@@ -107,12 +93,13 @@ export const usePushNotifications = () => {
 
     try {
       if (userProfile?.id) {
-        await supabase
-          .from('user_preferences')
-          .update({ 
-            push_notifications_enabled: false 
-          })
-          .eq('user_id', userProfile.id);
+        const { error } = await supabase
+          .from('push_devices')
+          .update({ enabled: false })
+          .eq('user_id', userProfile.id)
+          .eq('device_id', getDeviceId());
+        if (error) throw error;
+        setPermissionStatus('denied');
       }
       
       toast.success('Notifications disabled');
