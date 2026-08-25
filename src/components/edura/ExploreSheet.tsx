@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import ScheduleTestModal from "@/components/ScheduleTestModal";
+import ExamBadge from "@/components/edura/ExamBadge";
+
 import {
   Sheet,
   SheetContent,
