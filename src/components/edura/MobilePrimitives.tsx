@@ -71,36 +71,106 @@ export const PrimaryActionCard = ({
   </section>
 );
 
+const TONES = {
+  primary: { card: "bg-mint", icon: "bg-mint-foreground/10 text-mint-foreground", text: "text-mint-foreground" },
+  mint: { card: "bg-mint", icon: "bg-mint-foreground/10 text-mint-foreground", text: "text-mint-foreground" },
+  info: { card: "bg-sky", icon: "bg-sky-foreground/10 text-sky-foreground", text: "text-sky-foreground" },
+  sky: { card: "bg-sky", icon: "bg-sky-foreground/10 text-sky-foreground", text: "text-sky-foreground" },
+  warning: { card: "bg-butter", icon: "bg-butter-foreground/10 text-butter-foreground", text: "text-butter-foreground" },
+  butter: { card: "bg-butter", icon: "bg-butter-foreground/10 text-butter-foreground", text: "text-butter-foreground" },
+  lilac: { card: "bg-lilac", icon: "bg-lilac-foreground/10 text-lilac-foreground", text: "text-lilac-foreground" },
+  peach: { card: "bg-peach", icon: "bg-peach-foreground/10 text-peach-foreground", text: "text-peach-foreground" },
+  neutral: { card: "bg-lilac", icon: "bg-lilac-foreground/10 text-lilac-foreground", text: "text-lilac-foreground" },
+} as const;
+
+export type ToolTone = keyof typeof TONES;
+
 export const MobileToolCard = ({
   to,
   icon: Icon,
   title,
   description,
+  stat,
   tone = "primary",
 }: {
   to: string;
   icon: LucideIcon;
   title: string;
   description: string;
-  tone?: "primary" | "info" | "warning" | "neutral";
+  /** optional mini stat shown on the right of the title row */
+  stat?: string;
+  tone?: ToolTone;
 }) => {
-  const toneClass = {
-    primary: "bg-primary/10 text-primary",
-    info: "bg-info/10 text-info",
-    warning: "bg-warning/10 text-warning",
-    neutral: "bg-muted text-foreground",
-  }[tone];
+  const t = TONES[tone] ?? TONES.primary;
 
   return (
-    <Link to={to} className="app-card press flex min-h-32 flex-col p-4">
-      <span className={cn("flex h-10 w-10 items-center justify-center rounded-xl", toneClass)}>
-        <Icon className="h-5 w-5" />
-      </span>
-      <p className="mt-3 text-sm font-bold text-foreground">{title}</p>
-      <p className="mt-1 text-[11px] leading-snug text-muted-foreground">{description}</p>
+    <Link
+      to={to}
+      className={cn(
+        "press flex min-h-36 flex-col rounded-[1.5rem] p-4 transition-shadow",
+        t.card,
+        t.text
+      )}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <span className={cn("flex h-11 w-11 items-center justify-center rounded-2xl", t.icon)}>
+          <Icon className="h-5 w-5" strokeWidth={2.2} />
+        </span>
+        {stat && (
+          <span className="rounded-full bg-background/60 px-2 py-1 text-[10px] font-extrabold tabular">
+            {stat}
+          </span>
+        )}
+      </div>
+      <p className="mt-auto pt-3 font-display text-[15px] font-extrabold leading-tight">{title}</p>
+      <p className="mt-1 text-[11px] font-medium leading-snug opacity-75">{description}</p>
     </Link>
   );
 };
+
+/** Sun–Sat activity strip: instant, visual proof of a streak. */
+export const WeekStrip = ({
+  activeDays = [],
+  className,
+}: {
+  /** JS day indexes (0 = Sunday) that had activity */
+  activeDays?: number[];
+  className?: string;
+}) => {
+  const labels = ["S", "M", "T", "W", "T", "F", "S"];
+  const today = new Date();
+  const todayIdx = today.getDay();
+  const sunday = new Date(today);
+  sunday.setDate(today.getDate() - todayIdx);
+
+  return (
+    <div className={cn("grid grid-cols-7 gap-1.5", className)}>
+      {labels.map((label, idx) => {
+        const date = new Date(sunday);
+        date.setDate(sunday.getDate() + idx);
+        const isToday = idx === todayIdx;
+        const done = activeDays.includes(idx);
+        return (
+          <div
+            key={idx}
+            className={cn(
+              "flex flex-col items-center gap-1 rounded-2xl border px-1 py-2 transition-colors",
+              isToday
+                ? "border-transparent bg-ink text-ink-foreground"
+                : done
+                  ? "border-transparent bg-mint text-mint-foreground"
+                  : "border-border/70 bg-card text-muted-foreground"
+            )}
+          >
+            <span className="text-[10px] font-bold uppercase">{label}</span>
+            <span className="font-display text-[13px] font-extrabold tabular">{date.getDate()}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 
 export const MobileEmptyState = ({
   icon: Icon,
