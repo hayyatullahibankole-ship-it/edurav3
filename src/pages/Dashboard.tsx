@@ -354,16 +354,7 @@ const Dashboard = () => {
               )}
             </Panel>
 
-            <Panel title="Discover">
-              <div className="grid gap-2 sm:grid-cols-2">
-                <ListRow to="/study-hub" icon={Target} title="Study hub" meta="Planner & materials" />
-                <ListRow to="/resources" icon={FileText} title="Past questions" meta="Downloadables" />
-                <ListRow to="/ebooks" icon={Library} title="Ebook library" meta="Read online" />
-                <ListRow href={EDUCATION_NEWS_URL} icon={Newspaper} title="Education news" meta="Admissions, scholarships & updates" />
-                <ListRow to="/leaderboard" icon={Trophy} title="Leaderboard" meta="See your standing" />
-                <ListRow to="/referral-program" icon={Award} title="Referrals" meta="Earn rewards" />
-              </div>
-            </Panel>
+
           </div>
         </div>
       )}
