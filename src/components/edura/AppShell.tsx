@@ -356,7 +356,7 @@ export const AppShell = ({ side, title, subtitle, meta, action, nav, children }:
           </div>
         </header>
 
-        <main className="w-full flex-1 px-4 py-4 pb-24 sm:px-6 sm:py-7 lg:pb-10">
+        <main className="w-full flex-1 px-4 py-4 pb-32 sm:px-6 sm:py-7 lg:pb-10">
           <div className="mx-auto w-full max-w-6xl animate-screen-in">
             <div className="mb-4 hidden flex-wrap items-start justify-between gap-3 lg:flex">
               <div className="min-w-0">
