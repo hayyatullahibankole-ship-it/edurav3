@@ -3189,6 +3189,84 @@ export type Database = {
           },
         ]
       }
+      notification_log: {
+        Row: {
+          channel: string
+          created_at: string
+          dedupe_key: string
+          id: string
+          rule_key: string
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          dedupe_key: string
+          id?: string
+          rule_key: string
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          dedupe_key?: string
+          id?: string
+          rule_key?: string
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notification_rules: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          enabled: boolean
+          id: string
+          label: string
+          last_run_at: string | null
+          last_sent_count: number
+          priority: number
+          rule_key: string
+          run_window: string
+          total_sent_count: number
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          label: string
+          last_run_at?: string | null
+          last_sent_count?: number
+          priority?: number
+          rule_key: string
+          run_window?: string
+          total_sent_count?: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          label?: string
+          last_run_at?: string | null
+          last_sent_count?: number
+          priority?: number
+          rule_key?: string
+          run_window?: string
+          total_sent_count?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -5474,6 +5552,8 @@ export type Database = {
           profile_image_url: string | null
           state: string | null
           study_level: string | null
+          trial_source: string | null
+          trial_started_at: string | null
           two_fa_enabled: boolean | null
           two_fa_secret: string | null
           updated_at: string | null
@@ -5508,6 +5588,8 @@ export type Database = {
           profile_image_url?: string | null
           state?: string | null
           study_level?: string | null
+          trial_source?: string | null
+          trial_started_at?: string | null
           two_fa_enabled?: boolean | null
           two_fa_secret?: string | null
           updated_at?: string | null
@@ -5542,6 +5624,8 @@ export type Database = {
           profile_image_url?: string | null
           state?: string | null
           study_level?: string | null
+          trial_source?: string | null
+          trial_started_at?: string | null
           two_fa_enabled?: boolean | null
           two_fa_secret?: string | null
           updated_at?: string | null
