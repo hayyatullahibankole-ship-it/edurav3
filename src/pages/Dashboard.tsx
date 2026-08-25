@@ -23,7 +23,7 @@ import TrialStatusCard from "@/components/edura/TrialStatusCard";
 
 import BadgeStrip from "@/components/edura/gamify/BadgeStrip";
 import CountUp from "@/components/edura/gamify/CountUp";
-import { MobileSection, MobileToolCard, PrimaryActionCard } from "@/components/edura/MobilePrimitives";
+import { MobileSection, MobileToolCard, PrimaryActionCard, WeekStrip } from "@/components/edura/MobilePrimitives";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
