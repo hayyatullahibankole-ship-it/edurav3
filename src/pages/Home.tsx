@@ -136,6 +136,25 @@ const Home = () => {
                 </Link>
               </div>
 
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <span className="text-xs uppercase tracking-wide text-ink-foreground/50">Built for</span>
+                {[jambAsset.url, waecAsset.url, necoAsset.url, postUtmeAsset.url].map((src, i) => (
+                  <span
+                    key={src}
+                    className="flex h-11 w-11 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm"
+                  >
+                    <img
+                      src={src}
+                      alt={["JAMB", "WAEC", "NECO", "Post-UTME"][i] + " logo"}
+                      loading="lazy"
+                      className="h-full w-full object-contain"
+                    />
+                  </span>
+                ))}
+              </div>
+
+
+
               <div className="flex flex-wrap items-center gap-6 sm:gap-8 pt-6 border-t border-white/10">
                 {[
                   { v: "120,000+", l: "Practice questions" },
