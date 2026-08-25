@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, Gift } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from './ui/sheet';
 import { Card, CardContent } from './ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useSubscription } from '@/hooks/useSubscription';
 import { formatDistanceToNow } from 'date-fns';
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
@@ -22,6 +23,7 @@ interface Notification {
 
 const NotificationBell = () => {
   const { userProfile } = useAuth();
+  const { hasFreePromoAccess, freeAccessExpiry, freeAccessExpired } = useSubscription();
   const [showSheet, setShowSheet] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
