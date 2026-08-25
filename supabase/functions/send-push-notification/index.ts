@@ -1,135 +1,170 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 interface NotificationPayload {
-  userId: string;
+  userId?: string; // auth user id
+  userIds?: string[]; // multiple auth user ids
   title: string;
   body: string;
-  data?: Record<string, any>;
+  route?: string;
+  data?: Record<string, string>;
 }
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+// ---- FCM HTTP v1 auth (service account -> OAuth access token) ----
+const pemToArrayBuffer = (pem: string) => {
+  const b64 = pem
+    .replace(/-----BEGIN PRIVATE KEY-----/, "")
+    .replace(/-----END PRIVATE KEY-----/, "")
+    .replace(/\s+/g, "");
+  const bin = atob(b64);
+  const buf = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  return buf.buffer;
+};
+
+const b64url = (input: string | Uint8Array) => {
+  const bytes = typeof input === "string" ? new TextEncoder().encode(input) : input;
+  let str = "";
+  bytes.forEach((b) => (str += String.fromCharCode(b)));
+  return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+};
+
+const getAccessToken = async (sa: { client_email: string; private_key: string }) => {
+  const now = Math.floor(Date.now() / 1000);
+  const header = b64url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
+  const claim = b64url(
+    JSON.stringify({
+      iss: sa.client_email,
+      scope: "https://www.googleapis.com/auth/firebase.messaging",
+      aud: "https://oauth2.googleapis.com/token",
+      exp: now + 3600,
+      iat: now,
+    }),
+  );
+  const key = await crypto.subtle.importKey(
+    "pkcs8",
+    pemToArrayBuffer(sa.private_key),
+    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signature = new Uint8Array(
+    await crypto.subtle.sign("RSASSA-PKCS1-v1_5", key, new TextEncoder().encode(`${header}.${claim}`)),
+  );
+  const jwt = `${header}.${claim}.${b64url(signature)}`;
+
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion: jwt,
+    }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(`Google OAuth failed: ${JSON.stringify(json)}`);
+  return json.access_token as string;
+};
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const jsonRes = (payload: unknown, status = 200) =>
+    new Response(JSON.stringify(payload), {
+      status,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
 
   try {
-    const { userId, title, body, data } = await req.json() as NotificationPayload;
+    const payload = (await req.json()) as NotificationPayload;
+    const { title, body, route, data } = payload;
+    const authUserIds = payload.userIds?.length ? payload.userIds : payload.userId ? [payload.userId] : [];
 
-    if (!userId || !title || !body) {
-      return new Response(
-        JSON.stringify({ error: 'Missing required fields: userId, title, body' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+    if (!title || !body || authUserIds.length === 0) {
+      return jsonRes({ error: "Missing required fields: title, body and userId(s)" }, 400);
     }
 
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    );
 
-    // Get user's push token and preferences
-    const { data: user, error: userError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('auth_user_id', userId)
-      .single();
+    const { data: users, error: usersError } = await supabase
+      .from("users")
+      .select("id")
+      .in("auth_user_id", authUserIds);
+    if (usersError) throw usersError;
+    const appUserIds = (users ?? []).map((u: { id: string }) => u.id);
+    if (appUserIds.length === 0) return jsonRes({ success: false, message: "No matching users" });
 
-    if (userError || !user) {
-      throw new Error('User not found');
-    }
+    const { data: devices, error: devicesError } = await supabase
+      .from("push_devices")
+      .select("id, user_id, token")
+      .in("user_id", appUserIds)
+      .eq("enabled", true);
+    if (devicesError) throw devicesError;
 
-    const { data: preferences, error: prefError } = await supabase
-      .from('user_preferences')
-      .select('push_token, push_notifications_enabled')
-      .eq('user_id', user.id)
-      .single();
-
-    if (prefError || !preferences) {
-      throw new Error('User preferences not found');
-    }
-
-    if (!preferences.push_notifications_enabled || !preferences.push_token) {
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          message: 'User has not enabled push notifications or no token found' 
-        }),
-        { 
-          status: 200, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
-
-    // For FCM (Firebase Cloud Messaging) - Android
-    const FCM_SERVER_KEY = Deno.env.get('FCM_SERVER_KEY');
-    
-    if (FCM_SERVER_KEY && preferences.push_token) {
-      const fcmResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
-        method: 'POST',
-        headers: {
-          'Authorization': `key=${FCM_SERVER_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          to: preferences.push_token,
-          notification: {
-            title,
-            body,
-            sound: 'default',
-            badge: 1
-          },
-          data: data || {}
-        })
-      });
-
-      const fcmResult = await fcmResponse.json();
-      console.log('FCM Response:', fcmResult);
-    }
-
-    // For APNs (Apple Push Notification service) - iOS
-    // You would need to set up APNs certificates and implement the sending logic here
-    // This typically requires using Apple's HTTP/2 API with JWT authentication
-
-    // Log notification sent
-    await supabase
-      .from('notifications')
-      .insert({
-        user_id: user.id,
+    // Always store an in-app notification, even when no device is registered.
+    await supabase.from("notifications").insert(
+      appUserIds.map((id) => ({
+        user_id: id,
         title,
         message: body,
-        type: 'push',
-        metadata: data || {}
+        type: "push",
+        metadata: { ...(data ?? {}), ...(route ? { route } : {}) },
+      })),
+    );
+
+    if (!devices?.length) {
+      return jsonRes({ success: true, sent: 0, message: "Saved in-app; no registered devices" });
+    }
+
+    const raw = Deno.env.get("FIREBASE_SERVICE_ACCOUNT_JSON");
+    if (!raw) {
+      return jsonRes({ success: true, sent: 0, message: "FIREBASE_SERVICE_ACCOUNT_JSON not configured" });
+    }
+    const sa = JSON.parse(raw) as { client_email: string; private_key: string; project_id: string };
+    const accessToken = await getAccessToken(sa);
+    const endpoint = `https://fcm.googleapis.com/v1/projects/${sa.project_id}/messages:send`;
+
+    let sent = 0;
+    const staleDeviceIds: string[] = [];
+
+    for (const device of devices) {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: {
+            token: device.token,
+            notification: { title, body },
+            data: { ...(data ?? {}), ...(route ? { route } : {}) },
+            android: { priority: "HIGH", notification: { sound: "default" } },
+            apns: { payload: { aps: { sound: "default", badge: 1 } } },
+          },
+        }),
       });
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: 'Push notification sent successfully' 
-      }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      if (res.ok) {
+        sent++;
+      } else {
+        const err = await res.text();
+        console.error("FCM send failed", device.id, res.status, err);
+        if (res.status === 404 || res.status === 400) staleDeviceIds.push(device.id);
       }
-    );
+    }
 
+    if (staleDeviceIds.length) {
+      await supabase.from("push_devices").update({ enabled: false }).in("id", staleDeviceIds);
+    }
+
+    return jsonRes({ success: true, sent, devices: devices.length, disabled: staleDeviceIds.length });
   } catch (error) {
-    console.error('Error sending push notification:', error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+    console.error("Error sending push notification:", error);
+    return jsonRes({ error: error instanceof Error ? error.message : "Unknown error" }, 500);
   }
 });

@@ -5,9 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 
-// Push registration calls Firebase natively. Without android/app/google-services.json
-// the Android app crashes on launch, so keep this off until Firebase is configured.
-const PUSH_ENABLED = false;
+// Firebase is configured (android/app/google-services.json is present), so native
+// push registration is enabled. Web builds are skipped automatically.
+const PUSH_ENABLED = true;
 const DEVICE_ID_KEY = 'edura_push_device_id';
 
 const getDeviceId = () => {
@@ -68,7 +68,7 @@ export const usePushNotifications = () => {
 
   const requestPermission = async () => {
     if (!PUSH_ENABLED || !Capacitor.isNativePlatform()) {
-      toast.error('Push notifications will be available after Firebase setup');
+      toast.error('Push notifications are only available in the installed app');
       return;
     }
 
