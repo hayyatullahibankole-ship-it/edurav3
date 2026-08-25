@@ -203,16 +203,7 @@ export const usePushNotifications = () => {
   const requestPermission = () => enable(true);
 
   const openSystemSettings = async () => {
-    if (!Capacitor.isNativePlatform()) return;
-    try {
-      const { NativeSettings, AndroidSettings, IOSSettings } = await import('capacitor-native-settings');
-      await NativeSettings.open({
-        optionAndroid: AndroidSettings.ApplicationDetails,
-        optionIOS: IOSSettings.App,
-      });
-    } catch {
-      toast.info('Open your device settings > Apps > Edura > Notifications');
-    }
+    toast.info('Open your device Settings > Apps > Edura > Notifications to re-enable them.');
   };
 
   const disableNotifications = async () => {
