@@ -88,6 +88,13 @@ export default function AccountSettings() {
   };
 
   // State for settings
+  const {
+    permissionStatus: pushStatus,
+    requestPermission,
+    disableNotifications,
+    openSystemSettings,
+    isSupported: pushSupported,
+  } = usePushNotifications();
   const [notifications, setNotifications] = useState<NotificationSettings>({
     email_test_reminders: true,
     email_results: true,
