@@ -91,15 +91,16 @@ const CBTHome = () => {
             {EXAM_TYPES.map((exam, i) => {
               const inner = (
                 <div
-                  className={`app-card press w-full p-4 text-left animate-pop-in stagger-${Math.min(i + 1, 5)}`}
+                  className={`app-card press flex w-full items-center gap-3 p-3.5 text-left animate-pop-in stagger-${Math.min(i + 1, 5)}`}
                 >
-                  <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <exam.icon className="h-5 w-5" />
-                  </div>
-                  <span className="block font-display text-sm font-bold">{exam.label}</span>
-                  <span className="text-[10px] text-muted-foreground">{exam.subtitle}</span>
+                  <ExamBadge exam={exam.type} />
+                  <span className="min-w-0">
+                    <span className="block font-display text-sm font-extrabold">{exam.label}</span>
+                    <span className="block truncate text-[10px] text-muted-foreground">{exam.subtitle}</span>
+                  </span>
                 </div>
               );
+
               return isMobileBrowser ? (
                 <button
                   key={exam.type}
