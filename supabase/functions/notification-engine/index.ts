@@ -54,6 +54,67 @@ Deno.serve(async (req) => {
       return json({ skipped: "notifications disabled" });
     }
 
+    // ---- broadcast mode (news / announcements fan-out) -------------------
+    if (body?.mode === "broadcast") {
+      const title = String(body?.title || "").slice(0, 120);
+      const message = String(body?.message || "").slice(0, 500);
+      const route = String(body?.route || "/dashboard");
+      const stage = body?.stage as string | undefined; // 'candidate' | 'campus' | undefined
+      const ruleKey = String(body?.ruleKey || "news_published");
+      const dedupeKey = String(body?.dedupeKey || crypto.randomUUID());
+
+      if (!title || !message) return json({ error: "title and message are required" }, 400);
+
+      const rule = await supabase
+        .from("notification_rules")
+        .select("enabled")
+        .eq("rule_key", ruleKey)
+        .maybeSingle();
+      if (rule.data && rule.data.enabled === false) return json({ skipped: "rule disabled" });
+
+      let q = supabase
+        .from("users")
+        .select("id, auth_user_id, academic_stage")
+        .eq("is_suspended", false)
+        .not("auth_user_id", "is", null)
+        .limit(MAX_USERS);
+      if (stage === "campus") q = q.in("academic_stage", ["undergraduate", "graduate"]);
+      if (stage === "candidate") q = q.or("academic_stage.is.null,academic_stage.in.(secondary,sss3,candidate)");
+
+      const { data: targets } = await q;
+      const list = targets || [];
+      const inserted: any[] = [];
+      for (const t of list) {
+        const { error } = await supabase.from("notification_log").insert({
+          user_id: t.id, rule_key: ruleKey, dedupe_key: dedupeKey, channel: "inapp",
+        });
+        if (!error) inserted.push(t);
+      }
+      if (inserted.length) {
+        await supabase.from("notifications").insert(
+          inserted.map((t) => ({
+            user_id: t.id, title, message, type: "info",
+            metadata: { route, rule: ruleKey, automated: true },
+          })),
+        );
+        const authIds = inserted.map((t) => t.auth_user_id).filter(Boolean);
+        for (let i = 0; i < authIds.length; i += 200) {
+          try {
+            await supabase.functions.invoke("send-push-notification", {
+              body: { userIds: authIds.slice(i, i + 200), title, body: message, route },
+            });
+          } catch (e) {
+            console.error("broadcast push failed", e);
+          }
+        }
+        await supabase.from("notification_rules")
+          .update({ last_run_at: new Date().toISOString(), last_sent_count: inserted.length })
+          .eq("rule_key", ruleKey);
+      }
+      return json({ mode: "broadcast", sent: inserted.length });
+    }
+
+
     // ---- single-flight lock --------------------------------------------
     const now = new Date();
     const lockValue = settings[LOCK_KEY];
