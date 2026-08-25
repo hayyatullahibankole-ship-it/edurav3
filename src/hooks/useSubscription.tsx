@@ -273,7 +273,15 @@ export function useSubscription() {
     });
   }
 
+  // Trial state (signup / backfill granted free window)
+  const trialExpiry = trialInfo.expiry ? new Date(trialInfo.expiry) : null;
+  const msLeft = trialExpiry ? trialExpiry.getTime() - Date.now() : 0;
+  const isOnTrial = Boolean(trialInfo.startedAt && trialExpiry && msLeft >= 0);
+  const trialDaysLeft = isOnTrial ? Math.max(0, Math.ceil(msLeft / 86400000)) : 0;
+  const trialExpired = Boolean(trialInfo.startedAt && trialExpiry && msLeft < 0);
+
   return {
+
     subscription,
     loading,
     hasPremiumAccess: !!hasPremiumAccess,
