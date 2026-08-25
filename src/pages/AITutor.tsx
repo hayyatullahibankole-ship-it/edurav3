@@ -35,10 +35,36 @@ const AITutor = () => {
   const [threads, setThreads] = useState<TutorThread[]>([]);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [bootstrapped, setBootstrapped] = useState(false);
+  const [mobileViewport, setMobileViewport] = useState<{ height: number; top: number } | null>(null);
 
   useEffect(() => {
     document.title = "AI Tutor | Edura";
   }, []);
+
+  useEffect(() => {
+    if (!isMobile) {
+      setMobileViewport(null);
+      return;
+    }
+
+    const viewport = window.visualViewport;
+    const syncViewport = () => {
+      setMobileViewport({
+        height: Math.round(viewport?.height ?? window.innerHeight),
+        top: Math.round(viewport?.offsetTop ?? 0),
+      });
+    };
+
+    syncViewport();
+    viewport?.addEventListener("resize", syncViewport);
+    viewport?.addEventListener("scroll", syncViewport);
+    window.addEventListener("resize", syncViewport);
+    return () => {
+      viewport?.removeEventListener("resize", syncViewport);
+      viewport?.removeEventListener("scroll", syncViewport);
+      window.removeEventListener("resize", syncViewport);
+    };
+  }, [isMobile]);
 
   const loadThreads = useCallback(async () => {
     if (!user) {
@@ -128,27 +154,35 @@ const AITutor = () => {
               thread.id === threadId ? "bg-accent" : "hover:bg-accent/60"
             }`}
           >
-            <button onClick={() => handleSelect(thread.id)} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+            <Button
+              variant="ghost"
+              onClick={() => handleSelect(thread.id)}
+              className="h-auto min-w-0 flex-1 justify-start gap-2 whitespace-normal px-1 py-1 text-left hover:bg-transparent"
+            >
               <MessageSquare className="h-4 w-4 shrink-0 text-muted-foreground" />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium">{thread.title}</span>
                 <span className="block text-[11px] text-muted-foreground">{relativeTime(thread.updated_at)}</span>
               </span>
-            </button>
-            <button
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
               onClick={() => handleRename(thread)}
-              className="rounded-lg p-1.5 text-muted-foreground opacity-0 transition-opacity hover:bg-background hover:text-foreground group-hover:opacity-100"
+              className="h-8 w-8 text-muted-foreground md:opacity-0 md:transition-opacity md:group-hover:opacity-100"
               aria-label="Rename chat"
             >
               <Pencil className="h-3.5 w-3.5" />
-            </button>
-            <button
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
               onClick={() => handleDelete(thread.id)}
-              className="rounded-lg p-1.5 text-muted-foreground opacity-0 transition-opacity hover:bg-background hover:text-destructive group-hover:opacity-100"
+              className="h-8 w-8 text-muted-foreground hover:text-destructive md:opacity-0 md:transition-opacity md:group-hover:opacity-100"
               aria-label="Delete chat"
             >
               <Trash2 className="h-3.5 w-3.5" />
-            </button>
+            </Button>
           </div>
         ))}
       </div>
@@ -159,10 +193,17 @@ const AITutor = () => {
     <div
       className={
         isMobile
-          ? "fixed inset-x-0 top-0 z-50 flex w-full flex-col overflow-hidden bg-background"
-          : "flex h-[calc(100dvh-11rem)] w-full overflow-hidden rounded-2xl border bg-background"
+          ? "fixed inset-x-0 z-50 flex w-full flex-col overflow-hidden bg-background"
+          : "-mx-4 -mb-4 flex h-[calc(100dvh-5rem)] w-[calc(100%+2rem)] overflow-hidden border-t bg-background sm:-mx-6 sm:-mb-7 sm:w-[calc(100%+3rem)] lg:mx-0 lg:-mb-10 lg:h-[calc(100dvh-7.75rem)] lg:w-full"
       }
-      style={isMobile ? { height: "100dvh", maxHeight: "100dvh" } : undefined}
+      style={
+        isMobile
+          ? {
+              height: mobileViewport ? `${mobileViewport.height}px` : "100dvh",
+              top: mobileViewport ? `${mobileViewport.top}px` : 0,
+            }
+          : undefined
+      }
     >
 
 
@@ -173,7 +214,7 @@ const AITutor = () => {
         </aside>
       )}
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <header
           className="flex items-center gap-2 border-b border-border bg-card/60 px-3 py-2.5 sm:px-5"
           style={isMobile ? { paddingTop: "calc(env(safe-area-inset-top) + 0.625rem)" } : undefined}
@@ -187,10 +228,14 @@ const AITutor = () => {
           </div>
 
           {isMobile ? (
-            <Sheet open={historyOpen} onOpenChange={setHistoryOpen}>
+            <div className="flex items-center gap-1">
+              <Button size="icon" variant="ghost" className="h-9 w-9" onClick={handleNewChat} aria-label="Start new chat">
+                <Plus className="h-4 w-4" />
+              </Button>
+              <Sheet open={historyOpen} onOpenChange={setHistoryOpen}>
               <SheetTrigger asChild>
-                <Button size="sm" variant="outline" className="gap-1.5">
-                  <History className="h-4 w-4" /> History
+                <Button size="icon" variant="outline" className="h-9 w-9" aria-label="Open chat history">
+                  <History className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[85vw] max-w-sm p-4">
@@ -201,7 +246,8 @@ const AITutor = () => {
                   <ThreadList />
                 </div>
               </SheetContent>
-            </Sheet>
+              </Sheet>
+            </div>
           ) : (
             <Button size="sm" variant="outline" className="gap-1.5" onClick={handleNewChat}>
               <Plus className="h-4 w-4" /> New chat
@@ -209,10 +255,7 @@ const AITutor = () => {
           )}
         </header>
 
-        <div
-          className="min-h-0 flex-1"
-          style={isMobile ? { paddingBottom: "env(safe-area-inset-bottom)" } : undefined}
-        >
+        <div className="min-h-0 flex-1">
           <AITutorChat
             key={threadId ?? "new"}
             threadId={threadId ?? null}

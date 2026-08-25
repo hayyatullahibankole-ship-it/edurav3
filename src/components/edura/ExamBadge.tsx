@@ -3,6 +3,7 @@ import jambLogo from "@/assets/exam-jamb.png";
 import waecLogo from "@/assets/exam-waec.png";
 import necoLogo from "@/assets/exam-neco.png";
 import postUtmeLogo from "@/assets/exam-post-utme.jpg";
+import nabtebLogoAsset from "@/assets/exam-nabteb.png.asset.json";
 
 export type ExamKey = "jamb" | "waec" | "neco" | "post-utme" | "gce" | string;
 
@@ -13,6 +14,7 @@ const MARKS: Record<string, Mark> = {
   utme: { label: "JAMB", tint: "bg-mint", text: "text-mint-foreground", logo: jambLogo },
   waec: { label: "WAEC", tint: "bg-sky", text: "text-sky-foreground", logo: waecLogo },
   neco: { label: "NECO", tint: "bg-butter", text: "text-butter-foreground", logo: necoLogo },
+  nabteb: { label: "NABTEB", tint: "bg-mint", text: "text-mint-foreground", logo: nabtebLogoAsset.url },
   "post-utme": { label: "PUTME", tint: "bg-lilac", text: "text-lilac-foreground", logo: postUtmeLogo },
   post_utme: { label: "PUTME", tint: "bg-lilac", text: "text-lilac-foreground", logo: postUtmeLogo },
   "post utme": { label: "PUTME", tint: "bg-lilac", text: "text-lilac-foreground", logo: postUtmeLogo },

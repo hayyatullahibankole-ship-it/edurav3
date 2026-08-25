@@ -39,6 +39,7 @@ export const AITutorChat = ({ threadId, onThreadCreated, onThreadTouched }: AITu
   const cameraRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
   const lastSentRef = useRef<{ text: string; images: string[] } | null>(null);
+  const shouldFollowRef = useRef(true);
 
   /* ---------- load history for the active thread ---------- */
   useEffect(() => {
@@ -60,6 +61,7 @@ export const AITutorChat = ({ threadId, onThreadCreated, onThreadTouched }: AITu
         console.error("Failed to load tutor history:", loadError);
         setError("Couldn't load this conversation.");
       } else {
+        shouldFollowRef.current = true;
         setMessages(
           (data || []).map((row: any) => ({
             id: row.id,
@@ -80,17 +82,19 @@ export const AITutorChat = ({ threadId, onThreadCreated, onThreadTouched }: AITu
 
   useEffect(() => {
     const el = scrollRef.current;
-    if (!el) return;
-    // Only auto-follow when the reader is already near the bottom.
-    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 160;
-    if (!nearBottom && streaming) return;
-    el.scrollTo({ top: el.scrollHeight, behavior: streaming ? "auto" : "smooth" });
+    if (!el || !shouldFollowRef.current) return;
+    const frame = window.requestAnimationFrame(() => {
+      el.scrollTo({ top: el.scrollHeight, behavior: streaming ? "auto" : "smooth" });
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [messages, streaming]);
 
-
   useEffect(() => {
-    textareaRef.current?.focus();
-  }, [threadId]);
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    textarea.style.height = "auto";
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 128)}px`;
+  }, [input]);
 
   /* ---------- persistence helpers ---------- */
   const ensureThread = useCallback(
@@ -141,6 +145,7 @@ export const AITutorChat = ({ threadId, onThreadCreated, onThreadTouched }: AITu
 
       const userMessage: TutorMessage = { role: "user", content: text, images: attached };
       const history = [...messages, userMessage];
+      shouldFollowRef.current = true;
       setMessages(history);
       setStreaming(true);
 
@@ -236,7 +241,14 @@ export const AITutorChat = ({ threadId, onThreadCreated, onThreadTouched }: AITu
   return (
     <div className="flex flex-col h-full min-h-0">
       {/* Transcript */}
-      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto px-4 py-6 sm:px-6">
+      <div
+        ref={scrollRef}
+        onScroll={(event) => {
+          const el = event.currentTarget;
+          shouldFollowRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+        }}
+        className="min-h-0 flex-1 overscroll-contain overflow-y-auto px-4 py-6 sm:px-6"
+      >
         <div className="mx-auto w-full max-w-3xl space-y-6">
           {loadingHistory && (
             <div className="flex justify-center py-10">
@@ -252,14 +264,17 @@ export const AITutorChat = ({ threadId, onThreadCreated, onThreadTouched }: AITu
               </p>
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {TUTOR_STARTERS.map((starter) => (
-                  <button
+                  <Button
                     key={starter.label}
+                    variant="outline"
                     onClick={() => runTurn(starter.prompt, [])}
-                    className="rounded-2xl border border-border bg-card p-4 text-left transition-colors hover:border-primary/50 hover:bg-accent active:scale-[0.99]"
+                    className="h-auto min-h-24 items-start justify-start whitespace-normal rounded-xl p-4 text-left hover:border-primary/50"
                   >
-                    <p className="text-sm font-semibold">{starter.label}</p>
-                    <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{starter.prompt}</p>
-                  </button>
+                    <span>
+                      <span className="block text-sm font-semibold">{starter.label}</span>
+                      <span className="mt-1 line-clamp-2 block text-xs font-normal text-muted-foreground">{starter.prompt}</span>
+                    </span>
+                  </Button>
                 ))}
               </div>
               {!user && (
@@ -298,13 +313,15 @@ export const AITutorChat = ({ threadId, onThreadCreated, onThreadTouched }: AITu
                             className="text-sm leading-relaxed text-foreground [&_pre]:whitespace-pre-wrap"
                             dangerouslySetInnerHTML={{ __html: renderTutorMarkdown(message.content) }}
                           />
-                          <button
+                          <Button
+                            size="sm"
+                            variant="ghost"
                             onClick={() => copyMessage(message.content, index)}
-                            className="mt-2 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                            className="mt-2 h-8 gap-1.5 px-2 text-xs text-muted-foreground"
                           >
                             {copiedIndex === index ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                             {copiedIndex === index ? "Copied" : "Copy"}
-                          </button>
+                          </Button>
                         </>
                       ) : (
                         isLast &&
@@ -344,13 +361,15 @@ export const AITutorChat = ({ threadId, onThreadCreated, onThreadTouched }: AITu
               {images.map((src, i) => (
                 <div key={i} className="relative">
                   <img src={src} alt="Attachment preview" className="h-16 w-16 rounded-lg object-cover" />
-                  <button
+                  <Button
+                    size="icon"
+                    variant="secondary"
                     onClick={() => setImages((prev) => prev.filter((_, idx) => idx !== i))}
-                    className="absolute -right-1.5 -top-1.5 rounded-full bg-foreground p-0.5 text-background"
+                    className="absolute -right-2 -top-2 h-6 w-6 rounded-full"
                     aria-label="Remove attachment"
                   >
                     <X className="h-3 w-3" />
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
@@ -387,7 +406,7 @@ export const AITutorChat = ({ threadId, onThreadCreated, onThreadTouched }: AITu
               }}
               placeholder="Ask Edura AI anything…"
               rows={1}
-              className="max-h-32 min-h-[40px] flex-1 resize-none border-0 bg-transparent px-1 py-2 text-sm shadow-none focus-visible:ring-0"
+              className="max-h-32 min-h-[40px] flex-1 resize-none overflow-y-auto border-0 bg-transparent px-1 py-2 text-sm shadow-none focus-visible:ring-0"
             />
 
             <Button

@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowRight,
-  Award,
   Building2,
   FileCheck,
   GraduationCap,
   Layers,
 } from "lucide-react";
+import ProviderLogo from "@/components/edura/ProviderLogo";
 
 type CatalogRow = {
   id: string;
@@ -27,7 +27,7 @@ const PROVIDER_META: Record<string, { label: string; icon: typeof GraduationCap 
   jamb: { label: "JAMB", icon: GraduationCap },
   waec: { label: "WAEC", icon: FileCheck },
   neco: { label: "NECO", icon: FileCheck },
-  nabteb: { label: "NABTEB", icon: Award },
+  nabteb: { label: "NABTEB", icon: FileCheck },
   admission: { label: "Admissions", icon: Building2 },
 };
 
@@ -117,7 +117,11 @@ export const ServicesShowcase = () => {
                     onClick={() => navigate(`/services?provider=${provider}`)}
                     className="flex flex-col items-start gap-1.5 rounded-lg border p-3 text-left transition-colors hover:border-primary/60"
                   >
-                    <Icon className="h-4 w-4 text-foreground" />
+                    {provider === "admission" ? (
+                      <Icon className="h-8 w-8 rounded-md border bg-muted p-1.5 text-foreground" />
+                    ) : (
+                      <ProviderLogo provider={provider} className="h-8 w-8" />
+                    )}
                     <span className="text-xs font-semibold leading-tight">{meta.label}</span>
                     <span className="text-[11px] text-muted-foreground">
                       {count} service{count === 1 ? "" : "s"}
