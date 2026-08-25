@@ -645,6 +645,18 @@ All colors MUST be HSL for consistency across light/dark modes.
   .rail { display: flex; gap: 0.5rem; overflow-x: auto; scroll-snap-type: x mandatory; }
   .rail > * { scroll-snap-align: start; flex: 0 0 auto; }
 
+  /* Floating bottom dock with a circular notch for the raised centre action */
+  .dock-notch {
+    -webkit-mask-image: radial-gradient(circle 33px at 50% 0px, transparent 32px, #000 33px);
+    mask-image: radial-gradient(circle 33px at 50% 0px, transparent 32px, #000 33px);
+  }
+
+  /* Soft ambient elevation used by the dock and hero cards (no gradients) */
+  .shadow-float {
+    box-shadow: 0 4px 12px -6px hsl(var(--foreground) / 0.18), 0 18px 40px -20px hsl(var(--foreground) / 0.35);
+  }
+
+
   /* Screen entry motion */
   @keyframes screen-in {
     from { opacity: 0; transform: translateY(12px); }
