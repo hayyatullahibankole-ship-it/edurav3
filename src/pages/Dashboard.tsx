@@ -26,10 +26,7 @@ import { EDUCATION_NEWS_URL } from "@/lib/openExternal";
 
 import UpgradeToCampus from "@/components/edura/UpgradeToCampus";
 import OnboardingTour from "@/components/OnboardingTour";
-import { AIAssistant } from "@/components/AIAssistant";
-import { FreeAccessBanner } from "@/components/dashboard/FreeAccessBanner";
 import StreakHero from "@/components/edura/gamify/StreakHero";
-import GetStartedGuide from "@/components/edura/GetStartedGuide";
 import BadgeStrip from "@/components/edura/gamify/BadgeStrip";
 import CountUp from "@/components/edura/gamify/CountUp";
 import { MobileSection, MobileToolCard, PrimaryActionCard } from "@/components/edura/MobilePrimitives";
@@ -190,13 +187,6 @@ const Dashboard = () => {
         <HomeSkeleton />
       ) : (
         <div className="space-y-4">
-          {hasFreePromoAccess && freeAccessExpiry && (
-            <FreeAccessBanner expiryDate={freeAccessExpiry} />
-          )}
-          {freeAccessExpired && freeAccessExpiry && (
-            <FreeAccessBanner expiryDate={freeAccessExpiry} isExpired />
-          )}
-
           <div className="flex items-center justify-between px-0.5 lg:hidden">
             <div>
               <p className="text-xs font-medium text-muted-foreground">Welcome back,</p>
@@ -218,8 +208,6 @@ const Dashboard = () => {
             progress={gamify.level.progress}
             icon={Play}
           />
-
-          <GetStartedGuide />
 
           <MobileSection title="Your tools">
             <div className="grid grid-cols-2 gap-3">
@@ -378,8 +366,6 @@ const Dashboard = () => {
           </div>
         </div>
       )}
-
-      <AIAssistant />
     </AppShell>
   );
 };
