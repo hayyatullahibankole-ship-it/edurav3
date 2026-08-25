@@ -143,7 +143,7 @@ Deno.serve(async (req) => {
             token: device.token,
             notification: { title, body },
             data: { ...(data ?? {}), ...(route ? { route } : {}) },
-            android: { priority: "HIGH", notification: { sound: "default", channel_id: "edura_default" } },
+            android: { priority: "HIGH", notification: { sound: "default" } },
             apns: { payload: { aps: { sound: "default", badge: 1 } } },
           },
         }),
