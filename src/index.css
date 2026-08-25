@@ -9,26 +9,26 @@ All colors MUST be HSL for consistency across light/dark modes.
 @layer base {
   :root {
     /* Core backgrounds — Cloud & Green */
-    --background: 210 20% 98%;
-    --foreground: 224 61% 15%;
+    --background: 150 13% 97%;
+    --foreground: 211 60% 8%;
 
     /* Card system */
     --card: 0 0% 100%;
-    --card-foreground: 224 61% 15%;
+    --card-foreground: 211 60% 8%;
 
     /* Popover system */
     --popover: 0 0% 100%;
-    --popover-foreground: 224 61% 15%;
+    --popover-foreground: 211 60% 8%;
 
     /* Primary - Edura Green */
-    --primary: 152 82% 39%;
+    --primary: 151 82% 39%;
     --primary-foreground: 0 0% 100%;
     --primary-hover: 152 82% 33%;
     --primary-glow: 152 70% 52%;
 
     /* Secondary - Cool cloud grey */
     --secondary: 213 24% 93%;
-    --secondary-foreground: 224 61% 15%;
+    --secondary-foreground: 211 60% 8%;
 
     /* Muted elements */
     --muted: 213 24% 95%;
@@ -52,7 +52,7 @@ All colors MUST be HSL for consistency across light/dark modes.
     --destructive-foreground: 0 0% 100%;
 
     /* Info - Navy */
-    --info: 224 61% 25%;
+    --info: 217 91% 60%;
     --info-foreground: 0 0% 100%;
 
     /* Borders and inputs */
@@ -63,7 +63,7 @@ All colors MUST be HSL for consistency across light/dark modes.
     --radius: 0.875rem;
 
     /* Deep Ink surfaces (marketing / command-center) */
-    --ink: 211 60% 8%;
+    --ink: 211 49% 8%;
     --ink-soft: 209 55% 16%;
     --ink-foreground: 150 17% 96%;
     --surface: 150 17% 96%;
@@ -175,7 +175,7 @@ All colors MUST be HSL for consistency across light/dark modes.
 
   h1, h2, h3, h4 {
     font-family: 'Sora', ui-sans-serif, system-ui, sans-serif;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
   }
 
   

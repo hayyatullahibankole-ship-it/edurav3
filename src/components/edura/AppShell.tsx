@@ -11,6 +11,7 @@ import {
   Briefcase,
   Calculator,
   Sparkles,
+  MoreHorizontal,
 
   Settings as SettingsIcon,
   LogOut,
@@ -31,6 +32,7 @@ import {
 import NotificationBell from "@/components/NotificationBell";
 import { DashboardThemeMenu } from "@/components/DashboardThemeMenu";
 import { ExploreSheet } from "@/components/edura/ExploreSheet";
+import { CampusMoreSheet } from "@/components/edura/CampusMoreSheet";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import eduraLogo from "@/assets/edura-logo.png";
@@ -89,8 +91,7 @@ const SIDE_META: Record<ShellSide, { label: string }> = {
 type CenterAction = { icon: LucideIcon; onClick: () => void; label: string };
 
 /**
- * Shared native-style bottom tab bar: four labelled tabs with one raised,
- * unlabelled action button in the middle.
+ * Shared native-style bottom tab bar: four labelled tabs with one central action.
  */
 export const MobileTabBar = ({
   items = CANDIDATE_NAV,
@@ -111,14 +112,14 @@ export const MobileTabBar = ({
       key={item.to}
       to={item.to}
       end={item.end}
-      className="press flex-1 flex flex-col items-center gap-1 py-2"
+      className="press flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 py-1.5"
     >
       {({ isActive }) => (
         <>
           <span
             className={cn(
-              "flex h-7 w-11 items-center justify-center rounded-full transition-all duration-300",
-              isActive ? "bg-primary/12 text-primary" : "text-muted-foreground"
+              "flex h-7 w-10 items-center justify-center rounded-xl transition-colors duration-200",
+              isActive ? "bg-primary/10 text-primary" : "text-muted-foreground"
             )}
           >
             <item.icon
@@ -128,7 +129,7 @@ export const MobileTabBar = ({
           </span>
           <span
             className={cn(
-              "truncate max-w-full px-1 text-[9px] transition-colors",
+              "max-w-full truncate px-0.5 text-[9px] transition-colors",
               isActive ? "font-bold text-primary" : "font-medium text-muted-foreground"
             )}
           >
@@ -141,19 +142,23 @@ export const MobileTabBar = ({
 
   return (
     <>
-      <nav className="lg:hidden fixed bottom-safe inset-x-3 z-40">
-        <div className="relative mx-auto max-w-md h-[68px] rounded-[22px] border bg-card/95 backdrop-blur-xl shadow-[0_8px_30px_-12px_hsl(var(--foreground)/0.35)]">
-          <div className="relative h-full flex items-center px-1.5">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 pb-safe backdrop-blur-xl lg:hidden">
+        <div className="relative mx-auto h-[64px] max-w-md">
+          <div className="relative flex h-full items-center px-1.5">
             {left.map(tab)}
-            <div className="flex-1 flex justify-center -mt-8">
-              <button
+            <div className="flex flex-1 justify-center">
+              <Button
                 type="button"
+                variant="ghost"
                 aria-label={action.label}
                 onClick={action.onClick}
-                className="press w-14 h-14 rounded-full bg-primary flex items-center justify-center border-4 border-card shadow-[0_10px_24px_-8px_hsl(var(--primary)/0.7)]"
+                className="press flex h-14 min-h-14 w-full flex-col items-center justify-center gap-0.5 rounded-none px-0 text-primary hover:bg-transparent hover:text-primary"
               >
-                <action.icon className="h-6 w-6 text-primary-foreground" />
-              </button>
+                <span className="flex h-8 w-10 items-center justify-center rounded-xl bg-ink text-primary">
+                  <action.icon className="h-5 w-5" />
+                </span>
+                <span className="text-[9px] font-bold">{action.label}</span>
+              </Button>
             </div>
             {right.map(tab)}
           </div>
@@ -189,6 +194,7 @@ export const AppShell = ({ side, title, subtitle, meta, action, nav, children }:
   const { signOut, userProfile, user } = useAuth();
   const { toast } = useToast();
   const [exploreOpen, setExploreOpen] = useState(false);
+  const [campusMoreOpen, setCampusMoreOpen] = useState(false);
 
   // Warm the other tab bundles while the device is idle so switching tabs is
   // instant instead of showing a loader every time.
@@ -324,26 +330,29 @@ export const AppShell = ({ side, title, subtitle, meta, action, nav, children }:
         </div>
       </aside>
 
-      <div className="lg:pl-60 flex min-h-screen flex-col">
+      <div className="flex min-h-screen flex-col lg:pl-60">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-xl pt-safe">
-          <div className="flex h-14 items-center justify-between gap-3 px-4 sm:px-6">
-            <div className="flex items-center gap-2 min-w-0 lg:hidden">
-              <img src={eduraLogo} alt="Edura" className="h-7 w-auto" />
-              <Badge variant="outline" className="text-[10px] font-semibold">{sideMeta.label}</Badge>
+        <header className="sticky top-0 z-30 border-b bg-card/90 pt-safe backdrop-blur-xl">
+          <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
+            <div className="flex min-w-0 items-center gap-3 lg:hidden">
+              {avatarMenu}
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{sideMeta.label}</p>
+                <p className="truncate font-display text-sm font-bold">{title}</p>
+              </div>
             </div>
             <p className="hidden lg:block text-sm font-semibold truncate">{title}</p>
             <div className="flex items-center gap-1.5">
               <DashboardThemeMenu />
               <NotificationBell />
-              {avatarMenu}
+              <span className="hidden lg:inline-flex">{avatarMenu}</span>
             </div>
           </div>
         </header>
 
-        <main className="flex-1 w-full px-4 sm:px-6 py-4 sm:py-7 pb-32 lg:pb-10">
+        <main className="w-full flex-1 px-4 py-4 pb-24 sm:px-6 sm:py-7 lg:pb-10">
           <div className="mx-auto w-full max-w-6xl animate-screen-in">
-            <div className="mb-4 sm:mb-7 flex flex-wrap items-start justify-between gap-3">
+            <div className="mb-4 hidden flex-wrap items-start justify-between gap-3 lg:flex">
               <div className="min-w-0">
                 <h1 className="font-display text-[22px] sm:text-2xl font-bold tracking-tight">{title}</h1>
                 {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
@@ -362,11 +371,14 @@ export const AppShell = ({ side, title, subtitle, meta, action, nav, children }:
         items={items}
         center={
           side === "campus"
-            ? { icon: Calculator, label: "Study tools", onClick: () => navigate("/campus/tools") }
+            ? { icon: MoreHorizontal, label: "More", onClick: () => setCampusMoreOpen(true) }
             : { icon: Compass, label: "Explore", onClick: () => setExploreOpen(true) }
         }
       />
       {side !== "campus" && <ExploreSheet open={exploreOpen} onOpenChange={setExploreOpen} />}
+      {side === "campus" && (
+        <CampusMoreSheet open={campusMoreOpen} onOpenChange={setCampusMoreOpen} onLogout={handleLogout} />
+      )}
     </div>
   );
 };

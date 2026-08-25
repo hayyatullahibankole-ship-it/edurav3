@@ -57,10 +57,10 @@ export default function GetStartedGuide() {
   };
 
   return (
-    <section className="rounded-[1.25rem] border border-border bg-card p-4 animate-screen-in">
+    <section className="rounded-2xl border border-info/15 bg-info/5 p-4 animate-screen-in">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="font-display text-base font-extrabold">New here? Start with these</h2>
+          <h2 className="font-display text-sm font-extrabold">Your first steps</h2>
           <p className="text-xs text-muted-foreground">
             Four things students do first. Tap any one to try it.
           </p>
@@ -74,23 +74,22 @@ export default function GetStartedGuide() {
         </button>
       </div>
 
-      <ol className="mt-3 space-y-2">
-        {STEPS.map((step, i) => (
+      <ol className="mt-3 grid grid-cols-2 gap-2">
+        {STEPS.slice(0, 4).map((step, i) => (
           <li key={step.to}>
             <Link
               to={step.to}
-              className="press flex items-center gap-3 rounded-xl border border-border p-3"
+              className="press flex min-h-20 items-start gap-2 rounded-xl border border-info/10 bg-card p-3"
             >
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                 <step.icon className="h-4 w-4 text-primary" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold">
+                <span className="block text-xs font-semibold leading-snug">
                   {i + 1}. {step.title}
                 </span>
-                <span className="block text-xs text-muted-foreground">{step.detail}</span>
+                <span className="mt-1 block text-[10px] leading-snug text-muted-foreground">{step.detail}</span>
               </span>
-              <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
             </Link>
           </li>
         ))}
