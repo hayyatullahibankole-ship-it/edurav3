@@ -126,8 +126,9 @@ const Dashboard = () => {
 
   /** Days of this week that already have activity, derived from the streak run. */
   const activeDays = useMemo(() => {
-    const last = streakData?.last_activity_date ? new Date(streakData.last_activity_date) : null;
+    const last = streakData?.last_practice_date ? new Date(streakData.last_practice_date) : null;
     const run = streakData?.current_streak || 0;
+
     if (!last || run <= 0) return [];
     const days: number[] = [];
     for (let i = 0; i < Math.min(run, 7); i++) {
