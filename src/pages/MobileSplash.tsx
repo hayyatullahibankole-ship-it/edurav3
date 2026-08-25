@@ -26,7 +26,7 @@ const MobileSplash = () => {
       } catch {
         /* non-native, ignore */
       }
-      timer = window.setTimeout(go, 1300);
+      timer = window.setTimeout(go, 450);
     };
 
     init();
