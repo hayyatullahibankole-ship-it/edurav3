@@ -19,6 +19,8 @@ import { Panel, EmptyState } from "@/components/edura/tiles";
 import UpgradeToCampus from "@/components/edura/UpgradeToCampus";
 import OnboardingTour from "@/components/OnboardingTour";
 import StreakHero from "@/components/edura/gamify/StreakHero";
+import TrialStatusCard from "@/components/edura/TrialStatusCard";
+
 import BadgeStrip from "@/components/edura/gamify/BadgeStrip";
 import CountUp from "@/components/edura/gamify/CountUp";
 import { MobileSection, MobileToolCard, PrimaryActionCard } from "@/components/edura/MobilePrimitives";
