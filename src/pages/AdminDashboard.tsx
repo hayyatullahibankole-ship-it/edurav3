@@ -761,8 +761,10 @@ export default function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="notifications" className="space-y-6">
+            <TrialsAndAutomation />
             <NotificationManager />
           </TabsContent>
+
 
           <TabsContent value="security" className="space-y-6">
             <Tabs defaultValue="monitor" className="space-y-6">
