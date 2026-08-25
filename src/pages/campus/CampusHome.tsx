@@ -150,10 +150,10 @@ const CampusHome = () => {
             </div>
           </MobileSection>
 
-          <button type="button" onClick={() => navigate("/wallet")} className="press flex min-h-14 w-full items-center justify-between rounded-2xl border bg-card px-4 text-left">
+          <Button type="button" variant="outline" onClick={() => navigate("/wallet")} className="press flex h-auto min-h-14 w-full items-center justify-between rounded-2xl bg-card px-4 text-left">
             <span className="flex items-center gap-3"><WalletIcon className="h-5 w-5 text-primary" /><span><span className="block text-xs text-muted-foreground">Wallet</span><span className="block font-bold">{naira(balance)}</span></span></span>
             <ArrowRight className="h-4 w-4 text-muted-foreground" />
-          </button>
+          </Button>
         </div>
 
         <div className="hidden grid-cols-2 gap-3 auto-rows-min md:grid md:grid-cols-12 md:gap-4">
