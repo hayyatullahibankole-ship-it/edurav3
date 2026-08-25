@@ -9,6 +9,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AITutorChat } from "@/components/ai/AITutorChat";
 import type { TutorThread } from "@/lib/aiTutor";
+import AppShell from "@/components/edura/AppShell";
+import { useAcademicStage } from "@/hooks/useAcademicStage";
 
 const relativeTime = (iso: string) => {
   const diff = Date.now() - new Date(iso).getTime();
@@ -27,6 +29,7 @@ const AITutor = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const { isCampus } = useAcademicStage();
   const { toast } = useToast();
 
   const [threads, setThreads] = useState<TutorThread[]>([]);
@@ -153,7 +156,8 @@ const AITutor = () => {
   );
 
   return (
-    <div className="flex h-[100dvh] min-h-0 w-full bg-background">
+    <AppShell side={isCampus ? "campus" : "cbt"} title="AI Tutor" subtitle="Ask questions and continue saved chats">
+    <div className="flex h-[calc(100dvh-9.5rem)] min-h-[32rem] w-full overflow-hidden rounded-lg border bg-background lg:h-[calc(100dvh-10rem)]">
       {/* Desktop thread sidebar */}
       {!isMobile && (
         <aside className="hidden w-72 shrink-0 flex-col border-r border-border bg-card/40 p-3 md:flex">
@@ -209,6 +213,7 @@ const AITutor = () => {
         </div>
       </div>
     </div>
+    </AppShell>
   );
 };
 

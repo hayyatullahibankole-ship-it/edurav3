@@ -10,8 +10,7 @@ import Layout from '@/components/Layout';
 import { SubjectButton } from '@/components/dashboard/SubjectButton';
 import { useIsMobile } from '@/hooks/use-mobile';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import MobileNav from '@/components/MobileNav';
-import { useInstalledApp } from '@/hooks/useInstalledApp';
+import { MobileTabBar } from '@/components/edura/AppShell';
 
 interface Subject {
   id: string;
@@ -44,7 +43,6 @@ const subjectIcons: Record<string, { icon: any; gradient: string }> = {
 export default function StudyHub() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { isInstalledApp } = useInstalledApp();
   const { canAccessPremium, loading: subLoading } = useSubscription();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -250,11 +248,7 @@ if (isMobile) {
           </div>
         )}
       </div>
-      {isInstalledApp && <MobileNav activeTab="study" onTabChange={(tab) => {
-        if (tab === 'dashboard') navigate('/dashboard');
-        else if (tab === 'forum') navigate('/forum');
-        else if (tab === 'profile') navigate('/dashboard?tab=profile');
-      }} />}
+      <MobileTabBar />
       <WhatsAppButton />
     </>
   );

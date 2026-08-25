@@ -14,8 +14,7 @@ import Layout from '@/components/Layout';
 import { formatDistanceToNow } from 'date-fns';
 import { useIsMobile } from '@/hooks/use-mobile';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import MobileNav from '@/components/MobileNav';
-import { useInstalledApp } from '@/hooks/useInstalledApp';
+import { MobileTabBar } from '@/components/edura/AppShell';
 
 interface Challenge {
   id: string;
@@ -46,7 +45,6 @@ interface LeaderboardEntry {
 export default function ChallengeArena() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { isInstalledApp } = useInstalledApp();
   const { isEnterprise, loading: subLoading } = useSubscription();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -499,12 +497,7 @@ if (isMobile) {
           </Card>
         </div>
       </div>
-      {isInstalledApp && <MobileNav activeTab="dashboard" onTabChange={(tab) => {
-        if (tab === 'dashboard') navigate('/dashboard');
-        else if (tab === 'study') navigate('/study-hub');
-        else if (tab === 'forum') navigate('/forum');
-        else if (tab === 'profile') navigate('/dashboard?tab=profile');
-      }} />}
+      <MobileTabBar />
       <WhatsAppButton />
     </>
   );
