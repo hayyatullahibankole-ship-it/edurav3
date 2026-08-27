@@ -5,11 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Calendar } from "lucide-react";
+import { Plus, Edit, Trash2, Calendar, Users } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { EventFormBuilder } from "@/components/admin/EventFormBuilder";
+import { EventRegistrationsDialog } from "@/components/admin/EventRegistrationsDialog";
+import { EventFormField, parseFormFields } from "@/lib/eventForm";
 
 
 interface Event {
