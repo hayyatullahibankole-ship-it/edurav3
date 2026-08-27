@@ -69,7 +69,7 @@ export default function DeleteAccount() {
 
             <section>
               <h2 className="text-xl font-semibold text-foreground mb-2">Contact</h2>
-              <p>support@edura.com.ng · privacy@edura.com.ng</p>
+              <p>support@edura.com.ng · privacy@edura.com.ng · 0705 075 7085</p>
             </section>
           </CardContent>
         </Card>
