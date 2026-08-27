@@ -166,17 +166,16 @@ export default function AkboyEvents() {
                     <div className="text-3xl font-extrabold text-emerald-600">
                       {event.price}
                     </div>
-                    {event.registration_url ? (
-                      <Button asChild className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                        <a href={event.registration_url} target="_blank" rel="noopener noreferrer">
-                          Register <ArrowRight className="ml-2 w-4 h-4" />
-                        </a>
+                    {event.seatsLeft === 0 ? (
+                      <Button disabled className="bg-emerald-600 text-white">
+                        Fully booked
                       </Button>
                     ) : (
-                      <Button asChild className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                        <Link to={`${basePath}/contact`}>
-                          Register <ArrowRight className="ml-2 w-4 h-4" />
-                        </Link>
+                      <Button
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        onClick={() => setRegisterEvent(event)}
+                      >
+                        Register <ArrowRight className="ml-2 w-4 h-4" />
                       </Button>
                     )}
                   </div>
