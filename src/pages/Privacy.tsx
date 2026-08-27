@@ -363,8 +363,10 @@ const Privacy = () => {
               <div className="p-4 bg-muted rounded-lg">
                 <p className="text-sm text-muted-foreground">
                   <strong>Email:</strong> privacy@edura.com.ng<br />
+                  <strong>Support:</strong> support@edura.com.ng<br />
+                  <strong>Phone:</strong> 0705 075 7085<br />
                   <strong>Address:</strong> Lagos, Nigeria<br />
-                  <strong>Phone:</strong> +234 (0) 123 456 7890<br />
+                  <strong>Website:</strong> www.edura.com.ng<br />
                   <strong>Data Protection Officer:</strong> dpo@edura.com.ng
                 </p>
               </div>
