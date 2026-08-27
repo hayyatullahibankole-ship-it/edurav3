@@ -9,6 +9,7 @@ import { useDomainDetection } from "@/hooks/useDomainDetection";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import eventsHero from "@/assets/akboy-events-hero.jpg";
+import { EventRegistrationDialog } from "@/components/akboy/EventRegistrationDialog";
 
 export default function AkboyEvents() {
   const { isAkboy } = useDomainDetection();
@@ -236,6 +237,11 @@ export default function AkboyEvents() {
           </Button>
         </div>
       </section>
+      <EventRegistrationDialog
+        open={!!registerEvent}
+        onOpenChange={(o) => !o && setRegisterEvent(null)}
+        event={registerEvent}
+      />
     </AkboyLayout>
   );
 }
