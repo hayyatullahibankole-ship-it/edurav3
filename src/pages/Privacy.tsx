@@ -337,7 +337,7 @@ const Privacy = () => {
               <p className="text-muted-foreground">
                 Full instructions are on our{" "}
                 <Link to="/delete-account" className="underline">account deletion page</Link>, or email
-                support@edura.space. Anonymised payment and invoice records may be retained for up to 6 years
+                support@edura.com.ng. Anonymised payment and invoice records may be retained for up to 6 years
                 where tax and accounting law requires it.
               </p>
             </section>
@@ -362,10 +362,12 @@ const Privacy = () => {
               </p>
               <div className="p-4 bg-muted rounded-lg">
                 <p className="text-sm text-muted-foreground">
-                  <strong>Email:</strong> privacy@edura.ng<br />
+                  <strong>Email:</strong> privacy@edura.com.ng<br />
+                  <strong>Support:</strong> support@edura.com.ng<br />
+                  <strong>Phone:</strong> 0705 075 7085<br />
                   <strong>Address:</strong> Lagos, Nigeria<br />
-                  <strong>Phone:</strong> +234 (0) 123 456 7890<br />
-                  <strong>Data Protection Officer:</strong> dpo@edura.ng
+                  <strong>Website:</strong> www.edura.com.ng<br />
+                  <strong>Data Protection Officer:</strong> dpo@edura.com.ng
                 </p>
               </div>
             </section>

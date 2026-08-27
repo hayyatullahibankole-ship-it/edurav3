@@ -9,7 +9,7 @@ import { Resend } from "https://esm.sh/resend@4.0.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
 const hookSecret = Deno.env.get("SEND_EMAIL_HOOK_SECRET") as string;
-const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "Edura <onboarding@resend.dev>";
+const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "Edura <noreply@edura.com.ng>";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

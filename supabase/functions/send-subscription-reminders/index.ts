@@ -3,7 +3,7 @@ import { Resend } from "https://esm.sh/resend@4.0.0";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'Edura <onboarding@resend.dev>';
+const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'Edura <noreply@edura.com.ng>';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -100,7 +100,7 @@ const createReminderEmailHtml = (firstName: string, planName: string, endDate: s
           </div>
           <div class="footer">
             <p>© ${new Date().getFullYear()} Edura. All rights reserved.</p>
-            <p style="margin-top: 10px;">Need help? Contact us at support@edura.space</p>
+            <p style="margin-top: 10px;">Need help? Contact us at support@edura.com.ng</p>
             ${unsubscribeUrl ? `<p style="margin-top: 15px;"><a href="${unsubscribeUrl}" style="color: #9ca3af; font-size: 11px; text-decoration: underline;">Unsubscribe from these emails</a></p>` : ''}
           </div>
         </div>
@@ -218,7 +218,7 @@ const handler = async (req: Request): Promise<Response> => {
           day: 'numeric' 
         });
         const renewalPrice = `${plan.currency} ${Number(plan.price).toLocaleString()}`;
-        const manageUrl = `${supabaseUrl.replace('.supabase.co', '.lovableproject.com')}/dashboard` || 'https://edura.space/dashboard';
+        const manageUrl = `${supabaseUrl.replace('.supabase.co', '.lovableproject.com')}/dashboard` || 'https://edura.com.ng/dashboard';
 
         const emailHtml = createReminderEmailHtml(
           firstName,
@@ -346,9 +346,9 @@ const handler = async (req: Request): Promise<Response> => {
                       Billing tab in your school dashboard.
                     </p>
                     <div style="text-align:center;margin:25px 0;">
-                      <a href="https://edura.space/school-dashboard" style="display:inline-block;background:#0F3D2E;color:#fff;padding:14px 36px;text-decoration:none;border-radius:8px;font-weight:bold;">Go to Dashboard</a>
+                      <a href="https://edura.com.ng/school-dashboard" style="display:inline-block;background:#0F3D2E;color:#fff;padding:14px 36px;text-decoration:none;border-radius:8px;font-weight:bold;">Go to Dashboard</a>
                     </div>
-                    <p style="color:#6b7280;font-size:14px;">If you have questions, contact support@edura.space</p>
+                    <p style="color:#6b7280;font-size:14px;">If you have questions, contact support@edura.com.ng</p>
                   </div>
                   <div style="background:#111827;padding:24px 30px;text-align:center;">
                     <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Edura. All rights reserved.</p>

@@ -13,7 +13,7 @@ export default function DeleteAccount() {
           name="description"
           content="How to permanently delete your Edura account and what data is removed or retained."
         />
-        <link rel="canonical" href="https://edura.space/delete-account" />
+        <link rel="canonical" href="https://edura.com.ng/delete-account" />
       </Helmet>
       <div className="container mx-auto px-4 max-w-3xl">
         <Button asChild variant="outline" className="mb-6">
@@ -43,7 +43,7 @@ export default function DeleteAccount() {
               <h2 className="text-xl font-semibold text-foreground mb-2">Request by email</h2>
               <p>
                 If you can no longer sign in, email{" "}
-                <a className="underline" href="mailto:support@edura.space">support@edura.space</a> from your
+                <a className="underline" href="mailto:support@edura.com.ng">support@edura.com.ng</a> from your
                 registered address with the subject "Delete my account". We complete verified requests within
                 30 days.
               </p>
@@ -69,7 +69,7 @@ export default function DeleteAccount() {
 
             <section>
               <h2 className="text-xl font-semibold text-foreground mb-2">Contact</h2>
-              <p>support@edura.space · privacy@edura.space</p>
+              <p>support@edura.com.ng · privacy@edura.com.ng · 0705 075 7085</p>
             </section>
           </CardContent>
         </Card>

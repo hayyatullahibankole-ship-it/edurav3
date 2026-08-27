@@ -180,9 +180,10 @@ const Terms = () => {
               </p>
               <div className="mt-4 p-4 bg-muted rounded-lg">
                 <p className="text-sm text-muted-foreground">
-                  <strong>Email:</strong> support@edura.ng<br />
+                  <strong>Email:</strong> support@edura.com.ng<br />
+                  <strong>Phone:</strong> 0705 075 7085<br />
                   <strong>Address:</strong> Lagos, Nigeria<br />
-                  <strong>Phone:</strong> +234 (0) 123 456 7890
+                  <strong>Website:</strong> www.edura.com.ng
                 </p>
               </div>
             </section>

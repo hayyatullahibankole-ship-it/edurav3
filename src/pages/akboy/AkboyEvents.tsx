@@ -9,6 +9,7 @@ import { useDomainDetection } from "@/hooks/useDomainDetection";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import eventsHero from "@/assets/akboy-events-hero.jpg";
+import { EventRegistrationDialog } from "@/components/akboy/EventRegistrationDialog";
 
 export default function AkboyEvents() {
   const { isAkboy } = useDomainDetection();
@@ -16,6 +17,7 @@ export default function AkboyEvents() {
 
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [registerEvent, setRegisterEvent] = useState<any | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -40,6 +42,11 @@ export default function AkboyEvents() {
           participants: e.max_participants ? `${e.max_participants} seats` : "Open",
           price: e.price > 0 ? `₦${Number(e.price).toLocaleString()}` : "Free",
           registration_url: e.registration_url,
+          form_fields: e.form_fields,
+          seatsLeft:
+            e.max_participants && e.max_participants > 0
+              ? Math.max(0, e.max_participants - (e.current_participants || 0))
+              : null,
           image_url: e.image_url,
           featured: i === 0,
         };
@@ -160,17 +167,16 @@ export default function AkboyEvents() {
                     <div className="text-3xl font-extrabold text-emerald-600">
                       {event.price}
                     </div>
-                    {event.registration_url ? (
-                      <Button asChild className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                        <a href={event.registration_url} target="_blank" rel="noopener noreferrer">
-                          Register <ArrowRight className="ml-2 w-4 h-4" />
-                        </a>
+                    {event.seatsLeft === 0 ? (
+                      <Button disabled className="bg-emerald-600 text-white">
+                        Fully booked
                       </Button>
                     ) : (
-                      <Button asChild className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                        <Link to={`${basePath}/contact`}>
-                          Register <ArrowRight className="ml-2 w-4 h-4" />
-                        </Link>
+                      <Button
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        onClick={() => setRegisterEvent(event)}
+                      >
+                        Register <ArrowRight className="ml-2 w-4 h-4" />
                       </Button>
                     )}
                   </div>
@@ -231,6 +237,11 @@ export default function AkboyEvents() {
           </Button>
         </div>
       </section>
+      <EventRegistrationDialog
+        open={!!registerEvent}
+        onOpenChange={(o) => !o && setRegisterEvent(null)}
+        event={registerEvent}
+      />
     </AkboyLayout>
   );
 }

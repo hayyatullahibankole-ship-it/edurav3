@@ -58,7 +58,7 @@ export const generateSchoolManual = () => {
   doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
   doc.text("WAEC • JAMB • NECO CBT Practice Platform", pageWidth / 2, 72, { align: "center" });
-  doc.text("www.edura.ng", pageWidth / 2, 82, { align: "center" });
+  doc.text("www.edura.com.ng", pageWidth / 2, 82, { align: "center" });
   
   doc.setTextColor(0, 0, 0);
   yPosition = 105;
@@ -88,7 +88,7 @@ export const generateSchoolManual = () => {
   
   addSection(
     "1. Getting Started with Edura",
-    "After logging in to your Edura school dashboard at www.edura.ng/school-login, you'll land on the Overview page. This is your mission control center for monitoring all student activities, performance metrics, and practice sessions."
+    "After logging in to your Edura school dashboard at www.edura.com.ng/school-login, you'll land on the Overview page. This is your mission control center for monitoring all student activities, performance metrics, and practice sessions."
   );
 
   addSection(
@@ -252,7 +252,7 @@ export const generateSchoolManual = () => {
 
   addSection(
     "Contact Channels:",
-    "📱 WhatsApp Support (Fastest):\n+234 705 075 7085\nResponse time: Usually within 5 minutes\nBest for: Urgent issues, quick questions\n\n📧 Email Support:\nsupport@edura.ng\nResponse time: Within 24 hours\nBest for: Detailed queries, documentation requests\n\n💬 In-Dashboard Chat:\nClick the help icon (bottom right)\nResponse time: Instant during business hours\nBest for: Technical issues while using platform\n\n🌐 Website:\nwww.edura.ng\nFind: Documentation, FAQs, Video tutorials"
+    "📱 WhatsApp Support (Fastest):\n+234 705 075 7085\nResponse time: Usually within 5 minutes\nBest for: Urgent issues, quick questions\n\n📧 Email Support:\nsupport@edura.com.ng\nResponse time: Within 24 hours\nBest for: Detailed queries, documentation requests\n\n💬 In-Dashboard Chat:\nClick the help icon (bottom right)\nResponse time: Instant during business hours\nBest for: Technical issues while using platform\n\n🌐 Website:\nwww.edura.com.ng\nFind: Documentation, FAQs, Video tutorials"
   );
 
   addSection(
@@ -304,7 +304,7 @@ export const generateSchoolManual = () => {
 
   addSection(
     "Essential Links:",
-    "🌐 Login: www.edura.ng/school-login\n📚 Main Website: www.edura.ng\n📱 WhatsApp: +234 705 075 7085\n📧 Email: support@edura.ng"
+    "🌐 Login: www.edura.com.ng/school-login\n📚 Main Website: www.edura.com.ng\n📱 WhatsApp: +234 705 075 7085\n📧 Email: support@edura.com.ng"
   );
 
   addSection(
@@ -314,7 +314,7 @@ export const generateSchoolManual = () => {
 
   addSection(
     "Emergency Contacts:",
-    "For urgent issues (24/7):\n📱 +234 705 075 7085 (WhatsApp)\n\nFor general inquiries:\n📧 support@edura.ng"
+    "For urgent issues (24/7):\n📱 +234 705 075 7085 (WhatsApp)\n\nFor general inquiries:\n📧 support@edura.com.ng"
   );
 
   addSection(
@@ -346,7 +346,7 @@ export const generateSchoolManual = () => {
     
     // Website
     doc.text(
-      "www.edura.ng",
+      "www.edura.com.ng",
       pageWidth - margin,
       pageHeight - 10,
       { align: "right" }
