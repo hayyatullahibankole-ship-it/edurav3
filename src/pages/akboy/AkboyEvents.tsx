@@ -16,6 +16,7 @@ export default function AkboyEvents() {
 
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [registerEvent, setRegisterEvent] = useState<any | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -40,6 +41,11 @@ export default function AkboyEvents() {
           participants: e.max_participants ? `${e.max_participants} seats` : "Open",
           price: e.price > 0 ? `₦${Number(e.price).toLocaleString()}` : "Free",
           registration_url: e.registration_url,
+          form_fields: e.form_fields,
+          seatsLeft:
+            e.max_participants && e.max_participants > 0
+              ? Math.max(0, e.max_participants - (e.current_participants || 0))
+              : null,
           image_url: e.image_url,
           featured: i === 0,
         };
