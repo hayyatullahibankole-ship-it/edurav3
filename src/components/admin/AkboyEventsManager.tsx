@@ -29,6 +29,7 @@ interface Event {
   current_participants: number;
   price: number;
   is_active: boolean;
+  form_fields?: any;
 }
 
 export function AkboyEventsManager() {
@@ -36,6 +37,7 @@ export function AkboyEventsManager() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [regEvent, setRegEvent] = useState<Event | null>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -50,6 +52,7 @@ export function AkboyEventsManager() {
     max_participants: 0,
     price: 0,
     is_active: true,
+    form_fields: [] as EventFormField[],
   });
 
   useEffect(() => {
@@ -83,7 +86,7 @@ export function AkboyEventsManager() {
       if (editingEvent) {
         const { error } = await supabase
           .from("akboy_events")
-          .update(formData)
+          .update(formData as any)
           .eq("id", editingEvent.id);
 
         if (error) throw error;
@@ -91,7 +94,7 @@ export function AkboyEventsManager() {
       } else {
         const { error } = await supabase
           .from("akboy_events")
-          .insert([formData]);
+          .insert([formData as any]);
 
         if (error) throw error;
         toast({ title: "Event created successfully" });
@@ -123,6 +126,7 @@ export function AkboyEventsManager() {
       max_participants: event.max_participants || 0,
       price: event.price || 0,
       is_active: event.is_active,
+      form_fields: parseFormFields(event.form_fields),
     });
     setDialogOpen(true);
   };
@@ -161,6 +165,7 @@ export function AkboyEventsManager() {
       max_participants: 0,
       price: 0,
       is_active: true,
+      form_fields: [],
     });
     setEditingEvent(null);
   };
@@ -273,6 +278,11 @@ export function AkboyEventsManager() {
                   />
                 </div>
               </div>
+              <EventFormBuilder
+                value={formData.form_fields}
+                onChange={(fields) => setFormData({ ...formData, form_fields: fields })}
+              />
+
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -318,6 +328,9 @@ export function AkboyEventsManager() {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    <Button size="sm" variant="outline" onClick={() => setRegEvent(event)}>
+                      <Users className="w-4 h-4" />
+                    </Button>
                     <Button size="sm" variant="outline" onClick={() => handleEdit(event)}>
                       <Edit className="w-4 h-4" />
                     </Button>
@@ -331,6 +344,13 @@ export function AkboyEventsManager() {
           </Card>
         ))}
       </div>
+
+      <EventRegistrationsDialog
+        open={!!regEvent}
+        onOpenChange={(o) => !o && setRegEvent(null)}
+        eventId={regEvent?.id || null}
+        eventTitle={regEvent?.title}
+      />
     </div>
   );
 }
