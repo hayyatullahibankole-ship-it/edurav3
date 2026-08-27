@@ -115,6 +115,50 @@ export type Database = {
         }
         Relationships: []
       }
+      akboy_event_registrations: {
+        Row: {
+          created_at: string
+          email: string | null
+          event_id: string
+          full_name: string
+          id: string
+          phone: string | null
+          responses: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          event_id: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          responses?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          event_id?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          responses?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "akboy_event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "akboy_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       akboy_events: {
         Row: {
           created_at: string | null
@@ -123,6 +167,7 @@ export type Database = {
           end_date: string | null
           event_date: string | null
           event_type: string | null
+          form_fields: Json
           id: string
           image_url: string | null
           is_active: boolean | null
@@ -140,6 +185,7 @@ export type Database = {
           end_date?: string | null
           event_date?: string | null
           event_type?: string | null
+          form_fields?: Json
           id?: string
           image_url?: string | null
           is_active?: boolean | null
@@ -157,6 +203,7 @@ export type Database = {
           end_date?: string | null
           event_date?: string | null
           event_type?: string | null
+          form_fields?: Json
           id?: string
           image_url?: string | null
           is_active?: boolean | null
