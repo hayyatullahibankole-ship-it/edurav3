@@ -80,7 +80,7 @@ export default function AccountSettings() {
     } catch (e) {
       toast({
         title: "Could not delete account",
-        description: e instanceof Error ? e.message : "Please try again or email support@edura.space",
+        description: e instanceof Error ? e.message : "Please try again or email support@edura.com.ng",
         variant: "destructive",
       });
     } finally {

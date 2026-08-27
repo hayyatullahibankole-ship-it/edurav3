@@ -112,7 +112,7 @@ const Footer = () => {
           <div className="space-y-2.5">
             <h3 className="text-sm font-semibold text-foreground">Contact</h3>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Mail className="h-4 w-4" /> support@edura.space
+              <Mail className="h-4 w-4" /> support@edura.com.ng
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Phone className="h-4 w-4" /> 0705 075 7085

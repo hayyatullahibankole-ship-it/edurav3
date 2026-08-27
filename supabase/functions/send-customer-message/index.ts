@@ -142,7 +142,7 @@ const handler = async (req: Request): Promise<Response> => {
             ctaUrl
           );
 
-          const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'Edura <onboarding@resend.dev>';
+          const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'Edura <noreply@edura.com.ng>';
           
           const emailResponse = await resend.emails.send({
             from: fromEmail,

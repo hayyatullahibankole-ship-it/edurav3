@@ -19,7 +19,7 @@ export const isNativeApp = (): boolean => {
 /** True when an in-app checkout for digital content is allowed. */
 export const canPurchaseDigitalInApp = (): boolean => !isNativeApp();
 
-export const WEB_APP_ORIGIN = "https://edura.space";
+export const WEB_APP_ORIGIN = "https://edura.com.ng";
 
 /** Message shown in place of a digital-goods checkout inside the app. */
 export const DIGITAL_PURCHASE_NOTICE =

@@ -22,8 +22,8 @@ const CAMPUS_HUB_DOMAINS = [
 ];
 
 const EDURA_DOMAINS = [
-  'edura.space',
-  'www.edura.space',
+  'edura.com.ng',
+  'www.edura.com.ng',
   'edura.lovable.app',
   // Add your Edura domain when connected
 ];

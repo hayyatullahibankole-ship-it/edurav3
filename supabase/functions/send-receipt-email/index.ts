@@ -3,7 +3,7 @@ import { Resend } from "https://esm.sh/resend@4.0.0";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'Edura <onboarding@resend.dev>';
+const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'Edura <noreply@edura.com.ng>';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -233,14 +233,14 @@ const createReceiptEmailHtml = (data: ReceiptEmailRequest) => {
             </div>
 
             <div style="text-align: center;">
-              <a href="https://edura.space/${isSchoolSubscription ? 'school-dashboard' : 'dashboard'}" class="cta-button">
+              <a href="https://edura.com.ng/${isSchoolSubscription ? 'school-dashboard' : 'dashboard'}" class="cta-button">
                 Go to Dashboard
               </a>
             </div>
 
             <div class="support-info">
               <p><strong>💡 Need Help?</strong></p>
-              <p>If you have any questions about your subscription or need assistance, our support team is here to help at support@edura.space</p>
+              <p>If you have any questions about your subscription or need assistance, our support team is here to help at support@edura.com.ng</p>
             </div>
 
             <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 30px;">
@@ -251,7 +251,7 @@ const createReceiptEmailHtml = (data: ReceiptEmailRequest) => {
           <div class="footer">
             <p><strong>Edura - Educational Excellence Platform</strong></p>
             <p>© ${new Date().getFullYear()} Edura. All rights reserved.</p>
-            <p style="margin-top: 10px;">📧 support@edura.space | 🌐 www.edura.space</p>
+            <p style="margin-top: 10px;">📧 support@edura.com.ng | 🌐 www.edura.com.ng</p>
           </div>
         </div>
       </body>

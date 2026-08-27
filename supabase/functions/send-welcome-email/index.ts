@@ -3,7 +3,7 @@ import { Resend } from "https://esm.sh/resend@4.0.0";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'Edura <onboarding@resend.dev>';
+const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'Edura <noreply@edura.com.ng>';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -113,7 +113,7 @@ const createWelcomeEmailHtml = (firstName: string, dashboardUrl: string, unsubsc
           </div>
           <div class="footer">
             <p>© ${new Date().getFullYear()} Edura. All rights reserved.</p>
-            <p style="margin-top: 10px;">Need help? Contact us at support@edura.space</p>
+            <p style="margin-top: 10px;">Need help? Contact us at support@edura.com.ng</p>
             ${unsubscribeUrl ? `<p style="margin-top: 15px;"><a href="${unsubscribeUrl}" style="color: #9ca3af; font-size: 11px; text-decoration: underline;">Unsubscribe from these emails</a></p>` : ''}
           </div>
         </div>
@@ -177,7 +177,7 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     const displayName = firstName || 'there';
-    const dashboardUrl = `${supabaseUrl.replace('.supabase.co', '.lovableproject.com')}/dashboard` || 'https://edura.space/dashboard';
+    const dashboardUrl = `${supabaseUrl.replace('.supabase.co', '.lovableproject.com')}/dashboard` || 'https://edura.com.ng/dashboard';
 
     const emailHtml = createWelcomeEmailHtml(displayName, dashboardUrl, prefs?.unsubscribe_token);
 

@@ -35,7 +35,7 @@ type SettingsShape = {
 const DEFAULTS: SettingsShape = {
   site_name: 'Edura',
   site_description: 'Computer-based testing and educational services platform',
-  admin_email: 'support@edura.space',
+  admin_email: 'support@edura.com.ng',
   support_whatsapp: '+2347050757085',
   timezone: 'Africa/Lagos',
   default_exam_duration: 120,
