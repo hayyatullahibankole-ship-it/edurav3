@@ -142,8 +142,22 @@ Deno.serve(async (req) => {
           message: {
             token: device.token,
             notification: { title, body },
-            data: { ...(data ?? {}), ...(route ? { route } : {}) },
-            android: { priority: "HIGH", notification: { sound: "default" } },
+            // FCM requires every data value to be a string.
+            data: Object.fromEntries(
+              Object.entries({ ...(data ?? {}), ...(route ? { route } : {}) }).map(
+                ([k, v]) => [k, typeof v === "string" ? v : JSON.stringify(v)],
+              ),
+            ),
+            android: {
+              priority: "HIGH",
+              notification: {
+                sound: "default",
+                channel_id: "edura_default",
+                default_vibrate_timings: true,
+                notification_priority: "PRIORITY_HIGH",
+                click_action: "FCM_PLUGIN_ACTIVITY",
+              },
+            },
             apns: { payload: { aps: { sound: "default", badge: 1 } } },
           },
         }),
