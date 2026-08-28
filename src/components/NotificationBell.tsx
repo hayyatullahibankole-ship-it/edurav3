@@ -59,6 +59,12 @@ const NotificationBell = ({ campus }: NotificationBellProps) => {
     }
   }, [userProfile?.id]);
 
+  useEffect(() => {
+    const refresh = () => void fetchUnreadCount();
+    window.addEventListener("edura:notifications-change", refresh);
+    return () => window.removeEventListener("edura:notifications-change", refresh);
+  }, [userProfile?.id]);
+
   const fetchUnreadCount = async () => {
     if (!userProfile?.id) return;
     try {

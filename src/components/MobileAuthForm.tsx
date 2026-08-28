@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ACADEMIC_STAGES, STUDY_LEVELS, isCampusStage } from "@/lib/academicStages";
 import EmailOtpVerify from "@/components/auth/EmailOtpVerify";
 import { getAuthError } from "@/lib/errors";
-import { endSignupFlow, startSignupFlow } from "@/lib/signupFlow";
+import { endSignupFlow, getSignupFlow, startSignupFlow, updateSignupFlowStep } from "@/lib/signupFlow";
 
 const loginSchema = z.object({
   email: emailSchema,
@@ -34,7 +34,8 @@ const stepMeta: Record<number, { title: string; subtitle: string }> = {
 };
 
 export default function MobileAuthForm() {
-  const [isLogin, setIsLogin] = useState(true);
+  const restoredSignup = getSignupFlow();
+  const [isLogin, setIsLogin] = useState(!restoredSignup);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -42,21 +43,21 @@ export default function MobileAuthForm() {
   const [searchParams] = useSearchParams();
   const [referralCode, setReferralCode] = useState<string | null>(null);
 
-  const [step, setStep] = useState<SignupStep>(1);
+  const [step, setStep] = useState<SignupStep>(restoredSignup?.step ?? 1);
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    academicStage: "",
-    institutionName: "",
-    studyLevel: "",
+    firstName: restoredSignup?.draft.firstName ?? "",
+    lastName: restoredSignup?.draft.lastName ?? "",
+    email: restoredSignup?.draft.email ?? "",
+    phone: restoredSignup?.draft.phone ?? "",
+    academicStage: restoredSignup?.draft.academicStage ?? "",
+    institutionName: restoredSignup?.draft.institutionName ?? "",
+    studyLevel: restoredSignup?.draft.studyLevel ?? "",
     password: "",
     confirmPassword: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [mfaOpen, setMfaOpen] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
+  const [emailSent, setEmailSent] = useState(restoredSignup?.step === 3);
 
   useEffect(() => {
     const refCode = searchParams.get("ref");
@@ -65,9 +66,6 @@ export default function MobileAuthForm() {
       setIsLogin(false);
     }
   }, [searchParams]);
-
-  // Leaving the sign-up wizard should never leave the redirect suppression on.
-  useEffect(() => () => endSignupFlow(), []);
 
   useEffect(() => {
     const preferred = localStorage.getItem("preferredJourney");
@@ -187,7 +185,7 @@ export default function MobileAuthForm() {
             study_level: formData.studyLevel || null,
           })
           .eq("auth_user_id", data.user.id);
-        if (profileError) console.error("Profile update error:", profileError);
+        if (profileError) throw new Error("We verified your email, but could not save your profile. Please try again.");
       }
 
       if (formData.academicStage) {
@@ -389,8 +387,14 @@ export default function MobileAuthForm() {
                 type="email"
                 alreadySent={false}
                 createUser
-                onVerified={() => setStep(4)}
-                onCancel={() => setEmailSent(false)}
+                onVerified={() => {
+                  updateSignupFlowStep(4);
+                  setStep(4);
+                }}
+                onCancel={() => {
+                  endSignupFlow();
+                  setEmailSent(false);
+                }}
               />
             )}
 
@@ -402,7 +406,15 @@ export default function MobileAuthForm() {
                   if (!validateStep(3)) return;
                   // From here a session can appear mid-wizard; keep the app on
                   // this form until the password step is done.
-                  startSignupFlow();
+                  startSignupFlow({
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    email: formData.email.trim().toLowerCase(),
+                    phone: formData.phone,
+                    academicStage: formData.academicStage,
+                    institutionName: formData.institutionName,
+                    studyLevel: formData.studyLevel,
+                  });
                   setEmailSent(true);
                 }}
               >
@@ -414,6 +426,10 @@ export default function MobileAuthForm() {
       case 4:
         return (
           <div className="animate-fade-in space-y-4">
+            <div className="flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-sm">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
+              <span className="min-w-0 truncate">{formData.email} verified</span>
+            </div>
             <div className="space-y-1.5">
               <Label htmlFor="password">Password</Label>
               <div className="relative">

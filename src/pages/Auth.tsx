@@ -1,16 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useSyncExternalStore } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import AuthForm from '@/components/AuthForm';
 import MobileAuthForm from '@/components/MobileAuthForm';
 import { useInstalledApp } from '@/hooks/useInstalledApp';
 import { supabase } from '@/integrations/supabase/client';
-import { isSignupInProgress } from '@/lib/signupFlow';
+import { isSignupInProgress, subscribeSignupFlow } from '@/lib/signupFlow';
 
 export default function Auth() {
   const { user, loading, isAdmin, isSchoolAdmin, userRole, userProfile } = useAuth();
   const navigate = useNavigate();
   const { isInstalledApp } = useInstalledApp();
+  const signupInProgress = useSyncExternalStore(subscribeSignupFlow, isSignupInProgress, () => false);
 
   const hasMeaningfulPhone = Boolean(
     typeof userProfile?.phone === 'string' &&
@@ -28,7 +29,7 @@ export default function Auth() {
     const checkSchoolStatus = async () => {
       // Mid-signup the OTP step creates a session before the password step —
       // stay on the form instead of redirecting.
-      if (isSignupInProgress()) return;
+      if (signupInProgress) return;
       if (user && !loading && userRole !== null) {
         if (isInstalledApp && !isProfileComplete) {
           navigate('/mobile-home', { replace: true });
@@ -94,9 +95,9 @@ export default function Auth() {
     };
     
     checkSchoolStatus();
-  }, [user, loading, userRole, isAdmin, isSchoolAdmin, navigate, userProfile, isInstalledApp, isProfileComplete]);
+  }, [user, loading, userRole, isAdmin, isSchoolAdmin, navigate, userProfile, isInstalledApp, isProfileComplete, signupInProgress]);
 
-  if (loading) {
+  if (loading && !signupInProgress) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -107,7 +108,7 @@ export default function Auth() {
     );
   }
 
-  if (user && userRole !== null && !isSignupInProgress()) {
+  if (user && userRole !== null && !signupInProgress) {
     const redirectTo = isAdmin
       ? "/admin"
       : (isSchoolAdmin ? "/school-dashboard" : (isInstalledApp ? "/mobile-home" : "/dashboard"));
