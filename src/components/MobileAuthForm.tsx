@@ -157,6 +157,16 @@ export default function MobileAuthForm() {
 
       if (error) throw error;
 
+      if (signUpData.user && (signUpData.user.identities?.length ?? 1) === 0) {
+        toast({
+          title: "Account already exists",
+          description: "This email is already registered. Sign in instead, or reset your password.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       if (signUpData.user && referralCode) {
         try {
           localStorage.setItem(
@@ -166,6 +176,12 @@ export default function MobileAuthForm() {
         } catch (refError) {
           console.error("Referral storage error:", refError);
         }
+      }
+
+      if (signUpData.session) {
+        // Email confirmation is not required for this project — go straight in.
+        onVerified();
+        return;
       }
 
       setSignupComplete(true);

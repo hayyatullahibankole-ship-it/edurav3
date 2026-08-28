@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import CampusShell from "@/components/campus/CampusShell";
 import AIOutput from "@/components/campus/ai/AIOutput";
-import PremiumGate from "@/components/campus/ai/PremiumGate";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Sparkles, Save, BookOpen, ListChecks, FileText, Target, History, Crown } from "lucide-react";
+import { Loader2, Sparkles, Save, BookOpen, ListChecks, FileText, Target, History, Crown, Zap } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   runCampusAI,
   fetchCampusAIQuota,
@@ -139,13 +139,20 @@ const CampusCompanion = () => {
     setSessions((prev) => prev.filter((s) => s.id !== id));
   };
 
-  const locked = quota ? !quota.isPremium : false;
+  const outOfCredits = quota ? quota.remaining <= 0 : false;
 
   const quotaBadge = quota && (
-    <Badge variant={quota.isPremium ? "secondary" : "outline"} className="text-[11px]">
-      <Crown className="mr-1 h-3 w-3" />
-      {quota.isPremium ? `${quota.remaining} left today` : "Premium"}
-    </Badge>
+    <div className="flex items-center gap-2">
+      <Badge variant={quota.remaining > 0 ? "secondary" : "destructive"} className="text-[11px]">
+        <Zap className="mr-1 h-3 w-3" />
+        {quota.remaining} / {quota.limit} credits left today
+      </Badge>
+      {!quota.isPremium && (
+        <Button asChild size="sm" variant="outline" className="h-7 gap-1 text-[11px]">
+          <Link to="/payment?scope=campus"><Crown className="h-3 w-3" /> Get more</Link>
+        </Button>
+      )}
+    </div>
   );
 
   return (
@@ -154,8 +161,22 @@ const CampusCompanion = () => {
       subtitle="Explanations, practice questions and exam predictions — grounded in your own courses."
       action={quotaBadge}
     >
-      {locked ? (
-        <PremiumGate />
+      {outOfCredits ? (
+        <Card>
+          <CardContent className="p-6 sm:p-8 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
+              <Zap className="h-5 w-5 text-primary" />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold">You've used today's {quota?.limit} credits</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+              Your free credits reset at midnight. Upgrade to Edura Campus Premium for a much larger daily
+              allowance across the Course Companion and Project Assistant.
+            </p>
+            <Button asChild className="mt-6 gap-2">
+              <Link to="/payment?scope=campus"><Crown className="h-4 w-4" /> View Campus plans</Link>
+            </Button>
+          </CardContent>
+        </Card>
       ) : courses.length === 0 ? (
         <Card><CardContent className="p-10 text-center">
           <BookOpen className="mx-auto h-6 w-6 text-muted-foreground" />
