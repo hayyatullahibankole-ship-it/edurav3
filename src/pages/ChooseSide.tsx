@@ -56,8 +56,9 @@ const ChooseSide = () => {
     );
   }
 
-  // Journey first — no stage means onboarding isn't done
-  if (!stage) return <Navigate to="/campus/journey" replace />;
+  // Never force Journey during account restoration; it remains an explicit
+  // profile/settings action only.
+  if (!stage) return <Navigate to="/dashboard" replace />;
   // Higher institution students belong on Campus
   if (isCampus) return <Navigate to="/campus" replace />;
 

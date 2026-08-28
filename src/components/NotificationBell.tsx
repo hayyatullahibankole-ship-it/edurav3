@@ -26,29 +26,13 @@ const NotificationBell = ({ campus }: NotificationBellProps) => {
         .on(
           "postgres_changes",
           {
-            event: "INSERT",
+            event: "*",
             schema: "public",
             table: "notifications",
             filter: `user_id=eq.${userProfile.id}`,
           },
           (payload) => {
-            if (!(payload.new as any).is_read) {
-              setUnreadCount((prev) => prev + 1);
-            }
-          }
-        )
-        .on(
-          "postgres_changes",
-          {
-            event: "UPDATE",
-            schema: "public",
-            table: "notifications",
-            filter: `user_id=eq.${userProfile.id}`,
-          },
-          (payload) => {
-            if ((payload.new as any).is_read) {
-              setUnreadCount((prev) => Math.max(0, prev - 1));
-            }
+            void fetchUnreadCount();
           }
         )
         .subscribe();
