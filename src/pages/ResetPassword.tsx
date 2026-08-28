@@ -37,6 +37,13 @@ export default function ResetPassword() {
     return () => clearTimeout(t);
   }, [cooldown]);
 
+  // Restore any pending cooldown for this address (survives reloads).
+  useEffect(() => {
+    const pending = getOtpCooldown("recovery", email);
+    if (pending > 0) setCooldown(pending);
+  }, [email]);
+
+
   const sendCode = async () => {
     if (!email.trim()) {
       toast({ title: "Email required", description: "Enter the email on your account.", variant: "destructive" });
