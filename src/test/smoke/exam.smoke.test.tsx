@@ -17,27 +17,40 @@ const QUESTIONS = [
   },
 ];
 
-const supabase = vi.hoisted(() => createSupabaseMockHoisted({
-  tables: {
-    attempts: {
-      data: {
-        id: "attempt-1",
-        exam_id: null,
-        selected_subjects: ["s1"],
-        proctoring_data: { question_ids: ["q1", "q2"], duration_minutes: 60 },
-        exams: null,
+const { supabase, navigate } = await vi.hoisted(async () => {
+  const { createSupabaseMock } = await import("../supabaseMock");
+  const { vi: v } = await import("vitest");
+  return {
+    navigate: v.fn(),
+    supabase: createSupabaseMock({
+      tables: {
+        attempts: {
+          data: {
+            id: "attempt-1",
+            exam_id: null,
+            selected_subjects: ["s1"],
+            proctoring_data: { question_ids: ["q1", "q2"], duration_minutes: 60 },
+            exams: null,
+          },
+        },
+        subjects: { data: [{ id: "s1", name: "Mathematics" }] },
+        attempt_answers: { data: [] },
       },
-    },
-    subjects: { data: [{ id: "s1", name: "Mathematics" }] },
-    attempt_answers: { data: [] },
-  },
-  rpc: { get_exam_questions_secure: { data: QUESTIONS } },
+      rpc: {
+        get_exam_questions_secure: {
+          data: [
+            { id: "q1", question_text: "What is 2 + 2?", options: ["1", "2", "3", "4"], subject_id: "s1" },
+            { id: "q2", question_text: "Capital of Nigeria?", options: ["Lagos", "Abuja", "Kano", "Enugu"], subject_id: "s1" },
+          ],
+        },
+      },
+    }),
+  };
 });
-
-const navigate = vi.fn();
 
 vi.mock("@/integrations/supabase/client", () => ({ supabase }));
 vi.mock("react-router-dom", () => ({ useNavigate: () => navigate }));
+
 
 import { useCBTExam } from "@/hooks/useCBTExam";
 
