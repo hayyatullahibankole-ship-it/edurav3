@@ -66,7 +66,12 @@ export const fetchCampusAIQuota = async (): Promise<CampusAIQuota | null> => {
       body: JSON.stringify({ task: "status" }),
     });
     if (!res.ok) return null;
-    return (await res.json()) as CampusAIQuota;
+    const raw = (await res.json()) as Partial<CampusAIQuota>;
+    // Guard against a stale/incomplete response reporting a zero allowance.
+    const isPremium = Boolean(raw.isPremium);
+    const limit = Number(raw.limit) > 0 ? Number(raw.limit) : isPremium ? 500 : 100;
+    const used = Math.max(0, Number(raw.used) || 0);
+    return { isPremium, limit, used, remaining: Math.max(0, limit - used) };
   } catch {
     return null;
   }
