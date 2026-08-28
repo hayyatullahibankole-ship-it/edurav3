@@ -27,15 +27,47 @@ const PLANS = [
   },
 ];
 
-const supabase = vi.hoisted(() => createSupabaseMockHoisted({
-  tables: { subscription_plans: { data: PLANS } },
-  functions: { "pay-subscription-wallet": { data: { success: true } } },
+const { supabase, navigate, refreshWallet, createSubscriptionPayment } = await vi.hoisted(async () => {
+  const { createSupabaseMock } = await import("../supabaseMock");
+  const { vi: v } = await import("vitest");
+  return {
+    navigate: v.fn(),
+    refreshWallet: v.fn(),
+    createSubscriptionPayment: v.fn(async () => undefined),
+    supabase: createSupabaseMock({
+      tables: {
+        subscription_plans: {
+          data: [
+            {
+              id: "plan-free",
+              name: "Free",
+              price: 0,
+              duration_days: 30,
+              scope: "cbt",
+              description: "Get started at no cost",
+              features: ["Limited practice"],
+              is_active: true,
+            },
+            {
+              id: "plan-premium",
+              name: "Premium",
+              price: 2500,
+              duration_days: 30,
+              scope: "cbt",
+              description: "Full CBT access",
+              features: ["Unlimited practice"],
+              is_active: true,
+            },
+          ],
+        },
+      },
+      functions: { "pay-subscription-wallet": { data: { success: true } } },
+    }),
+  };
 });
 
-const navigate = vi.fn();
-const refreshWallet = vi.fn();
-const createSubscriptionPayment = vi.fn(async () => undefined);
 let walletBalance = 10000;
+
 
 vi.mock("@/integrations/supabase/client", () => ({ supabase }));
 vi.mock("@/utils/paystack", () => ({
