@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserPlus, Download, Users, FileText, BookOpen } from "lucide-react";
+import { UserPlus, Users, FileText, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { generateSchoolManual } from "@/utils/schoolManualGenerator";
 
@@ -12,9 +12,6 @@ interface QuickActionsProps {
 }
 
 export default function QuickActions({ onAddStudent, onViewReports, onViewStudents, schoolId }: QuickActionsProps) {
-  const handleDownloadReport = () => {
-    toast.info("Report download feature coming soon");
-  };
 
   const handleDownloadManual = () => {
     try {

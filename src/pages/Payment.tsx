@@ -10,6 +10,13 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { canPurchaseDigitalInApp, DIGITAL_PURCHASE_NOTICE } from "@/lib/nativePayments";
 
+const DEFAULT_PLAN_FEATURES = [
+  "Full CBT practice with real exam timing",
+  "Past questions across all subjects",
+  "Instant scoring and answer explanations",
+  "Performance reports and progress tracking",
+];
+
 const Payment = () => {
   const { user, userProfile } = useAuth();
   const { toast } = useToast();
@@ -206,16 +213,15 @@ const Payment = () => {
                 <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{plan.description}</p>
 
                 <div className="mt-5 space-y-2.5 border-t border-border pt-5">
-                  {Array.isArray(plan.features) ? (
-                    plan.features.map((feature: string, idx: number) => (
-                      <div key={idx} className="flex items-start gap-2.5">
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                        <span className="text-sm text-muted-foreground">{feature}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Features coming soon</p>
-                  )}
+                  {(Array.isArray(plan.features) && plan.features.length > 0
+                    ? (plan.features as string[])
+                    : DEFAULT_PLAN_FEATURES
+                  ).map((feature: string, idx: number) => (
+                    <div key={idx} className="flex items-start gap-2.5">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                      <span className="text-sm text-muted-foreground">{feature}</span>
+                    </div>
+                  ))}
                 </div>
 
                 {plan.name !== "Free" && plan.price > 0 && (

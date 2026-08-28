@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { MathRenderer } from '@/components/ui/math-renderer';
 import Calculator from '@/components/Calculator';
+import { toast } from 'sonner';
 import { 
   Clock, 
   Flag, 
@@ -113,7 +114,10 @@ const JambCBTInterface: React.FC<JambCBTInterfaceProps> = ({
       if (document.hidden) {
         setTabSwitchCount(prev => prev + 1);
         if (tabSwitchCount >= 2) {
-          alert('Warning: Excessive tab switching detected. This may affect your test submission.');
+          toast.warning('Excessive tab switching detected', {
+            description: 'Leaving the exam repeatedly may affect your submission.',
+            duration: 6000,
+          });
         }
       }
     };
@@ -126,7 +130,7 @@ const JambCBTInterface: React.FC<JambCBTInterfaceProps> = ({
         (e.ctrlKey && e.shiftKey && e.key === 'I')
       ) {
         e.preventDefault();
-        alert('This action is not allowed during the exam.');
+        toast.error('Action not allowed during the exam');
       }
     };
 
