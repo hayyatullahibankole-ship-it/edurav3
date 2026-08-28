@@ -82,6 +82,7 @@ const CampusLogbook = lazy(() => import("@/pages/campus/CampusLogbook"));
 const CampusNysc = lazy(() => import("@/pages/campus/CampusNysc"));
 const CampusCareer = lazy(() => import("@/pages/campus/CampusCareer"));
 const CampusNotifications = lazy(() => import("@/pages/campus/CampusNotifications"));
+import { isSignupInProgress } from "@/lib/signupFlow";
 const Notifications = lazy(() => import("@/pages/Notifications"));
 
 
@@ -93,7 +94,7 @@ const DashboardBySide = ({ isInstalledApp }: { isInstalledApp: boolean }) => {
   // Journey first: only send genuinely new users to onboarding, never during a
   // session restore.
   if (loading) return <LoadingAnimation />;
-  if (!stage && resolved) return <Navigate to="/campus/journey" replace />;
+  if (!stage && resolved && !isSignupInProgress()) return <Navigate to="/campus/journey" replace />;
 
   // Higher institution students live on Campus only
   if (isCampus) return <Navigate to="/campus" replace />;
@@ -108,7 +109,7 @@ const CampusPremiumGate = lazy(() => import("@/components/campus/CampusPremiumGa
 const CampusOnly = ({ children }: { children: JSX.Element }) => {
   const { stage, isCampus, loading, resolved } = useAcademicStage();
   if (loading) return <LoadingAnimation />;
-  if (!stage && resolved) return <Navigate to="/campus/journey" replace />;
+  if (!stage && resolved && !isSignupInProgress()) return <Navigate to="/campus/journey" replace />;
   if (!isCampus && stage) return <Navigate to="/dashboard" replace />;
   return children;
 };
@@ -117,7 +118,7 @@ const CampusOnly = ({ children }: { children: JSX.Element }) => {
 const CoreOnly = ({ children }: { children: JSX.Element }) => {
   const { stage, isCampus, loading, resolved } = useAcademicStage();
   if (loading) return <LoadingAnimation />;
-  if (!stage && resolved) return <Navigate to="/campus/journey" replace />;
+  if (!stage && resolved && !isSignupInProgress()) return <Navigate to="/campus/journey" replace />;
   if (isCampus) return <Navigate to="/campus" replace />;
   return children;
 };
