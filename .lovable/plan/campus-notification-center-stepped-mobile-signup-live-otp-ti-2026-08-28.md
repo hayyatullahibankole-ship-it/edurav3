@@ -5,6 +5,7 @@
 New page at `/campus/notifications`, reachable from a bell icon in the Campus header (with an unread count badge).
 
 Two tabs:
+
 - **Inbox** — full notification list (not just the last 20), grouped by Today / Earlier, unread rows visually marked, tap to mark read and follow any link stored in the notification, plus "Mark all as read", per-item delete, and an All / Unread filter. Realtime so new notifications appear instantly.
 - **Preferences** — toggles for push notifications, email results, test/study reminders, study tips and subscription updates, saved to the existing preferences record. Includes device push permission status with an enable button on the app.
 
@@ -35,6 +36,8 @@ The resend button becomes a real-time countdown: "Resend code in 0:42" ticking e
 ## 5. Android version bump
 
 Set `versionCode 3` and `versionName "1.0.0"` in the Android app config so the next upload sits above the two builds already on Play.
+
+6. Wrap up and fix any unfinished job, page or error
 
 ## Technical notes
 
