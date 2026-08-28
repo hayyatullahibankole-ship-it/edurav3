@@ -350,7 +350,7 @@ export const AppShell = ({ side, title, subtitle, meta, action, nav, children }:
             <p className="hidden lg:block text-sm font-semibold truncate">{title}</p>
             <div className="flex items-center gap-1.5">
               <DashboardThemeMenu />
-              <NotificationBell />
+              <NotificationBell campus={side === "campus"} />
               <span className="hidden lg:inline-flex">{avatarMenu}</span>
             </div>
           </div>
