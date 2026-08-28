@@ -236,8 +236,16 @@ const CampusAcademics = () => {
           <MaterialList items={materials} onOpen={openFile} empty="Upload your notes, handouts and past questions to keep them in one place." />
         </TabsContent>
 
-        <TabsContent value="library" className="mt-4">
-          <MaterialList items={library} onOpen={openFile} empty="No shared library materials published yet." />
+        <TabsContent value="library" className="mt-4 space-y-4">
+          <div className="rounded-xl border bg-muted/40 p-4">
+            <p className="text-sm font-medium">What is the Library?</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              The Library holds materials published by Edura for every campus student &mdash; lecture notes,
+              past questions, project templates and guides. They are read-only and shared with everyone, unlike
+              &ldquo;My materials&rdquo;, which only you can see. Tap any item to open it.
+            </p>
+          </div>
+          <MaterialList items={library} onOpen={openFile} empty="No shared library materials published yet. Check back soon." />
         </TabsContent>
       </Tabs>
     </CampusShell>
