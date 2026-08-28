@@ -188,10 +188,7 @@ const NotificationRow = ({
 
   const handleClick = () => {
     if (!n.is_read) onMarkRead(n.id);
-    const route = n.metadata?.route;
-    if (typeof route === "string" && route.startsWith("/")) {
-      window.location.hash = `#${route}`;
-    }
+    onOpen?.(n);
   };
 
   return (
