@@ -420,10 +420,6 @@ export default function MobileAuthForm() {
             </div>
           </div>
         );
-      case 4:
-        return signupComplete ? (
-          <EmailOtpVerify email={formData.email} type="signup" onVerified={onVerified} />
-        ) : null;
       default:
         return null;
     }
