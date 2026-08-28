@@ -99,6 +99,8 @@ export default function MobileAuthForm() {
       }
       if (targetStep >= 3) {
         emailSchema.parse(formData.email);
+      }
+      if (targetStep >= 4) {
         passwordSchema.parse(formData.password);
         if (formData.password !== formData.confirmPassword) {
           newErrors.confirmPassword = "Passwords don't match";
