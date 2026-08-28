@@ -5,8 +5,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-campus-token",
 };
 
-const FREE_DAILY_LIMIT = 0; // Campus AI is a premium feature
-const PREMIUM_DAILY_LIMIT = 200;
+const FREE_DAILY_LIMIT = 100; // Free students get 100 Campus AI credits per day
+const PREMIUM_DAILY_LIMIT = 500;
 
 type Task =
   | "explain"
@@ -240,27 +240,14 @@ Deno.serve(async (req) => {
     }
     if (!TASKS.includes(task)) return json({ error: "Unknown request." }, 400);
 
-    if (!isPremium) {
-      return json(
-        {
-          error: "Campus AI is an Edura Premium feature. Subscribe to unlock the Course Companion and Project Assistant.",
-          requiresUpgrade: true,
-          limitReached: true,
-          isPremium,
-          limit,
-          used,
-        },
-        403,
-      );
-    }
-
     if (used >= limit) {
       return json(
         {
           error: isPremium
             ? "You've reached today's Campus AI limit. It resets tomorrow."
-            : "You've used your free Campus AI actions for today. Upgrade to Edura Premium for unlimited access.",
+            : `You've used all ${limit} free Campus AI credits for today. They reset at midnight — upgrade to Edura Campus Premium for ${PREMIUM_DAILY_LIMIT} credits a day.`,
           limitReached: true,
+          requiresUpgrade: !isPremium,
           isPremium,
           limit,
           used,
