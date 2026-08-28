@@ -256,6 +256,11 @@ const EduraRoutes = () => {
           <Settings />
         </ProtectedRoute>
       } />
+      <Route path="/notifications" element={
+        <ProtectedRoute>
+          <Notifications />
+        </ProtectedRoute>
+      } />
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <DashboardBySide isInstalledApp={isInstalledApp} />
