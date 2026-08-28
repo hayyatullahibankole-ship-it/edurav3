@@ -214,6 +214,7 @@ export default function MobileAuthForm() {
     e.preventDefault();
     setLoading(true);
     setErrors({});
+    endSignupFlow();
     await handleHaptic();
 
     try {
