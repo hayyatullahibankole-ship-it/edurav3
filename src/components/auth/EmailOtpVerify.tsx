@@ -164,30 +164,33 @@ export const EmailOtpVerify = ({
         Verify email
       </Button>
 
+      <button
+        type="button"
+        onClick={resend}
+        disabled={cooldown > 0 || resending}
+        className="flex w-full flex-col items-center gap-1 rounded-lg py-2 text-sm text-primary transition-colors disabled:text-muted-foreground"
+      >
+        {cooldown > 0 ? (
+          <>
+            <span className="font-medium">Resend code in {cooldown}s</span>
+            <div className="h-1 w-32 overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full rounded-full bg-primary transition-all duration-1000"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+            <span className="text-xs text-muted-foreground">You can request a new code once the timer ends.</span>
+          </>
+        ) : resending ? (
+          <span className="flex items-center gap-2"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending…</span>
+        ) : (
+          "Resend code"
+        )}
+      </button>
+      </>
+      )}
+
       <div className="space-y-2">
-        <button
-          type="button"
-          onClick={resend}
-          disabled={cooldown > 0 || resending}
-          className="flex w-full flex-col items-center gap-1 rounded-lg py-2 text-sm text-primary transition-colors disabled:text-muted-foreground"
-        >
-          {cooldown > 0 ? (
-            <>
-              <span className="font-medium">Resend code in {cooldown}s</span>
-              <div className="h-1 w-32 overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full rounded-full bg-primary transition-all duration-1000"
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
-              <span className="text-xs text-muted-foreground">You can request a new code once the timer ends.</span>
-            </>
-          ) : resending ? (
-            <span className="flex items-center gap-2"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending…</span>
-          ) : (
-            "Resend code"
-          )}
-        </button>
         {onCancel && (
           <button type="button" onClick={onCancel} className="w-full text-center text-sm text-muted-foreground underline">
             Use a different email
