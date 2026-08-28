@@ -41,12 +41,21 @@ export default function ResetPassword() {
       toast({ title: "Email required", description: "Enter the email on your account.", variant: "destructive" });
       return;
     }
+    if (cooldown > 0 || busy) return;
     setBusy(true);
     try {
+      const gate = await guardOtpSend("recovery", email);
+      if (!gate.allowed) {
+        setCooldown(gate.retryAfter);
+        setStep("code");
+        toast({ title: "Slow down", description: gate.message, variant: "destructive" });
+        return;
+      }
+
       const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase());
       if (error) throw error;
       setStep("code");
-      setCooldown(45);
+      setCooldown(OTP_COOLDOWN_SECONDS);
       toast({ title: "Code sent", description: "Check your inbox for a 6-digit reset code." });
     } catch (e: any) {
       toast({ title: "Could not send code", description: e?.message, variant: "destructive" });
