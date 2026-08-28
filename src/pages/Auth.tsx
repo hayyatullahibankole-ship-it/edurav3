@@ -107,7 +107,7 @@ export default function Auth() {
     );
   }
 
-  if (user && userRole !== null) {
+  if (user && userRole !== null && !isSignupInProgress()) {
     const redirectTo = isAdmin
       ? "/admin"
       : (isSchoolAdmin ? "/school-dashboard" : (isInstalledApp ? "/mobile-home" : "/dashboard"));
