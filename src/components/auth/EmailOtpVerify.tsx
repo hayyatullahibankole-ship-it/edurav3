@@ -93,8 +93,9 @@ export const EmailOtpVerify = ({
       const { error } =
         type === "signup"
           ? await supabase.auth.resend({ type: "signup", email })
-          : await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+          : await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: createUser } });
       if (error) throw error;
+      setSent(true);
       setCooldown(OTP_COOLDOWN_SECONDS);
       toast({ title: "Code sent", description: `We sent a new code to ${email}.` });
     } catch (e: any) {
