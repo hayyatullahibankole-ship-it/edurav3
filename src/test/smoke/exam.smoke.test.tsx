@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
-import { createSupabaseMock } from "../supabaseMock";
+
 
 const QUESTIONS = [
   {
@@ -17,7 +17,7 @@ const QUESTIONS = [
   },
 ];
 
-const supabase = createSupabaseMock({
+const supabase = vi.hoisted(() => createSupabaseMockHoisted({
   tables: {
     attempts: {
       data: {

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { createSupabaseMock } from "../supabaseMock";
+
 
 const PLANS = [
   {
@@ -27,7 +27,7 @@ const PLANS = [
   },
 ];
 
-const supabase = createSupabaseMock({
+const supabase = vi.hoisted(() => createSupabaseMockHoisted({
   tables: { subscription_plans: { data: PLANS } },
   functions: { "pay-subscription-wallet": { data: { success: true } } },
 });
