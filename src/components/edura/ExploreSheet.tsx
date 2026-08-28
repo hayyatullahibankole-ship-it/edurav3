@@ -60,9 +60,21 @@ const groups: {
       },
       {
         label: "Wallet",
-        description: "Fund, pay & earn rewards",
+        description: "Fund, pay & track transactions",
         icon: Wallet,
+        path: "/wallet",
+      },
+      {
+        label: "Referrals",
+        description: "Invite friends & earn rewards",
+        icon: Gift,
         path: "/referral-program",
+      },
+      {
+        label: "Subscription",
+        description: "Plans, upgrade & billing",
+        icon: CreditCard,
+        path: "/payment",
       },
     ],
   },
