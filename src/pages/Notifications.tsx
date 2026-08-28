@@ -109,7 +109,7 @@ export default function Notifications() {
   };
 
   return (
-    <AppShell title="Notifications" subtitle="Your alerts and preferences in one place.">
+    <AppShell side="cbt" title="Notifications" subtitle="Your alerts and preferences in one place.">
       <Helmet>
         <title>Notifications | Edura</title>
         <meta name="description" content="Your Edura notification inbox and preferences." />
