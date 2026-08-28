@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { MathRenderer } from '@/components/ui/math-renderer';
 import Calculator from '@/components/Calculator';
+import { toast } from 'sonner';
 import { 
   Clock, 
   Flag, 
