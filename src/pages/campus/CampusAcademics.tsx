@@ -33,6 +33,10 @@ const CampusAcademics = () => {
   const [form, setForm] = useState({ code: "", title: "", units: "3", semester: "First", lecturer: "" });
   const [upload, setUpload] = useState({ title: "", kind: "note", course_id: "", description: "" });
   const [file, setFile] = useState<File | null>(null);
+  const [contributeOpen, setContributeOpen] = useState(false);
+  const [contribute, setContribute] = useState({ title: "", kind: "note", course_code: "", description: "" });
+  const [contributeFile, setContributeFile] = useState<File | null>(null);
+  const [submissions, setSubmissions] = useState<any[]>([]);
 
   useEffect(() => {
     document.title = "Academics | Edura Campus";
@@ -41,15 +45,19 @@ const CampusAcademics = () => {
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const [c, m, l] = await Promise.all([
+    const [c, m, l, sub] = await Promise.all([
       supabase.from("campus_courses").select("*").eq("user_id", user.id).order("code"),
-      supabase.from("campus_materials").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+      supabase.from("campus_materials").select("*").eq("user_id", user.id).eq("is_library", false)
+        .order("created_at", { ascending: false }),
       supabase.from("campus_materials").select("*").eq("is_library", true).eq("is_published", true)
         .order("created_at", { ascending: false }).limit(50),
+      supabase.from("campus_materials").select("*").eq("submitted_by", user.id).eq("is_library", true)
+        .order("created_at", { ascending: false }).limit(20),
     ]);
     setCourses(c.data ?? []);
     setMaterials(m.data ?? []);
     setLibrary(l.data ?? []);
+    setSubmissions(sub.data ?? []);
     setLoading(false);
   };
 
@@ -114,6 +122,63 @@ const CampusAcademics = () => {
     setUpload({ title: "", kind: "note", course_id: "", description: "" });
     setFile(null);
     setUploadOpen(false);
+    load();
+  };
+
+  const saveToMine = async (item: any) => {
+    if (!user) return;
+    const { error } = await supabase.from("campus_materials").insert({
+      user_id: user.id,
+      title: item.title,
+      kind: item.kind,
+      description: item.description,
+      course_code: item.course_code,
+      file_url: item.file_url,
+      file_name: item.file_name,
+      file_size: item.file_size,
+      department: item.department ?? department,
+      level: item.level ?? study_level,
+      is_library: false,
+      is_published: false,
+    });
+    if (error) return toast.error(error.message);
+    toast.success("Saved to your materials");
+    load();
+  };
+
+  const submitToLibrary = async () => {
+    if (!user || !contributeFile || !contribute.title.trim()) {
+      toast.error("Pick a file and give it a title");
+      return;
+    }
+    setSaving(true);
+    const path = `${user.id}/library-submissions/${Date.now()}-${contributeFile.name.replace(/\s+/g, "-")}`;
+    const { error: upErr } = await supabase.storage.from("campus-files").upload(path, contributeFile);
+    if (upErr) {
+      setSaving(false);
+      return toast.error(upErr.message);
+    }
+    const { error } = await supabase.from("campus_materials").insert({
+      user_id: user.id,
+      title: contribute.title.trim(),
+      kind: contribute.kind,
+      course_code: contribute.course_code.trim().toUpperCase() || null,
+      description: contribute.description.trim() || null,
+      file_url: path,
+      file_name: contributeFile.name,
+      file_size: contributeFile.size,
+      department,
+      level: study_level,
+      is_library: true,
+      is_published: false,
+      review_status: "pending",
+    });
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Submitted for review", { description: "An admin will approve it before it appears in the Library." });
+    setContribute({ title: "", kind: "note", course_code: "", description: "" });
+    setContributeFile(null);
+    setContributeOpen(false);
     load();
   };
 
