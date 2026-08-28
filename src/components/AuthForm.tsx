@@ -296,28 +296,14 @@ export default function AuthForm() {
         }
 
         toast({
-          title: "Account created successfully! 🎉",
-          description: "Please check your email inbox and click the verification link to activate your account. The email should arrive within a few minutes.",
+          title: "Account created",
+          description: "Enter the 6-digit code we sent to your email to verify your account.",
           duration: 8000,
         });
 
-        // Clear the form
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          academicStage: '',
-          examType: '',
-          currentClass: '',
-          institutionName: '',
-          studyLevel: '',
-          password: '',
-          confirmPassword: '',
-          agreedToTerms: false
-        });
+        setPendingOtpEmail(signupData.email);
+        return;
 
-        setIsLogin(true);
       }
     } catch (error: any) {
       if (error.issues) {
