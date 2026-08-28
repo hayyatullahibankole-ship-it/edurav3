@@ -20,6 +20,12 @@ if (!window.HTMLElement.prototype.scrollIntoView) {
   window.HTMLElement.prototype.scrollIntoView = () => {};
 }
 
+// jsdom does not implement hit testing, which input-otp polls for.
+if (!(document as any).elementFromPoint) {
+  (document as any).elementFromPoint = () => null;
+}
+
+
 Object.defineProperty(window, "ResizeObserver", {
   writable: true,
   value: class {
