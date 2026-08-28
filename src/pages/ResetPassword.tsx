@@ -10,6 +10,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { passwordSchema } from "@/utils/inputValidation";
+import { getOtpCooldown, guardOtpSend, OTP_COOLDOWN_SECONDS } from "@/lib/otpRateLimit";
 import eduraLogo from "@/assets/edura-logo.png";
 
 type Step = "email" | "code" | "password" | "done";
