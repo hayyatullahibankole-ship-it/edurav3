@@ -26,6 +26,9 @@ export default function Auth() {
 
   useEffect(() => {
     const checkSchoolStatus = async () => {
+      // Mid-signup the OTP step creates a session before the password step —
+      // stay on the form instead of redirecting.
+      if (isSignupInProgress()) return;
       if (user && !loading && userRole !== null) {
         if (isInstalledApp && !isProfileComplete) {
           navigate('/mobile-home', { replace: true });
