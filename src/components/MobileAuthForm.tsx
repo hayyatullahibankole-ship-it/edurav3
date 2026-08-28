@@ -28,8 +28,8 @@ type SignupStep = 1 | 2 | 3 | 4;
 const stepMeta: Record<number, { title: string; subtitle: string }> = {
   1: { title: "About you", subtitle: "Let's start with the basics." },
   2: { title: "Your path", subtitle: "Tell us where you are in your education." },
-  3: { title: "Your account", subtitle: "Set a secure password." },
-  4: { title: "Verify email", subtitle: "Enter the 6-digit code we sent." },
+  3: { title: "Verify email", subtitle: "Confirm your email address with a 6-digit code." },
+  4: { title: "Create password", subtitle: "Set a secure password to finish." },
 };
 
 export default function MobileAuthForm() {
