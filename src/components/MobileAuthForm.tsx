@@ -28,8 +28,8 @@ type SignupStep = 1 | 2 | 3 | 4;
 const stepMeta: Record<number, { title: string; subtitle: string }> = {
   1: { title: "About you", subtitle: "Let's start with the basics." },
   2: { title: "Your path", subtitle: "Tell us where you are in your education." },
-  3: { title: "Your account", subtitle: "Set a secure password." },
-  4: { title: "Verify email", subtitle: "Enter the 6-digit code we sent." },
+  3: { title: "Verify email", subtitle: "Confirm your email address with a 6-digit code." },
+  4: { title: "Create password", subtitle: "Set a secure password to finish." },
 };
 
 export default function MobileAuthForm() {
@@ -55,7 +55,7 @@ export default function MobileAuthForm() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [mfaOpen, setMfaOpen] = useState(false);
-  const [signupComplete, setSignupComplete] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   useEffect(() => {
     const refCode = searchParams.get("ref");
@@ -99,6 +99,8 @@ export default function MobileAuthForm() {
       }
       if (targetStep >= 3) {
         emailSchema.parse(formData.email);
+      }
+      if (targetStep >= 4) {
         passwordSchema.parse(formData.password);
         if (formData.password !== formData.confirmPassword) {
           newErrors.confirmPassword = "Passwords don't match";
@@ -135,60 +137,41 @@ export default function MobileAuthForm() {
     navigate(`/reset-password${email ? `?email=${encodeURIComponent(email)}` : ""}`);
   };
 
-  const submitSignup = async () => {
-    if (!validateStep(3)) return;
+  /** Email is verified (an OTP session now exists) — set the password and profile data. */
+  const finishSignup = async () => {
+    if (!validateStep(4)) return;
     setLoading(true);
     await handleHaptic();
     try {
-      const { data: signUpData, error } = await supabase.auth.signUp({
-        email: formData.email.trim().toLowerCase(),
+      const { data, error } = await supabase.auth.updateUser({
         password: formData.password,
-        options: {
-          data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            phone: formData.phone,
-            academic_stage: formData.academicStage,
-            institution_name: formData.institutionName,
-            study_level: formData.studyLevel,
-          },
+        data: {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          phone: formData.phone,
+          academic_stage: formData.academicStage,
+          institution_name: formData.institutionName,
+          study_level: formData.studyLevel,
         },
       });
 
       if (error) throw error;
 
-      if (signUpData.user && (signUpData.user.identities?.length ?? 1) === 0) {
-        toast({
-          title: "Account already exists",
-          description: "This email is already registered. Sign in instead, or reset your password.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
-      if (signUpData.user && referralCode) {
+      if (data.user && referralCode) {
         try {
           localStorage.setItem(
             "pending_referral",
-            JSON.stringify({ code: referralCode, userId: signUpData.user.id, email: formData.email })
+            JSON.stringify({ code: referralCode, userId: data.user.id, email: formData.email })
           );
         } catch (refError) {
           console.error("Referral storage error:", refError);
         }
       }
 
-      if (signUpData.session) {
-        // Email confirmation is not required for this project — go straight in.
-        onVerified();
-        return;
-      }
-
-      setSignupComplete(true);
-      setStep(4);
+      onVerified();
     } catch (error: any) {
       toast({
-        title: "Could not create account",
+        title: "Could not finish setting up your account",
         description: getAuthError(error),
         variant: "destructive",
       });
@@ -360,11 +343,42 @@ export default function MobileAuthForm() {
                   placeholder="you@email.com"
                   value={formData.email}
                   onChange={(e) => updateField("email", e.target.value)}
+                  disabled={emailSent}
                   className={`pl-10 ${errors.email ? "border-destructive" : ""}`}
                 />
               </div>
               {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
             </div>
+
+            {emailSent && (
+              <EmailOtpVerify
+                key={formData.email}
+                email={formData.email.trim().toLowerCase()}
+                type="email"
+                alreadySent={false}
+                createUser
+                onVerified={() => setStep(4)}
+                onCancel={() => setEmailSent(false)}
+              />
+            )}
+
+            {!emailSent && (
+              <Button
+                className="h-12 w-full rounded-xl text-base font-semibold"
+                onClick={async () => {
+                  await handleHaptic();
+                  if (!validateStep(3)) return;
+                  setEmailSent(true);
+                }}
+              >
+                Verify email <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        );
+      case 4:
+        return (
+          <div className="animate-fade-in space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
@@ -390,6 +404,7 @@ export default function MobileAuthForm() {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="confirmPassword">Confirm password</Label>
+              {/* email already verified in step 3 */}
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -405,10 +420,6 @@ export default function MobileAuthForm() {
             </div>
           </div>
         );
-      case 4:
-        return signupComplete ? (
-          <EmailOtpVerify email={formData.email} type="signup" onVerified={onVerified} />
-        ) : null;
       default:
         return null;
     }
@@ -487,31 +498,30 @@ export default function MobileAuthForm() {
 
       {renderStepContent()}
 
-      {step < 4 && (
-        <div className="flex gap-3 pt-2">
-          {step > 1 && (
-            <Button variant="outline" className="h-12 flex-1 rounded-xl" onClick={prevStep} disabled={loading}>
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back
-            </Button>
-          )}
-          {step < 3 ? (
-            <Button className="h-12 flex-1 rounded-xl text-base font-semibold" onClick={nextStep}>
-              Continue <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          ) : (
-            <Button className="h-12 flex-1 rounded-xl text-base font-semibold" onClick={submitSignup} disabled={loading}>
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  Creating…
-                </span>
-              ) : (
-                <>Create account <ArrowRight className="ml-2 h-4 w-4" /></>
-              )}
-            </Button>
-          )}
-        </div>
-      )}
+      <div className="flex gap-3 pt-2">
+        {step > 1 && step < 4 && (
+          <Button variant="outline" className="h-12 flex-1 rounded-xl" onClick={prevStep} disabled={loading}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back
+          </Button>
+        )}
+        {step < 3 && (
+          <Button className="h-12 flex-1 rounded-xl text-base font-semibold" onClick={nextStep}>
+            Continue <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        )}
+        {step === 4 && (
+          <Button className="h-12 flex-1 rounded-xl text-base font-semibold" onClick={finishSignup} disabled={loading}>
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Creating…
+              </span>
+            ) : (
+              <>Create account <ArrowRight className="ml-2 h-4 w-4" /></>
+            )}
+          </Button>
+        )}
+      </div>
     </div>
   );
 

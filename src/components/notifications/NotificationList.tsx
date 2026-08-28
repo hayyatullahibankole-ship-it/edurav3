@@ -31,6 +31,8 @@ interface Props {
   onMarkAllRead: () => void;
   onDelete: (id: string) => void;
   onRetry?: () => void;
+  /** Called when a row is tapped, after it is marked read. */
+  onOpen?: (notification: Notification) => void;
 }
 
 type Filter = "all" | "unread";
@@ -50,6 +52,7 @@ export const NotificationList = ({
   onMarkAllRead,
   onDelete,
   onRetry,
+  onOpen,
 }: Props) => {
   const [filter, setFilter] = useState<Filter>("all");
 
@@ -152,6 +155,7 @@ export const NotificationList = ({
                     notification={n}
                     onMarkRead={onMarkRead}
                     onDelete={onDelete}
+                    onOpen={onOpen}
                   />
                 ))}
               </div>
@@ -167,10 +171,12 @@ const NotificationRow = ({
   notification: n,
   onMarkRead,
   onDelete,
+  onOpen,
 }: {
   notification: Notification;
   onMarkRead: (id: string) => void;
   onDelete: (id: string) => void;
+  onOpen?: (notification: Notification) => void;
 }) => {
   const time = useMemo(() => {
     try {
@@ -182,10 +188,7 @@ const NotificationRow = ({
 
   const handleClick = () => {
     if (!n.is_read) onMarkRead(n.id);
-    const route = n.metadata?.route;
-    if (typeof route === "string" && route.startsWith("/")) {
-      window.location.hash = `#${route}`;
-    }
+    onOpen?.(n);
   };
 
   return (

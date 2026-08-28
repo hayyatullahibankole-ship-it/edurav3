@@ -1,8 +1,9 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Lock, Check, Loader2, RefreshCw } from "lucide-react";
+import { Lock, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAuth } from "@/hooks/useAuth";
 import CampusShell from "@/components/campus/CampusShell";
 
 const PERKS = [
@@ -12,10 +13,29 @@ const PERKS = [
   "A much larger daily AI credit allowance",
 ];
 
+const cacheKey = (userId?: string) => `campus_premium_${userId || "anon"}`;
+
+const readCache = (userId?: string): boolean | null => {
+  try {
+    const v = sessionStorage.getItem(cacheKey(userId));
+    return v === null ? null : v === "1";
+  } catch {
+    return null;
+  }
+};
+
+const writeCache = (userId: string | undefined, allowed: boolean) => {
+  try {
+    sessionStorage.setItem(cacheKey(userId), allowed ? "1" : "0");
+  } catch {
+    /* ignore */
+  }
+};
+
 /**
  * Gate for paid Edura Campus tools.
- * Trials and active plans pass through; everyone else sees the upgrade screen.
- * The spinner is time-boxed so a stalled subscription lookup can never hang the page.
+ * The decision is cached per session so a returning premium user never sees the
+ * wall, and undecided lookups fall back to the wall after 2s instead of spinning.
  */
 export const CampusPremiumGate = ({
   children,
@@ -24,48 +44,42 @@ export const CampusPremiumGate = ({
   children: ReactNode;
   title?: string;
 }) => {
-  const { loading, hasPremiumAccess, isOnTrial } = useSubscription();
-  const [timedOut, setTimedOut] = useState(false);
+  const { user } = useAuth();
+  const { loading, canAccessPremium, isOnTrial } = useSubscription();
+  const [cached, setCached] = useState<boolean | null>(() => readCache(user?.id));
+  const [settled, setSettled] = useState(false);
+
+  const allowed = canAccessPremium || isOnTrial;
 
   useEffect(() => {
+    if (loading) return;
+    setCached(allowed);
+    writeCache(user?.id, allowed);
+  }, [loading, allowed, user?.id]);
+
+  // Never spin for more than 2 seconds — decide with whatever we know.
+  useEffect(() => {
     if (!loading) {
-      setTimedOut(false);
+      setSettled(true);
       return;
     }
-    const t = setTimeout(() => setTimedOut(true), 8000);
+    setSettled(false);
+    const t = setTimeout(() => setSettled(true), 2000);
     return () => clearTimeout(t);
   }, [loading]);
 
-  if (loading && !timedOut) {
+  // Known-premium from an earlier check: show content immediately.
+  if (allowed || cached === true) return <>{children}</>;
+
+  if (loading && !settled && cached === null) {
     return (
       <CampusShell title={title}>
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <div className="flex min-h-[30vh] items-center justify-center">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
         </div>
       </CampusShell>
     );
   }
-
-  if (loading && timedOut) {
-    return (
-      <CampusShell title={title}>
-        <div className="mx-auto max-w-md rounded-2xl border bg-card p-6 text-center">
-          <h2 className="font-display text-lg font-bold">We couldn't check your plan</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Your subscription status is taking too long to load. Check your connection and try again.
-          </p>
-          <Button className="mt-5 w-full gap-2" onClick={() => window.location.reload()}>
-            <RefreshCw className="h-4 w-4" /> Try again
-          </Button>
-          <Button asChild variant="ghost" className="mt-2 w-full">
-            <Link to="/campus">Back to campus home</Link>
-          </Button>
-        </div>
-      </CampusShell>
-    );
-  }
-
-  if (hasPremiumAccess || isOnTrial) return <>{children}</>;
 
   return (
     <CampusShell title={title} subtitle="Available on Edura Campus plans">

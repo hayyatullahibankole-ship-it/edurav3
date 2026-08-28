@@ -11,6 +11,13 @@ interface Props {
   email: string;
   /** 'signup' for new accounts, 'email' for magic-link style codes */
   type?: "signup" | "email";
+  /**
+   * true  - a code was already sent by the caller (start the cooldown immediately)
+   * false - show a "Send code" button and send it from here
+   */
+  alreadySent?: boolean;
+  /** Allow the OTP request to create the user (email-first signup). */
+  createUser?: boolean;
   onVerified: () => void;
   onCancel?: () => void;
 }
@@ -18,16 +25,25 @@ interface Props {
 /**
  * Six digit email verification. The code is delivered by the auth email hook.
  */
-export const EmailOtpVerify = ({ email, type = "signup", onVerified, onCancel }: Props) => {
+export const EmailOtpVerify = ({
+  email,
+  type = "signup",
+  alreadySent = true,
+  createUser = false,
+  onVerified,
+  onCancel,
+}: Props) => {
   const { toast } = useToast();
   const [code, setCode] = useState("");
   const [verifying, setVerifying] = useState(false);
   const [resending, setResending] = useState(false);
   const [verified, setVerified] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const [sent, setSent] = useState(alreadySent);
 
-  // The first code was just sent by the signup call — start (or restore) the timer.
+  // When the caller already triggered the send, start (or restore) the timer.
   useEffect(() => {
+    if (!alreadySent) return;
     const existing = getOtpCooldown(type, email);
     if (existing > 0) {
       setCooldown(existing);
@@ -35,7 +51,7 @@ export const EmailOtpVerify = ({ email, type = "signup", onVerified, onCancel }:
       markOtpSent(type, email);
       setCooldown(OTP_COOLDOWN_SECONDS);
     }
-  }, [email, type]);
+  }, [email, type, alreadySent]);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -77,8 +93,9 @@ export const EmailOtpVerify = ({ email, type = "signup", onVerified, onCancel }:
       const { error } =
         type === "signup"
           ? await supabase.auth.resend({ type: "signup", email })
-          : await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+          : await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: createUser } });
       if (error) throw error;
+      setSent(true);
       setCooldown(OTP_COOLDOWN_SECONDS);
       toast({ title: "Code sent", description: `We sent a new code to ${email}.` });
     } catch (e: any) {
@@ -107,13 +124,23 @@ export const EmailOtpVerify = ({ email, type = "signup", onVerified, onCancel }:
           <Mail className="h-5 w-5" />
         </span>
         <div>
-          <p className="font-semibold">Enter your 6-digit code</p>
+          <p className="font-semibold">{sent ? "Enter your 6-digit code" : "Verify your email"}</p>
           <p className="text-sm text-muted-foreground">
-            We sent it to <span className="font-medium text-foreground">{email}</span>
+            {sent ? "We sent it to " : "We'll send a 6-digit code to "}
+            <span className="font-medium text-foreground">{email}</span>
           </p>
         </div>
       </div>
 
+      {!sent && (
+        <Button className="w-full" onClick={resend} disabled={resending || cooldown > 0}>
+          {resending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+          {cooldown > 0 ? `Send code in ${cooldown}s` : "Send verification code"}
+        </Button>
+      )}
+
+      {sent && (
+      <>
       <div className="flex justify-center">
         <InputOTP
           maxLength={6}
@@ -137,30 +164,33 @@ export const EmailOtpVerify = ({ email, type = "signup", onVerified, onCancel }:
         Verify email
       </Button>
 
+      <button
+        type="button"
+        onClick={resend}
+        disabled={cooldown > 0 || resending}
+        className="flex w-full flex-col items-center gap-1 rounded-lg py-2 text-sm text-primary transition-colors disabled:text-muted-foreground"
+      >
+        {cooldown > 0 ? (
+          <>
+            <span className="font-medium">Resend code in {cooldown}s</span>
+            <div className="h-1 w-32 overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full rounded-full bg-primary transition-all duration-1000"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+            <span className="text-xs text-muted-foreground">You can request a new code once the timer ends.</span>
+          </>
+        ) : resending ? (
+          <span className="flex items-center gap-2"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending…</span>
+        ) : (
+          "Resend code"
+        )}
+      </button>
+      </>
+      )}
+
       <div className="space-y-2">
-        <button
-          type="button"
-          onClick={resend}
-          disabled={cooldown > 0 || resending}
-          className="flex w-full flex-col items-center gap-1 rounded-lg py-2 text-sm text-primary transition-colors disabled:text-muted-foreground"
-        >
-          {cooldown > 0 ? (
-            <>
-              <span className="font-medium">Resend code in {cooldown}s</span>
-              <div className="h-1 w-32 overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full rounded-full bg-primary transition-all duration-1000"
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
-              <span className="text-xs text-muted-foreground">You can request a new code once the timer ends.</span>
-            </>
-          ) : resending ? (
-            <span className="flex items-center gap-2"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending…</span>
-          ) : (
-            "Resend code"
-          )}
-        </button>
         {onCancel && (
           <button type="button" onClick={onCancel} className="w-full text-center text-sm text-muted-foreground underline">
             Use a different email
