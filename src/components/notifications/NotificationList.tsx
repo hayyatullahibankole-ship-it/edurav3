@@ -155,6 +155,7 @@ export const NotificationList = ({
                     notification={n}
                     onMarkRead={onMarkRead}
                     onDelete={onDelete}
+                    onOpen={onOpen}
                   />
                 ))}
               </div>
