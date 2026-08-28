@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { resolveNotificationRoute } from "@/lib/notificationRoutes";
 
 export default function Notifications() {
-  const { userProfile } = useAuth();
+  const { userProfile, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -20,7 +20,12 @@ export default function Notifications() {
   const [error, setError] = useState<unknown>(null);
 
   const fetchNotifications = async () => {
-    if (!userProfile?.id) return;
+    // Once auth has settled without a profile there is nothing to wait for —
+    // otherwise the inbox would spin forever.
+    if (!userProfile?.id) {
+      if (!authLoading) setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -40,7 +45,7 @@ export default function Notifications() {
 
   useEffect(() => {
     fetchNotifications();
-  }, [userProfile?.id]);
+  }, [userProfile?.id, authLoading]);
 
   useEffect(() => {
     if (!userProfile?.id) return;
