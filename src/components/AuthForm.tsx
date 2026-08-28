@@ -339,35 +339,11 @@ export default function AuthForm() {
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (!formData.email) {
-      toast({
-        title: "Email required",
-        description: "Please enter your email address first",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
-        redirectTo: `${window.location.origin}/auth`
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Password reset email sent",
-        description: "Check your email for password reset instructions",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to send reset email",
-        variant: "destructive",
-      });
-    }
+  const handleForgotPassword = () => {
+    const email = formData.email?.trim();
+    navigate(`/reset-password${email ? `?email=${encodeURIComponent(email)}` : ""}`);
   };
+
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
