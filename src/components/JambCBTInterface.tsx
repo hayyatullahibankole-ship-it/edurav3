@@ -113,7 +113,10 @@ const JambCBTInterface: React.FC<JambCBTInterfaceProps> = ({
       if (document.hidden) {
         setTabSwitchCount(prev => prev + 1);
         if (tabSwitchCount >= 2) {
-          alert('Warning: Excessive tab switching detected. This may affect your test submission.');
+          toast.warning('Excessive tab switching detected', {
+            description: 'Leaving the exam repeatedly may affect your submission.',
+            duration: 6000,
+          });
         }
       }
     };
