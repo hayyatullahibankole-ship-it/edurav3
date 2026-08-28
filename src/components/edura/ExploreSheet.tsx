@@ -25,6 +25,8 @@ import {
   FileCheck,
   Award,
   Zap,
+  Gift,
+  CreditCard,
 } from "lucide-react";
 
 const tests: { examType: "jamb" | "waec" | "neco" | "post-utme"; label: string; icon: React.ElementType }[] = [
