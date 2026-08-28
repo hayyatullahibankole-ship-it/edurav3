@@ -53,57 +53,64 @@ serve(async (req) => {
     }
 
     const { user, email_data } = emailData;
-    const { token_hash, redirect_to, email_action_type } = email_data;
+    const { token, token_hash, redirect_to, email_action_type } = email_data;
 
     console.log(`Sending ${email_action_type} email to ${user.email}`);
 
-    // Build HTML directly (no React Email) for maximum compatibility
     const supaUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const redirect = redirect_to || `${supaUrl}/`;
+    const siteUrl = "https://edura.com.ng";
+    const redirect = redirect_to || `${siteUrl}/#/dashboard`;
     const verificationUrl = `${supaUrl}/auth/v1/verify?token=${token_hash}&type=${email_action_type}&redirect_to=${redirect}`;
 
-    const heading = email_action_type === "recovery"
-      ? "Reset your Edura password"
-      : email_action_type === "email_change"
-      ? "Confirm your new email"
-      : "Verify your Edura account";
+    const isRecovery = email_action_type === "recovery";
+    const isEmailChange = email_action_type === "email_change";
 
-    const bodyText = email_action_type === "recovery"
-      ? "We received a request to reset your password. Click the button below to continue."
-      : email_action_type === "email_change"
-      ? "Click the button below to confirm your new email address."
-      : "Click the button below to verify your email and activate your account.";
+    const heading = isRecovery
+      ? "Reset your password"
+      : isEmailChange
+      ? "Confirm your new email address"
+      : "Confirm your email address";
 
-    const buttonText = email_action_type === "recovery"
-      ? "Reset Password"
-      : email_action_type === "email_change"
-      ? "Confirm Email"
-      : "Verify Email";
+    const bodyText = isRecovery
+      ? "Use the code below to reset the password on your Edura account. It expires in 60 minutes."
+      : isEmailChange
+      ? "Use the code below to confirm your new email address. It expires in 60 minutes."
+      : "Use the code below to finish setting up your Edura account. It expires in 60 minutes.";
+
+    let subject = "Confirm your email address";
+    if (isRecovery) subject = "Your Edura password reset code";
+    else if (isEmailChange) subject = "Confirm your new email address";
+    else subject = "Your Edura verification code";
+
+    const codeBlock = token
+      ? `<div style="margin:28px 0;text-align:center">
+            <div style="display:inline-block;padding:16px 28px;border:1px solid #d8dee6;border-radius:8px;background:#f7f9fb">
+              <span style="font-family:'Courier New',monospace;font-size:30px;letter-spacing:8px;font-weight:700;color:#08121F">${token}</span>
+            </div>
+          </div>`
+      : `<p style="text-align:center;margin:28px 0">
+            <a href="${verificationUrl}" style="background:#12B76A;color:#ffffff;padding:12px 26px;border-radius:6px;text-decoration:none;display:inline-block;font-weight:600">Continue</a>
+          </p>`;
 
     const html = `
       <html>
-        <body style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;background:#f6f9fc;padding:24px">
-          <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:8px;padding:24px;border:1px solid #e6ebf1">
-            <h1 style="margin-top:0">${heading}</h1>
-            <p>${bodyText}</p>
-            <p style="text-align:center;margin:24px 0">
-              <a href="${verificationUrl}" style="background:#6366f1;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block">${buttonText}</a>
+        <body style="margin:0;padding:24px;background:#f4f6f8;font-family:Helvetica,Arial,sans-serif;color:#1f2933">
+          <div style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e3e8ee;border-radius:10px;padding:32px">
+            <p style="margin:0 0 24px;font-size:18px;font-weight:700;color:#08121F;letter-spacing:0.5px">Edura</p>
+            <h1 style="margin:0 0 12px;font-size:20px;color:#08121F">${heading}</h1>
+            <p style="margin:0;font-size:15px;line-height:1.6;color:#4b5563">${bodyText}</p>
+            ${codeBlock}
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#6b7280">
+              If you did not request this, you can safely ignore this email. Your account remains secure.
             </p>
-            <p>Or copy and paste this link into your browser:</p>
-            <p style="word-break:break-all;color:#6366f1">${verificationUrl}</p>
-            <hr style="border:none;border-top:1px solid #e6ebf1;margin:24px 0" />
-            <p style="color:#6b7280;font-size:14px">If you did not request this, you can safely ignore this email.</p>
+            <hr style="border:none;border-top:1px solid #e5e9ef;margin:28px 0" />
+            <p style="margin:0;font-size:12px;line-height:1.6;color:#8a94a6">
+              Edura &middot; support@edura.com.ng &middot; 0705 075 7085<br />
+              <a href="${siteUrl}" style="color:#12B76A;text-decoration:none">edura.com.ng</a>
+            </p>
           </div>
         </body>
       </html>`;
-
-    // Determine subject based on action type
-    let subject = "Verify your Edura account";
-    if (email_action_type === "recovery") {
-      subject = "Reset your Edura password";
-    } else if (email_action_type === "email_change") {
-      subject = "Confirm your new email address";
-    }
 
     // Send email via Resend
     const { data, error } = await resend.emails.send({
