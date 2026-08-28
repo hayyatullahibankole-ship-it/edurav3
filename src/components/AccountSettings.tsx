@@ -880,52 +880,29 @@ export default function AccountSettings() {
         </CardContent>
       </Card>
 
-      {/* Danger Zone */}
-      <Card className="border-destructive/40">
+      {/* Account closure */}
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-destructive">
+          <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5" />
-            Delete account
+            Close your account
           </CardTitle>
           <CardDescription>
-            Permanently delete your Edura account and all associated data. This cannot be undone.
+            Account deletion is handled by our support team so we can verify the request.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              Deleting removes your profile, test history, study plans, wallet balance, service requests and
-              uploaded files. Any remaining wallet balance is forfeited. Anonymised payment records may be kept
-              where the law requires.
-            </AlertDescription>
-          </Alert>
-          <div className="space-y-2">
-            <Label htmlFor="delete-confirm">Type DELETE to confirm</Label>
-            <Input
-              id="delete-confirm"
-              value={deleteConfirm}
-              onChange={(e) => setDeleteConfirm(e.target.value)}
-              placeholder="DELETE"
-              autoComplete="off"
-            />
-          </div>
-          <Button
-            variant="destructive"
-            onClick={handleDeleteAccount}
-            disabled={deleting || deleteConfirm.trim().toUpperCase() !== "DELETE"}
-            className="w-full sm:w-auto"
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            {deleting ? "Deleting..." : "Delete my account permanently"}
-          </Button>
-          <p className="text-xs text-muted-foreground">
-            Can't sign in? See the{" "}
-            <Link to="/delete-account" className="underline">
-              account deletion page
-            </Link>
-            .
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Email{" "}
+            <a href="mailto:support@edura.com.ng" className="font-medium underline">
+              support@edura.com.ng
+            </a>{" "}
+            from your registered address with the subject "Delete my account". We complete verified requests
+            within 30 days and confirm by email once your data has been removed.
           </p>
+          <Button asChild variant="outline" className="w-full sm:w-auto">
+            <a href="mailto:support@edura.com.ng?subject=Delete%20my%20account">Contact support</a>
+          </Button>
         </CardContent>
       </Card>
 
