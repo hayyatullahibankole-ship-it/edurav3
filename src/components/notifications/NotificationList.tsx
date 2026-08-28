@@ -31,6 +31,8 @@ interface Props {
   onMarkAllRead: () => void;
   onDelete: (id: string) => void;
   onRetry?: () => void;
+  /** Called when a row is tapped, after it is marked read. */
+  onOpen?: (notification: Notification) => void;
 }
 
 type Filter = "all" | "unread";
