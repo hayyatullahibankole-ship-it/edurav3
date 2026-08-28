@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
@@ -28,6 +28,7 @@ export function useSubscription() {
     expiry: null,
   });
   const { user, userProfile } = useAuth();
+  const profileWaitTimer = useRef<number | null>(null);
 
 
   useEffect(() => {
@@ -39,11 +40,33 @@ export function useSubscription() {
         return;
       }
 
-      // Wait for the public.users profile to load (required for all access checks)
+      // Wait for the public.users profile to load (required for all access checks).
+      // Bounded wait: if the profile never resolves we still settle into a decided
+      // state so gated screens never spin forever.
       if (!userProfile?.id) {
         setSubscription(null);
         setLoading(true);
+        profileWaitTimer.current = window.setTimeout(() => {
+          setSubscription({
+            id: 'free',
+            status: 'ACTIVE',
+            plan_id: 'free',
+            start_date: new Date().toISOString(),
+            end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+            subscription_plans: {
+              name: 'Free Access',
+              price: 0,
+              resource_access_level: 'basic',
+              features: ['Limited practice tests'],
+            },
+          });
+          setLoading(false);
+        }, 6000);
         return;
+      }
+      if (profileWaitTimer.current) {
+        clearTimeout(profileWaitTimer.current);
+        profileWaitTimer.current = null;
       }
 
       try {
@@ -215,6 +238,12 @@ export function useSubscription() {
       }
     };
     fetchSubscription();
+    return () => {
+      if (profileWaitTimer.current) {
+        clearTimeout(profileWaitTimer.current);
+        profileWaitTimer.current = null;
+      }
+    };
   }, [user?.id, userProfile?.id]);
 
   // Normalize subscription state - fix the premium detection logic
