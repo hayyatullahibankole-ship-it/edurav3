@@ -52,6 +52,7 @@ export const NotificationList = ({
   onMarkAllRead,
   onDelete,
   onRetry,
+  onOpen,
 }: Props) => {
   const [filter, setFilter] = useState<Filter>("all");
 
