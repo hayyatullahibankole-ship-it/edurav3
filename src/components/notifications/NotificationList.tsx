@@ -171,10 +171,12 @@ const NotificationRow = ({
   notification: n,
   onMarkRead,
   onDelete,
+  onOpen,
 }: {
   notification: Notification;
   onMarkRead: (id: string) => void;
   onDelete: (id: string) => void;
+  onOpen?: (notification: Notification) => void;
 }) => {
   const time = useMemo(() => {
     try {
