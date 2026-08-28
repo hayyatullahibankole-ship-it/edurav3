@@ -343,11 +343,42 @@ export default function MobileAuthForm() {
                   placeholder="you@email.com"
                   value={formData.email}
                   onChange={(e) => updateField("email", e.target.value)}
+                  disabled={emailSent}
                   className={`pl-10 ${errors.email ? "border-destructive" : ""}`}
                 />
               </div>
               {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
             </div>
+
+            {emailSent && (
+              <EmailOtpVerify
+                key={formData.email}
+                email={formData.email.trim().toLowerCase()}
+                type="email"
+                alreadySent={false}
+                createUser
+                onVerified={() => setStep(4)}
+                onCancel={() => setEmailSent(false)}
+              />
+            )}
+
+            {!emailSent && (
+              <Button
+                className="h-12 w-full rounded-xl text-base font-semibold"
+                onClick={async () => {
+                  await handleHaptic();
+                  if (!validateStep(3)) return;
+                  setEmailSent(true);
+                }}
+              >
+                Verify email <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        );
+      case 4:
+        return (
+          <div className="animate-fade-in space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
