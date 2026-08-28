@@ -11,6 +11,13 @@ interface Props {
   email: string;
   /** 'signup' for new accounts, 'email' for magic-link style codes */
   type?: "signup" | "email";
+  /**
+   * true  - a code was already sent by the caller (start the cooldown immediately)
+   * false - show a "Send code" button and send it from here
+   */
+  alreadySent?: boolean;
+  /** Allow the OTP request to create the user (email-first signup). */
+  createUser?: boolean;
   onVerified: () => void;
   onCancel?: () => void;
 }
@@ -18,16 +25,25 @@ interface Props {
 /**
  * Six digit email verification. The code is delivered by the auth email hook.
  */
-export const EmailOtpVerify = ({ email, type = "signup", onVerified, onCancel }: Props) => {
+export const EmailOtpVerify = ({
+  email,
+  type = "signup",
+  alreadySent = true,
+  createUser = false,
+  onVerified,
+  onCancel,
+}: Props) => {
   const { toast } = useToast();
   const [code, setCode] = useState("");
   const [verifying, setVerifying] = useState(false);
   const [resending, setResending] = useState(false);
   const [verified, setVerified] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const [sent, setSent] = useState(alreadySent);
 
-  // The first code was just sent by the signup call — start (or restore) the timer.
+  // When the caller already triggered the send, start (or restore) the timer.
   useEffect(() => {
+    if (!alreadySent) return;
     const existing = getOtpCooldown(type, email);
     if (existing > 0) {
       setCooldown(existing);
@@ -35,7 +51,7 @@ export const EmailOtpVerify = ({ email, type = "signup", onVerified, onCancel }:
       markOtpSent(type, email);
       setCooldown(OTP_COOLDOWN_SECONDS);
     }
-  }, [email, type]);
+  }, [email, type, alreadySent]);
 
   useEffect(() => {
     if (cooldown <= 0) return;
