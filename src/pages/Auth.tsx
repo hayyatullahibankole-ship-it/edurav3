@@ -5,6 +5,7 @@ import AuthForm from '@/components/AuthForm';
 import MobileAuthForm from '@/components/MobileAuthForm';
 import { useInstalledApp } from '@/hooks/useInstalledApp';
 import { supabase } from '@/integrations/supabase/client';
+import { isSignupInProgress } from '@/lib/signupFlow';
 
 export default function Auth() {
   const { user, loading, isAdmin, isSchoolAdmin, userRole, userProfile } = useAuth();
