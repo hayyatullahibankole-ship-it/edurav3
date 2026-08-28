@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Plus, Trash2, Upload, FileText, Download, BookOpen, Loader2 } from "lucide-react";
+import { Plus, Trash2, Upload, FileText, Download, BookOpen, Loader2, Bookmark } from "lucide-react";
 
 const SEMESTERS = ["First", "Second"];
 const KINDS = ["note", "past_question", "handout", "slide", "textbook", "other"];
@@ -256,20 +256,54 @@ const CampusAcademics = () => {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+
+          <Dialog open={contributeOpen} onOpenChange={setContributeOpen}>
+            <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-md">
+              <DialogHeader><DialogTitle>Contribute to the Library</DialogTitle></DialogHeader>
+              <p className="-mt-2 text-sm text-muted-foreground">
+                Share a note, past question or handout with every campus student. An admin reviews it before it goes live.
+              </p>
+              <div className="grid gap-3">
+                <div><Label>Title</Label><Input value={contribute.title} onChange={(e) => setContribute({ ...contribute, title: e.target.value })} /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Type</Label>
+                    <Select value={contribute.kind} onValueChange={(v) => setContribute({ ...contribute, kind: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>{KINDS.map((k) => <SelectItem key={k} value={k} className="capitalize">{k.replace("_", " ")}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div><Label>Course code</Label><Input value={contribute.course_code} onChange={(e) => setContribute({ ...contribute, course_code: e.target.value })} placeholder="CSC 201" /></div>
+                </div>
+                <div><Label>What is it about?</Label><Textarea rows={2} value={contribute.description} onChange={(e) => setContribute({ ...contribute, description: e.target.value })} /></div>
+                <div><Label>File</Label><Input type="file" onChange={(e) => setContributeFile(e.target.files?.[0] ?? null)} /></div>
+              </div>
+              <DialogFooter>
+                <Button onClick={submitToLibrary} disabled={saving}>{saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Submit for review</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       }
     >
       <Tabs defaultValue="courses">
-        <TabsList>
+        <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="courses">Courses</TabsTrigger>
           <TabsTrigger value="materials">My materials</TabsTrigger>
           <TabsTrigger value="library">Library</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="courses" className="mt-4">
+        <TabsContent value="courses" className="mt-4 space-y-3">
+          <div className="flex justify-end">
+            <Button size="sm" className="gap-2" onClick={() => setCourseOpen(true)}>
+              <Plus className="h-4 w-4" /> Add course
+            </Button>
+          </div>
           {courses.length === 0 && !loading ? (
             <Card><CardContent className="p-8 text-center text-sm text-muted-foreground">
-              <BookOpen className="h-6 w-6 mx-auto mb-2" /> No courses yet. Add your first course above.
+              <BookOpen className="h-6 w-6 mx-auto mb-2" />
+              <p>No courses yet.</p>
+              <Button className="mt-4 gap-2" onClick={() => setCourseOpen(true)}><Plus className="h-4 w-4" /> Add your first course</Button>
             </CardContent></Card>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -297,8 +331,21 @@ const CampusAcademics = () => {
           )}
         </TabsContent>
 
-        <TabsContent value="materials" className="mt-4">
-          <MaterialList items={materials} onOpen={openFile} empty="Upload your notes, handouts and past questions to keep them in one place." />
+        <TabsContent value="materials" className="mt-4 space-y-3">
+          <div className="flex justify-end">
+            <Button size="sm" className="gap-2" onClick={() => setUploadOpen(true)}>
+              <Upload className="h-4 w-4" /> Upload material
+            </Button>
+          </div>
+          {materials.length === 0 && !loading ? (
+            <Card><CardContent className="p-8 text-center text-sm text-muted-foreground">
+              <FileText className="h-6 w-6 mx-auto mb-2" />
+              <p>Upload your notes, handouts and past questions to keep them in one place.</p>
+              <Button className="mt-4 gap-2" onClick={() => setUploadOpen(true)}><Upload className="h-4 w-4" /> Upload your first material</Button>
+            </CardContent></Card>
+          ) : (
+            <MaterialList items={materials} onOpen={openFile} empty="" />
+          )}
         </TabsContent>
 
         <TabsContent value="library" className="mt-4 space-y-4">
@@ -310,15 +357,59 @@ const CampusAcademics = () => {
               &ldquo;My materials&rdquo;, which only you can see. Tap any item to open it.
             </p>
           </div>
-          <MaterialList items={library} onOpen={openFile} empty="No shared library materials published yet. Check back soon." />
+          <div className="flex justify-end">
+            <Button size="sm" className="gap-2" onClick={() => setContributeOpen(true)}>
+              <Upload className="h-4 w-4" /> Contribute a material
+            </Button>
+          </div>
+
+          {submissions.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Your submissions</p>
+              {submissions.map((sub) => (
+                <Card key={sub.id}>
+                  <CardContent className="flex items-center justify-between gap-3 p-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{sub.title}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{String(sub.kind).replace("_", " ")}</p>
+                    </div>
+                    <Badge
+                      variant={sub.is_published ? "secondary" : sub.review_status === "rejected" ? "destructive" : "outline"}
+                      className="shrink-0 text-[11px]"
+                    >
+                      {sub.is_published ? "Published" : sub.review_status === "rejected" ? "Not accepted" : "Pending review"}
+                    </Badge>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          <MaterialList
+            items={library}
+            onOpen={openFile}
+            onSave={saveToMine}
+            empty="No shared library materials published yet. Check back soon."
+          />
         </TabsContent>
       </Tabs>
     </CampusShell>
   );
 };
 
-const MaterialList = ({ items, onOpen, empty }: { items: any[]; onOpen: (p?: string | null) => void; empty: string }) => {
+const MaterialList = ({
+  items,
+  onOpen,
+  empty,
+  onSave,
+}: {
+  items: any[];
+  onOpen: (p?: string | null) => void;
+  empty: string;
+  onSave?: (item: any) => void;
+}) => {
   if (items.length === 0) {
+    if (!empty) return null;
     return <Card><CardContent className="p-8 text-center text-sm text-muted-foreground">{empty}</CardContent></Card>;
   }
   return (
@@ -334,9 +425,16 @@ const MaterialList = ({ items, onOpen, empty }: { items: any[]; onOpen: (p?: str
               </p>
               {m.description && <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{m.description}</p>}
             </div>
-            <Button variant="outline" size="sm" className="gap-1 shrink-0" onClick={() => onOpen(m.file_url)}>
-              <Download className="h-3.5 w-3.5" /> Open
-            </Button>
+            <div className="flex shrink-0 flex-col gap-1.5">
+              <Button variant="outline" size="sm" className="gap-1" onClick={() => onOpen(m.file_url)}>
+                <Download className="h-3.5 w-3.5" /> Open
+              </Button>
+              {onSave && (
+                <Button variant="ghost" size="sm" className="gap-1" onClick={() => onSave(m)}>
+                  <Bookmark className="h-3.5 w-3.5" /> Save
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       ))}
