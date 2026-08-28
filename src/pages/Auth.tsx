@@ -5,6 +5,7 @@ import AuthForm from '@/components/AuthForm';
 import MobileAuthForm from '@/components/MobileAuthForm';
 import { useInstalledApp } from '@/hooks/useInstalledApp';
 import { supabase } from '@/integrations/supabase/client';
+import { isSignupInProgress } from '@/lib/signupFlow';
 
 export default function Auth() {
   const { user, loading, isAdmin, isSchoolAdmin, userRole, userProfile } = useAuth();
@@ -25,6 +26,9 @@ export default function Auth() {
 
   useEffect(() => {
     const checkSchoolStatus = async () => {
+      // Mid-signup the OTP step creates a session before the password step —
+      // stay on the form instead of redirecting.
+      if (isSignupInProgress()) return;
       if (user && !loading && userRole !== null) {
         if (isInstalledApp && !isProfileComplete) {
           navigate('/mobile-home', { replace: true });
@@ -103,7 +107,7 @@ export default function Auth() {
     );
   }
 
-  if (user && userRole !== null) {
+  if (user && userRole !== null && !isSignupInProgress()) {
     const redirectTo = isAdmin
       ? "/admin"
       : (isSchoolAdmin ? "/school-dashboard" : (isInstalledApp ? "/mobile-home" : "/dashboard"));

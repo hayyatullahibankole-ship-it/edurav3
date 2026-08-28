@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ACADEMIC_STAGES, STUDY_LEVELS, isCampusStage } from "@/lib/academicStages";
 import EmailOtpVerify from "@/components/auth/EmailOtpVerify";
 import { getAuthError } from "@/lib/errors";
+import { endSignupFlow, startSignupFlow } from "@/lib/signupFlow";
 
 const loginSchema = z.object({
   email: emailSchema,
@@ -64,6 +65,9 @@ export default function MobileAuthForm() {
       setIsLogin(false);
     }
   }, [searchParams]);
+
+  // Leaving the sign-up wizard should never leave the redirect suppression on.
+  useEffect(() => () => endSignupFlow(), []);
 
   useEffect(() => {
     const preferred = localStorage.getItem("preferredJourney");
@@ -168,6 +172,32 @@ export default function MobileAuthForm() {
         }
       }
 
+      // The account row was created by the OTP signup before we had these
+      // details, so write them now — the stage in particular, otherwise the
+      // journey page would ask for it again right after signup.
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from("users")
+          .update({
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            phone: formData.phone,
+            academic_stage: formData.academicStage || null,
+            institution_name: formData.institutionName || null,
+            study_level: formData.studyLevel || null,
+          })
+          .eq("auth_user_id", data.user.id);
+        if (profileError) console.error("Profile update error:", profileError);
+      }
+
+      if (formData.academicStage) {
+        try {
+          localStorage.setItem("edura_academic_stage", formData.academicStage);
+        } catch {
+          /* ignore */
+        }
+      }
+
       onVerified();
     } catch (error: any) {
       toast({
@@ -184,6 +214,7 @@ export default function MobileAuthForm() {
     e.preventDefault();
     setLoading(true);
     setErrors({});
+    endSignupFlow();
     await handleHaptic();
 
     try {
@@ -221,7 +252,8 @@ export default function MobileAuthForm() {
   };
 
   const onVerified = () => {
-    toast({ title: "Email verified", description: "Welcome to Edura!" });
+    endSignupFlow();
+    toast({ title: "Account ready", description: "Welcome to Edura!" });
     navigate("/dashboard", { replace: true });
   };
 
@@ -368,6 +400,9 @@ export default function MobileAuthForm() {
                 onClick={async () => {
                   await handleHaptic();
                   if (!validateStep(3)) return;
+                  // From here a session can appear mid-wizard; keep the app on
+                  // this form until the password step is done.
+                  startSignupFlow();
                   setEmailSent(true);
                 }}
               >
@@ -556,9 +591,11 @@ export default function MobileAuthForm() {
             type="button"
             onClick={async () => {
               await handleHaptic();
+              endSignupFlow();
               setIsLogin(!isLogin);
               setErrors({});
               setStep(1);
+              setEmailSent(false);
             }}
             className="text-sm text-muted-foreground"
           >
