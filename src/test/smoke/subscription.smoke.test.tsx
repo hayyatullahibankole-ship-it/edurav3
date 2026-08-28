@@ -4,33 +4,11 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 
 
-const PLANS = [
-  {
-    id: "plan-free",
-    name: "Free",
-    price: 0,
-    duration_days: 30,
-    scope: "cbt",
-    description: "Get started at no cost",
-    features: ["Limited practice"],
-    is_active: true,
-  },
-  {
-    id: "plan-premium",
-    name: "Premium",
-    price: 2500,
-    duration_days: 30,
-    scope: "cbt",
-    description: "Full CBT access",
-    features: ["Unlimited practice"],
-    is_active: true,
-  },
-];
-
-const { supabase, navigate, refreshWallet, createSubscriptionPayment } = await vi.hoisted(async () => {
+const { supabase, navigate, refreshWallet, createSubscriptionPayment, state } = await vi.hoisted(async () => {
   const { createSupabaseMock } = await import("../supabaseMock");
   const { vi: v } = await import("vitest");
   return {
+    state: { balance: 10000 },
     navigate: v.fn(),
     refreshWallet: v.fn(),
     createSubscriptionPayment: v.fn(async () => undefined),
@@ -66,7 +44,6 @@ const { supabase, navigate, refreshWallet, createSubscriptionPayment } = await v
   };
 });
 
-let walletBalance = 10000;
 
 
 vi.mock("@/integrations/supabase/client", () => ({ supabase }));
@@ -78,7 +55,7 @@ vi.mock("@/hooks/useAuth", () => ({
   useAuth: () => ({ user: { id: "user-1", email: "student@edura.com.ng" }, userProfile: { id: "p1" } }),
 }));
 vi.mock("@/hooks/useWallet", () => ({
-  useWallet: () => ({ balance: walletBalance, loading: false, refresh: refreshWallet }),
+  useWallet: () => ({ balance: state.balance, loading: false, refresh: refreshWallet }),
 }));
 vi.mock("@/lib/nativePayments", () => ({
   canPurchaseDigitalInApp: () => true,
@@ -101,7 +78,7 @@ const renderPayment = () =>
 describe("smoke: subscription purchase", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    walletBalance = 10000;
+    state.balance = 10000;
   });
 
   it("lists active plans for the CBT scope", async () => {
@@ -129,7 +106,7 @@ describe("smoke: subscription purchase", () => {
   });
 
   it("redirects to funding when the wallet balance is short", async () => {
-    walletBalance = 100;
+    state.balance = 100;
     const user = userEvent.setup();
     renderPayment();
     await screen.findByText("Premium");
