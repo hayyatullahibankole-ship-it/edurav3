@@ -4,6 +4,8 @@
 
 On step 3 of the mobile sign-up, verifying the 6-digit code creates a real Supabase session. The app treats any new session as "user just logged in", so the auth screen's redirect effect fires and sends the user to the journey page and then the dashboard — before the password step ever renders.
 
+notifications is also loading indefinitely
+
 ## What it should do
 
 ```text
