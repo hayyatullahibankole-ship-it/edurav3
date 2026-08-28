@@ -81,6 +81,8 @@ const CampusCompanion = lazy(() => import("@/pages/campus/CampusCompanion"));
 const CampusLogbook = lazy(() => import("@/pages/campus/CampusLogbook"));
 const CampusNysc = lazy(() => import("@/pages/campus/CampusNysc"));
 const CampusCareer = lazy(() => import("@/pages/campus/CampusCareer"));
+const CampusNotifications = lazy(() => import("@/pages/campus/CampusNotifications"));
+const Notifications = lazy(() => import("@/pages/Notifications"));
 
 
 
@@ -254,6 +256,11 @@ const EduraRoutes = () => {
           <Settings />
         </ProtectedRoute>
       } />
+      <Route path="/notifications" element={
+        <ProtectedRoute>
+          <Notifications />
+        </ProtectedRoute>
+      } />
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <DashboardBySide isInstalledApp={isInstalledApp} />
@@ -363,6 +370,11 @@ const EduraRoutes = () => {
       <Route path="/campus/journey" element={
         <ProtectedRoute>
           <CampusJourney />
+        </ProtectedRoute>
+      } />
+      <Route path="/campus/notifications" element={
+        <ProtectedRoute>
+          <CampusOnly><CampusNotifications /></CampusOnly>
         </ProtectedRoute>
       } />
       <Route path="/wallet" element={

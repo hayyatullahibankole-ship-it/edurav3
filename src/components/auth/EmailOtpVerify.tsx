@@ -5,6 +5,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { getOtpCooldown, guardOtpSend, markOtpSent, OTP_COOLDOWN_SECONDS } from "@/lib/otpRateLimit";
+import { getOtpError } from "@/lib/errors";
 
 interface Props {
   email: string;
@@ -53,7 +54,7 @@ export const EmailOtpVerify = ({ email, type = "signup", onVerified, onCancel }:
     } catch (e: any) {
       toast({
         title: "Invalid code",
-        description: e?.message || "That code is incorrect or has expired. Request a new one.",
+        description: getOtpError(e),
         variant: "destructive",
       });
       setCode("");
@@ -81,7 +82,7 @@ export const EmailOtpVerify = ({ email, type = "signup", onVerified, onCancel }:
       setCooldown(OTP_COOLDOWN_SECONDS);
       toast({ title: "Code sent", description: `We sent a new code to ${email}.` });
     } catch (e: any) {
-      toast({ title: "Could not send code", description: e?.message, variant: "destructive" });
+      toast({ title: "Could not send code", description: getOtpError(e), variant: "destructive" });
     } finally {
       setResending(false);
     }
@@ -96,6 +97,8 @@ export const EmailOtpVerify = ({ email, type = "signup", onVerified, onCancel }:
       </div>
     );
   }
+
+  const progressPct = cooldown > 0 ? Math.round((cooldown / OTP_COOLDOWN_SECONDS) * 100) : 0;
 
   return (
     <div className="space-y-4 rounded-xl border p-5">
@@ -134,17 +137,32 @@ export const EmailOtpVerify = ({ email, type = "signup", onVerified, onCancel }:
         Verify email
       </Button>
 
-      <div className="flex items-center justify-between text-sm">
+      <div className="space-y-2">
         <button
           type="button"
           onClick={resend}
           disabled={cooldown > 0 || resending}
-          className="text-primary disabled:text-muted-foreground"
+          className="flex w-full flex-col items-center gap-1 rounded-lg py-2 text-sm text-primary transition-colors disabled:text-muted-foreground"
         >
-          {cooldown > 0 ? `Resend in ${cooldown}s` : resending ? "Sending..." : "Resend code"}
+          {cooldown > 0 ? (
+            <>
+              <span className="font-medium">Resend code in {cooldown}s</span>
+              <div className="h-1 w-32 overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-1000"
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
+              <span className="text-xs text-muted-foreground">You can request a new code once the timer ends.</span>
+            </>
+          ) : resending ? (
+            <span className="flex items-center gap-2"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending…</span>
+          ) : (
+            "Resend code"
+          )}
         </button>
         {onCancel && (
-          <button type="button" onClick={onCancel} className="text-muted-foreground underline">
+          <button type="button" onClick={onCancel} className="w-full text-center text-sm text-muted-foreground underline">
             Use a different email
           </button>
         )}
