@@ -63,30 +63,6 @@ export default function AccountSettings() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [verificationLoading, setVerificationLoading] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState("");
-  const [deleting, setDeleting] = useState(false);
-
-  const handleDeleteAccount = async () => {
-    if (deleteConfirm.trim().toUpperCase() !== "DELETE") return;
-    setDeleting(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("delete-account");
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
-      toast({ title: "Account deleted", description: "Your account and data have been permanently removed." });
-      try { localStorage.clear(); } catch { /* ignore */ }
-      await supabase.auth.signOut();
-      window.location.href = "/";
-    } catch (e) {
-      toast({
-        title: "Could not delete account",
-        description: e instanceof Error ? e.message : "Please try again or email support@edura.com.ng",
-        variant: "destructive",
-      });
-    } finally {
-      setDeleting(false);
-    }
-  };
 
   // State for settings
   const {
