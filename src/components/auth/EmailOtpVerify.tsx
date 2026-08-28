@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getOtpCooldown, guardOtpSend, markOtpSent, OTP_COOLDOWN_SECONDS } from "@/lib/otpRateLimit";
 
 interface Props {
   email: string;
@@ -22,7 +23,18 @@ export const EmailOtpVerify = ({ email, type = "signup", onVerified, onCancel }:
   const [verifying, setVerifying] = useState(false);
   const [resending, setResending] = useState(false);
   const [verified, setVerified] = useState(false);
-  const [cooldown, setCooldown] = useState(45);
+  const [cooldown, setCooldown] = useState(0);
+
+  // The first code was just sent by the signup call — start (or restore) the timer.
+  useEffect(() => {
+    const existing = getOtpCooldown(type, email);
+    if (existing > 0) {
+      setCooldown(existing);
+    } else {
+      markOtpSent(type, email);
+      setCooldown(OTP_COOLDOWN_SECONDS);
+    }
+  }, [email, type]);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -51,14 +63,22 @@ export const EmailOtpVerify = ({ email, type = "signup", onVerified, onCancel }:
   };
 
   const resend = async () => {
+    if (cooldown > 0 || resending) return;
     setResending(true);
     try {
+      const gate = await guardOtpSend(type, email);
+      if (!gate.allowed) {
+        setCooldown(gate.retryAfter);
+        toast({ title: "Slow down", description: gate.message, variant: "destructive" });
+        return;
+      }
+
       const { error } =
         type === "signup"
           ? await supabase.auth.resend({ type: "signup", email })
           : await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
       if (error) throw error;
-      setCooldown(45);
+      setCooldown(OTP_COOLDOWN_SECONDS);
       toast({ title: "Code sent", description: `We sent a new code to ${email}.` });
     } catch (e: any) {
       toast({ title: "Could not send code", description: e?.message, variant: "destructive" });

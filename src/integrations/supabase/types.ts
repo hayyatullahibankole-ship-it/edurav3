@@ -5963,6 +5963,10 @@ export type Database = {
         Args: { p_registration_number: string }
         Returns: Json
       }
+      check_otp_send_rate_limit: {
+        Args: { p_email: string; p_purpose?: string }
+        Returns: Json
+      }
       check_rate_limit: {
         Args: {
           endpoint_name: string

@@ -10,6 +10,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { passwordSchema } from "@/utils/inputValidation";
+import { getOtpCooldown, guardOtpSend, OTP_COOLDOWN_SECONDS } from "@/lib/otpRateLimit";
 import eduraLogo from "@/assets/edura-logo.png";
 
 type Step = "email" | "code" | "password" | "done";
@@ -36,17 +37,33 @@ export default function ResetPassword() {
     return () => clearTimeout(t);
   }, [cooldown]);
 
+  // Restore any pending cooldown for this address (survives reloads).
+  useEffect(() => {
+    const pending = getOtpCooldown("recovery", email);
+    if (pending > 0) setCooldown(pending);
+  }, [email]);
+
+
   const sendCode = async () => {
     if (!email.trim()) {
       toast({ title: "Email required", description: "Enter the email on your account.", variant: "destructive" });
       return;
     }
+    if (cooldown > 0 || busy) return;
     setBusy(true);
     try {
+      const gate = await guardOtpSend("recovery", email);
+      if (!gate.allowed) {
+        setCooldown(gate.retryAfter);
+        setStep("code");
+        toast({ title: "Slow down", description: gate.message, variant: "destructive" });
+        return;
+      }
+
       const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase());
       if (error) throw error;
       setStep("code");
-      setCooldown(45);
+      setCooldown(OTP_COOLDOWN_SECONDS);
       toast({ title: "Code sent", description: "Check your inbox for a 6-digit reset code." });
     } catch (e: any) {
       toast({ title: "Could not send code", description: e?.message, variant: "destructive" });
