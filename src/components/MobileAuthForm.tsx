@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ACADEMIC_STAGES, STUDY_LEVELS, isCampusStage } from "@/lib/academicStages";
 import EmailOtpVerify from "@/components/auth/EmailOtpVerify";
 import { getAuthError } from "@/lib/errors";
+import { endSignupFlow, startSignupFlow } from "@/lib/signupFlow";
 
 const loginSchema = z.object({
   email: emailSchema,
