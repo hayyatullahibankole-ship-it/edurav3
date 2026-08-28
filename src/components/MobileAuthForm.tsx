@@ -498,31 +498,30 @@ export default function MobileAuthForm() {
 
       {renderStepContent()}
 
-      {step < 4 && (
-        <div className="flex gap-3 pt-2">
-          {step > 1 && (
-            <Button variant="outline" className="h-12 flex-1 rounded-xl" onClick={prevStep} disabled={loading}>
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back
-            </Button>
-          )}
-          {step < 3 ? (
-            <Button className="h-12 flex-1 rounded-xl text-base font-semibold" onClick={nextStep}>
-              Continue <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          ) : (
-            <Button className="h-12 flex-1 rounded-xl text-base font-semibold" onClick={submitSignup} disabled={loading}>
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  Creating…
-                </span>
-              ) : (
-                <>Create account <ArrowRight className="ml-2 h-4 w-4" /></>
-              )}
-            </Button>
-          )}
-        </div>
-      )}
+      <div className="flex gap-3 pt-2">
+        {step > 1 && step < 4 && (
+          <Button variant="outline" className="h-12 flex-1 rounded-xl" onClick={prevStep} disabled={loading}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back
+          </Button>
+        )}
+        {step < 3 && (
+          <Button className="h-12 flex-1 rounded-xl text-base font-semibold" onClick={nextStep}>
+            Continue <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        )}
+        {step === 4 && (
+          <Button className="h-12 flex-1 rounded-xl text-base font-semibold" onClick={finishSignup} disabled={loading}>
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Creating…
+              </span>
+            ) : (
+              <>Create account <ArrowRight className="ml-2 h-4 w-4" /></>
+            )}
+          </Button>
+        )}
+      </div>
     </div>
   );
 
