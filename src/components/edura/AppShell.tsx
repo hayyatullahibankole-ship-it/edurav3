@@ -367,6 +367,13 @@ export const AppShell = ({ side, title, subtitle, meta, action, nav, children }:
 
               {action}
             </div>
+
+            {/* Mobile: subtitle, badges and page actions (hidden on desktop, shown above) */}
+            <div className="mb-4 space-y-2 lg:hidden">
+              {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+              {meta && <div className="flex flex-wrap gap-1.5">{meta}</div>}
+              {action && <div className="flex flex-wrap items-center gap-2 pt-1">{action}</div>}
+            </div>
             {children}
           </div>
         </main>
