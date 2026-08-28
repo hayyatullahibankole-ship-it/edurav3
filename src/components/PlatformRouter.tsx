@@ -81,6 +81,8 @@ const CampusCompanion = lazy(() => import("@/pages/campus/CampusCompanion"));
 const CampusLogbook = lazy(() => import("@/pages/campus/CampusLogbook"));
 const CampusNysc = lazy(() => import("@/pages/campus/CampusNysc"));
 const CampusCareer = lazy(() => import("@/pages/campus/CampusCareer"));
+const CampusNotifications = lazy(() => import("@/pages/campus/CampusNotifications"));
+const Notifications = lazy(() => import("@/pages/Notifications"));
 
 
 
