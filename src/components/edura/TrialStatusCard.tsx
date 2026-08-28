@@ -37,7 +37,7 @@ export default function TrialStatusCard() {
           </p>
         </div>
         <Button asChild size="sm" variant={urgent ? "default" : "outline"} className="shrink-0">
-          <Link to="/subscription">Keep access</Link>
+          <Link to="/payment">Keep access</Link>
         </Button>
       </div>
     );
@@ -56,7 +56,7 @@ export default function TrialStatusCard() {
           </p>
         </div>
         <Button asChild size="sm" className="shrink-0">
-          <Link to="/subscription">Upgrade</Link>
+          <Link to="/payment">Upgrade</Link>
         </Button>
       </div>
     );
