@@ -10,6 +10,13 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { canPurchaseDigitalInApp, DIGITAL_PURCHASE_NOTICE } from "@/lib/nativePayments";
 
+const DEFAULT_PLAN_FEATURES = [
+  "Full CBT practice with real exam timing",
+  "Past questions across all subjects",
+  "Instant scoring and answer explanations",
+  "Performance reports and progress tracking",
+];
+
 const Payment = () => {
   const { user, userProfile } = useAuth();
   const { toast } = useToast();
