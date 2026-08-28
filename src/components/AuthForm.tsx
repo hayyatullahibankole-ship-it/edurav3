@@ -386,7 +386,7 @@ export default function AuthForm() {
               </div>
             )}
             
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className={`space-y-4 ${pendingOtpEmail ? 'hidden' : ''}`}>
               {!isLogin && (
                 <>
                   {/* Name Fields */}
