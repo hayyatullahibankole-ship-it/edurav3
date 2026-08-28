@@ -2,7 +2,7 @@ import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Mail } from "lucide-react";
 
 export default function DeleteAccount() {
   return (
@@ -11,7 +11,7 @@ export default function DeleteAccount() {
         <title>Delete Your Edura Account | Data Deletion Request</title>
         <meta
           name="description"
-          content="How to permanently delete your Edura account and what data is removed or retained."
+          content="How to request permanent deletion of your Edura account and what data is removed or retained."
         />
         <link rel="canonical" href="https://edura.com.ng/delete-account" />
       </Helmet>
@@ -25,28 +25,22 @@ export default function DeleteAccount() {
         <Card>
           <CardHeader>
             <CardTitle className="text-3xl flex items-center gap-2">
-              <Trash2 className="w-7 h-7" /> Delete your Edura account
+              <Mail className="w-7 h-7" /> Request account deletion
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 text-muted-foreground leading-relaxed">
             <section>
-              <h2 className="text-xl font-semibold text-foreground mb-2">Delete from inside the app</h2>
-              <ol className="list-decimal list-inside space-y-1">
-                <li>Open the Edura app and sign in.</li>
-                <li>Go to <strong>Settings → Account</strong>.</li>
-                <li>Scroll to <strong>Delete account</strong>, type <code>DELETE</code> and confirm.</li>
-              </ol>
-              <p className="mt-2">Your account is removed immediately and you are signed out.</p>
-            </section>
-
-            <section>
-              <h2 className="text-xl font-semibold text-foreground mb-2">Request by email</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-2">How to request</h2>
               <p>
-                If you can no longer sign in, email{" "}
-                <a className="underline" href="mailto:support@edura.com.ng">support@edura.com.ng</a> from your
-                registered address with the subject "Delete my account". We complete verified requests within
-                30 days.
+                Email{" "}
+                <a className="underline" href="mailto:support@edura.com.ng">support@edura.com.ng</a> from the
+                address registered on your Edura account, using the subject{" "}
+                <strong>"Delete my account"</strong>. Our support team verifies the request and confirms by
+                email once the deletion is complete. Verified requests are completed within 30 days.
               </p>
+              <Button asChild className="mt-4">
+                <a href="mailto:support@edura.com.ng?subject=Delete%20my%20account">Email support</a>
+              </Button>
             </section>
 
             <section>

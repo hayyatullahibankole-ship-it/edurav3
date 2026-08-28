@@ -2,29 +2,40 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTheme } from 'next-themes';
 
-// Dark mode is only allowed inside the app dashboards.
-// Public / marketing pages always render in light mode.
-const DASHBOARD_PREFIXES = [
-  '/dashboard',
-  '/mobile-home',
-  '/admin',
-  '/services',
-  '/wallet',
-  '/practice',
-  '/results',
-  '/test-results',
-  '/challenge-results',
-  '/answer-review',
-  '/study-hub',
-  '/resources',
-  '/profile',
-  '/settings',
-  '/school-dashboard',
-  '/school',
+// Dark mode is allowed everywhere inside the signed-in app.
+// Only public / marketing & Akboy pages are forced to light mode.
+const PUBLIC_LIGHT_PREFIXES = [
+  '/akboy',
+  '/campus-hub',
+  '/blog',
+  '/privacy',
+  '/terms',
+  '/delete-account',
+  '/schools',
+  '/school-landing',
+  '/campus-landing',
+  '/install-app',
+  '/mock',
+  '/mock-registration',
+  '/mock-login',
+  '/mock-exam',
+  '/mock-submitted',
+  '/mock-results',
+  '/reprint-admit-slip',
+  '/tutorials',
+  '/register',
+  '/tutorial-registration',
+  '/events',
+  '/portfolio',
+  '/contact',
+  '/about',
 ];
 
+const matches = (pathname: string, list: string[]) =>
+  list.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+
 export const isDashboardPath = (pathname: string) =>
-  DASHBOARD_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  pathname !== '/' && !matches(pathname, PUBLIC_LIGHT_PREFIXES);
 
 export const ThemeScope = () => {
   const { pathname } = useLocation();

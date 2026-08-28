@@ -25,6 +25,8 @@ import {
   FileCheck,
   Award,
   Zap,
+  Gift,
+  CreditCard,
 } from "lucide-react";
 
 const tests: { examType: "jamb" | "waec" | "neco" | "post-utme"; label: string; icon: React.ElementType }[] = [
@@ -60,9 +62,21 @@ const groups: {
       },
       {
         label: "Wallet",
-        description: "Fund, pay & earn rewards",
+        description: "Fund, pay & track transactions",
         icon: Wallet,
+        path: "/wallet",
+      },
+      {
+        label: "Referrals",
+        description: "Invite friends & earn rewards",
+        icon: Gift,
         path: "/referral-program",
+      },
+      {
+        label: "Subscription",
+        description: "Plans, upgrade & billing",
+        icon: CreditCard,
+        path: "/payment",
       },
     ],
   },

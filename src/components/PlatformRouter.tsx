@@ -100,6 +100,8 @@ const DashboardBySide = ({ isInstalledApp }: { isInstalledApp: boolean }) => {
 
 
 /** Campus routes are for undergraduates & graduates only */
+const CampusPremiumGate = lazy(() => import("@/components/campus/CampusPremiumGate"));
+
 const CampusOnly = ({ children }: { children: JSX.Element }) => {
   const { stage, isCampus, loading, resolved } = useAcademicStage();
   if (loading) return <LoadingAnimation />;
@@ -318,40 +320,40 @@ const EduraRoutes = () => {
       } />
       <Route path="/campus/companion" element={
         <ProtectedRoute>
-          <CampusOnly><CampusCompanion /></CampusOnly>
+          <CampusOnly><CampusPremiumGate><CampusCompanion /></CampusPremiumGate></CampusOnly>
         </ProtectedRoute>
       } />
       <Route path="/campus/tools" element={
 
         <ProtectedRoute>
-          <CampusOnly><CampusTools /></CampusOnly>
+          <CampusOnly><CampusPremiumGate><CampusTools /></CampusPremiumGate></CampusOnly>
         </ProtectedRoute>
       } />
 
       <Route path="/campus/logbook" element={
         <ProtectedRoute>
-          <CampusOnly><CampusLogbook /></CampusOnly>
+          <CampusOnly><CampusPremiumGate><CampusLogbook /></CampusPremiumGate></CampusOnly>
         </ProtectedRoute>
       } />
       <Route path="/campus/nysc" element={
         <ProtectedRoute>
-          <CampusOnly><CampusNysc /></CampusOnly>
+          <CampusOnly><CampusPremiumGate><CampusNysc /></CampusPremiumGate></CampusOnly>
         </ProtectedRoute>
       } />
       <Route path="/campus/career" element={
         <ProtectedRoute>
-          <CampusOnly><CampusCareer /></CampusOnly>
+          <CampusOnly><CampusPremiumGate><CampusCareer /></CampusPremiumGate></CampusOnly>
         </ProtectedRoute>
       } />
 
       <Route path="/campus/projects" element={
         <ProtectedRoute>
-          <CampusOnly><CampusProjects /></CampusOnly>
+          <CampusOnly><CampusPremiumGate><CampusProjects /></CampusPremiumGate></CampusOnly>
         </ProtectedRoute>
       } />
       <Route path="/campus/opportunities" element={
         <ProtectedRoute>
-          <CampusOnly><CampusOpportunities /></CampusOnly>
+          <CampusOnly><CampusPremiumGate><CampusOpportunities /></CampusPremiumGate></CampusOnly>
         </ProtectedRoute>
       } />
 

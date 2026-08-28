@@ -8,6 +8,8 @@ import {
   LogOut,
   Settings,
   Wallet,
+  CreditCard,
+  Gift,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -19,6 +21,8 @@ const ITEMS = [
   { label: "NYSC Hub", description: "Track each service-year step", icon: Compass, to: "/campus/nysc" },
   { label: "Study tools", description: "CGPA, timetable and deadlines", icon: Calculator, to: "/campus/tools" },
   { label: "Wallet", description: "Fund and manage your balance", icon: Wallet, to: "/wallet" },
+  { label: "Subscription", description: "Plan, upgrade and billing", icon: CreditCard, to: "/payment?scope=campus" },
+  { label: "Referrals", description: "Invite friends and earn", icon: Gift, to: "/referral-program" },
 ];
 
 export const CampusMoreSheet = ({
