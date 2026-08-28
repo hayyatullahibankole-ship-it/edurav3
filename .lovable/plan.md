@@ -38,6 +38,6 @@ Set `versionCode 3` and `versionName "1.0.0"` in the Android app config so the n
 
 ## Technical notes
 
-- Files: new `src/pages/campus/CampusNotifications.tsx`, new shared `src/components/notifications/NotificationList.tsx` and `NotificationPreferences.tsx`, plus edits to `CampusShell.tsx`, `NotificationBell.tsx`, `MobileAuthForm.tsx`, `src/components/auth/EmailOtpVerify.tsx`, `ResetPassword.tsx`, `src/lib/otpRateLimit.ts`, a new `src/lib/errors.ts`, route registration, and `android/app/build.gradle`.
+- Files: new `src/pages/campus/CampusNotifications.tsx`, new `src/pages/Notifications.tsx` for the main dashboard, new shared `src/components/notifications/NotificationList.tsx` and `NotificationPreferences.tsx`, plus edits to `CampusShell.tsx`, `AppShell.tsx`, `NotificationBell.tsx`, `MobileAuthForm.tsx`, `src/components/auth/EmailOtpVerify.tsx`, `ResetPassword.tsx`, `src/lib/otpRateLimit.ts`, a new `src/lib/errors.ts`, route registration, and `android/app/build.gradle`.
 - Uses the existing `notifications` table and the `user_preferences` notification columns — no schema changes needed. A delete policy check on `notifications` is the only DB item to confirm before wiring per-item delete.
 - Countdown state stays in the existing localStorage cooldown so it survives reloads; only the presentation changes.
