@@ -24,6 +24,7 @@ const DEFAULT_MILESTONES = ["Proposal approval", "Chapter One", "Chapter Two", "
 
 const CampusProjects = () => {
   const { user } = useAuth();
+  const [projects, setProjects] = useState<any[]>([]);
   const [project, setProject] = useState<any | null>(null);
   const [milestones, setMilestones] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
@@ -33,17 +34,41 @@ const CampusProjects = () => {
 
   useEffect(() => { document.title = "Project Hub | Edura Campus"; }, []);
 
-  const load = async () => {
+  const load = async (preferId?: string) => {
     if (!user) return;
     const { data } = await supabase.from("campus_projects").select("*").eq("user_id", user.id)
-      .order("created_at", { ascending: false }).limit(1);
-    const p = data?.[0] ?? null;
+      .order("created_at", { ascending: false });
+    const list = data ?? [];
+    setProjects(list);
+    const p = list.find((x: any) => x.id === (preferId ?? project?.id)) ?? list[0] ?? null;
     setProject(p);
     if (p) {
       const { data: ms } = await supabase.from("campus_project_milestones").select("*")
         .eq("project_id", p.id).order("position");
       setMilestones(ms ?? []);
+    } else {
+      setMilestones([]);
     }
+  };
+
+  const selectProject = async (id: string) => {
+    const p = projects.find((x) => x.id === id);
+    if (!p) return;
+    setProject(p);
+    const { data: ms } = await supabase.from("campus_project_milestones").select("*")
+      .eq("project_id", id).order("position");
+    setMilestones(ms ?? []);
+  };
+
+  const deleteProject = async () => {
+    if (!project) return;
+    if (!window.confirm(`Delete "${project.title}" and all its milestones?`)) return;
+    await supabase.from("campus_project_milestones").delete().eq("project_id", project.id);
+    const { error } = await supabase.from("campus_projects").delete().eq("id", project.id);
+    if (error) return toast.error(error.message);
+    toast.success("Project deleted");
+    setProject(null);
+    load();
   };
 
   useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user]);
@@ -64,8 +89,9 @@ const CampusProjects = () => {
     );
     setSaving(false);
     setOpen(false);
+    setForm({ title: "", topic: "", supervisor: "", deadline: "" });
     toast.success("Project created");
-    load();
+    load(data.id);
   };
 
   const toggleMilestone = async (m: any) => {
@@ -109,7 +135,16 @@ const CampusProjects = () => {
       title="Project Hub"
       subtitle="Plan your final year project from proposal to defence."
       action={
-        !project && (
+        (
+          <div className="flex items-center gap-2">
+          {projects.length > 1 && (
+            <Select value={project?.id} onValueChange={selectProject}>
+              <SelectTrigger className="w-[170px]"><SelectValue placeholder="Switch project" /></SelectTrigger>
+              <SelectContent>
+                {projects.map((p) => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          )}
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild><Button className="gap-2"><Plus className="h-4 w-4" /> New project</Button></DialogTrigger>
             <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-md">
@@ -125,6 +160,7 @@ const CampusProjects = () => {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          </div>
         )
       }
     >
@@ -189,6 +225,9 @@ const CampusProjects = () => {
                 <p><span className="text-muted-foreground">Deadline:</span> {project.deadline ? new Date(project.deadline).toLocaleDateString() : "—"}</p>
                 <Badge variant="secondary" className="capitalize">{String(project.stage).replace("_", " ")}</Badge>
               </div>
+              <Button variant="outline" size="sm" className="mt-4 w-full text-destructive" onClick={deleteProject}>
+                <Trash2 className="h-3.5 w-3.5 mr-2" /> Delete project
+              </Button>
             </CardContent></Card>
 
             <Card><CardContent className="p-5">
