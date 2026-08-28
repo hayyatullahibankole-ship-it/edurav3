@@ -172,6 +172,32 @@ export default function MobileAuthForm() {
         }
       }
 
+      // The account row was created by the OTP signup before we had these
+      // details, so write them now — the stage in particular, otherwise the
+      // journey page would ask for it again right after signup.
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from("users")
+          .update({
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            phone: formData.phone,
+            academic_stage: formData.academicStage || null,
+            institution_name: formData.institutionName || null,
+            study_level: formData.studyLevel || null,
+          })
+          .eq("auth_user_id", data.user.id);
+        if (profileError) console.error("Profile update error:", profileError);
+      }
+
+      if (formData.academicStage) {
+        try {
+          localStorage.setItem("edura_academic_stage", formData.academicStage);
+        } catch {
+          /* ignore */
+        }
+      }
+
       onVerified();
     } catch (error: any) {
       toast({
