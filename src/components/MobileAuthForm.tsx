@@ -137,60 +137,41 @@ export default function MobileAuthForm() {
     navigate(`/reset-password${email ? `?email=${encodeURIComponent(email)}` : ""}`);
   };
 
-  const submitSignup = async () => {
-    if (!validateStep(3)) return;
+  /** Email is verified (an OTP session now exists) — set the password and profile data. */
+  const finishSignup = async () => {
+    if (!validateStep(4)) return;
     setLoading(true);
     await handleHaptic();
     try {
-      const { data: signUpData, error } = await supabase.auth.signUp({
-        email: formData.email.trim().toLowerCase(),
+      const { data, error } = await supabase.auth.updateUser({
         password: formData.password,
-        options: {
-          data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            phone: formData.phone,
-            academic_stage: formData.academicStage,
-            institution_name: formData.institutionName,
-            study_level: formData.studyLevel,
-          },
+        data: {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          phone: formData.phone,
+          academic_stage: formData.academicStage,
+          institution_name: formData.institutionName,
+          study_level: formData.studyLevel,
         },
       });
 
       if (error) throw error;
 
-      if (signUpData.user && (signUpData.user.identities?.length ?? 1) === 0) {
-        toast({
-          title: "Account already exists",
-          description: "This email is already registered. Sign in instead, or reset your password.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
-      if (signUpData.user && referralCode) {
+      if (data.user && referralCode) {
         try {
           localStorage.setItem(
             "pending_referral",
-            JSON.stringify({ code: referralCode, userId: signUpData.user.id, email: formData.email })
+            JSON.stringify({ code: referralCode, userId: data.user.id, email: formData.email })
           );
         } catch (refError) {
           console.error("Referral storage error:", refError);
         }
       }
 
-      if (signUpData.session) {
-        // Email confirmation is not required for this project — go straight in.
-        onVerified();
-        return;
-      }
-
-      setSignupComplete(true);
-      setStep(4);
+      onVerified();
     } catch (error: any) {
       toast({
-        title: "Could not create account",
+        title: "Could not finish setting up your account",
         description: getAuthError(error),
         variant: "destructive",
       });
