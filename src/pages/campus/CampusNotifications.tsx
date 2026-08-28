@@ -8,10 +8,13 @@ import NotificationList, { Notification } from "@/components/notifications/Notif
 import NotificationPreferences from "@/components/notifications/NotificationPreferences";
 import { useToast } from "@/hooks/use-toast";
 import { getSpecificError } from "@/lib/errors";
+import { useNavigate } from "react-router-dom";
+import { resolveNotificationRoute } from "@/lib/notificationRoutes";
 
 export default function CampusNotifications() {
   const { userProfile } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
@@ -129,6 +132,7 @@ export default function CampusNotifications() {
             onMarkAllRead={markAllAsRead}
             onDelete={deleteNotification}
             onRetry={fetchNotifications}
+            onOpen={(n) => navigate(resolveNotificationRoute(n, { campus: true }))}
           />
         </TabsContent>
         <TabsContent value="preferences" className="mt-0">
