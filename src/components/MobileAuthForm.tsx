@@ -590,9 +590,11 @@ export default function MobileAuthForm() {
             type="button"
             onClick={async () => {
               await handleHaptic();
+              endSignupFlow();
               setIsLogin(!isLogin);
               setErrors({});
               setStep(1);
+              setEmailSent(false);
             }}
             className="text-sm text-muted-foreground"
           >
