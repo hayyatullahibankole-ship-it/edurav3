@@ -80,6 +80,8 @@ export default function ResourceManagement() {
     resource_type: 'file' as 'file' | 'video' | 'link'
   });
 
+  const [editingResource, setEditingResource] = useState<Resource | null>(null);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [bulkFiles, setBulkFiles] = useState<FileList | null>(null);
   const [bulkCategory, setBulkCategory] = useState<'past-questions' | 'syllabus' | 'books'>('past-questions');
   const [brokenResources, setBrokenResources] = useState<Resource[]>([]);
