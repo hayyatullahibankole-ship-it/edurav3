@@ -126,6 +126,11 @@ export function getSpecificError(
 
   if (fallback) return fallback;
 
+  if (context === "notification") return knownMessages.notification.load_failed;
+  if (context === "preferences") return knownMessages.preferences.load_failed;
+  if (context === "auth") return "We couldn't complete that account action. Please check your details and try again.";
+  if (context === "otp") return knownMessages.auth.otp_incorrect;
+
   return knownMessages.generic.unknown;
 }
 
