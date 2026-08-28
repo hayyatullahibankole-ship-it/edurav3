@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserPlus, Download, Users, FileText, BookOpen } from "lucide-react";
+import { UserPlus, Users, FileText, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { generateSchoolManual } from "@/utils/schoolManualGenerator";
 
