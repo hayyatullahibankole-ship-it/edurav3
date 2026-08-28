@@ -12,9 +12,6 @@ interface QuickActionsProps {
 }
 
 export default function QuickActions({ onAddStudent, onViewReports, onViewStudents, schoolId }: QuickActionsProps) {
-  const handleDownloadReport = () => {
-    toast.info("Report download feature coming soon");
-  };
 
   const handleDownloadManual = () => {
     try {
