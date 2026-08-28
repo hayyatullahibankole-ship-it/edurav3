@@ -251,7 +251,8 @@ export default function MobileAuthForm() {
   };
 
   const onVerified = () => {
-    toast({ title: "Email verified", description: "Welcome to Edura!" });
+    endSignupFlow();
+    toast({ title: "Account ready", description: "Welcome to Edura!" });
     navigate("/dashboard", { replace: true });
   };
 
