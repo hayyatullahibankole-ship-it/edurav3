@@ -4,7 +4,10 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 
 
-const supabase = vi.hoisted(() => createSupabaseMockHoisted();
+const { supabase } = await vi.hoisted(async () => {
+  const { createSupabaseMock } = await import("../supabaseMock");
+  return { supabase: createSupabaseMock() };
+});
 
 vi.mock("@/integrations/supabase/client", () => ({ supabase }));
 vi.mock("@/utils/sessionManager", () => ({

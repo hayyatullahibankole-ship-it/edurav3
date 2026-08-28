@@ -3,7 +3,10 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 
-const supabase = vi.hoisted(() => createSupabaseMockHoisted();
+const { supabase } = await vi.hoisted(async () => {
+  const { createSupabaseMock } = await import("../supabaseMock");
+  return { supabase: createSupabaseMock() };
+});
 
 vi.mock("@/integrations/supabase/client", () => ({ supabase }));
 
