@@ -124,13 +124,23 @@ export const EmailOtpVerify = ({
           <Mail className="h-5 w-5" />
         </span>
         <div>
-          <p className="font-semibold">Enter your 6-digit code</p>
+          <p className="font-semibold">{sent ? "Enter your 6-digit code" : "Verify your email"}</p>
           <p className="text-sm text-muted-foreground">
-            We sent it to <span className="font-medium text-foreground">{email}</span>
+            {sent ? "We sent it to " : "We'll send a 6-digit code to "}
+            <span className="font-medium text-foreground">{email}</span>
           </p>
         </div>
       </div>
 
+      {!sent && (
+        <Button className="w-full" onClick={resend} disabled={resending || cooldown > 0}>
+          {resending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+          {cooldown > 0 ? `Send code in ${cooldown}s` : "Send verification code"}
+        </Button>
+      )}
+
+      {sent && (
+      <>
       <div className="flex justify-center">
         <InputOTP
           maxLength={6}
