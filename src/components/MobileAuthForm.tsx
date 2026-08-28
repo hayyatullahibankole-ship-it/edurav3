@@ -55,7 +55,7 @@ export default function MobileAuthForm() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [mfaOpen, setMfaOpen] = useState(false);
-  const [signupComplete, setSignupComplete] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   useEffect(() => {
     const refCode = searchParams.get("ref");
