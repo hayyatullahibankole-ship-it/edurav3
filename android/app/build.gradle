@@ -2,13 +2,15 @@ apply plugin: 'com.android.application'
 
 android {
     namespace "com.akboy.edura"
-    compileSdk rootProject.ext.compileSdkVersion
+    // Pinned explicitly so a stale variables.gradle cannot silently lower the
+    // target and trigger Play Console's "old API level" warning.
+    compileSdk 36
     defaultConfig {
         applicationId "com.akboy.edura"
         minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 3
-        versionName "1.0.0"
+        targetSdkVersion 36
+        versionCode 4
+        versionName "1.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
