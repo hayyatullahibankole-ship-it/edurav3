@@ -185,34 +185,10 @@ export default function SchoolLogin() {
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (!formData.email) {
-      toastHook({
-        variant: "destructive",
-        title: "Email required",
-        description: "Please enter your email address first",
-      });
-      return;
-    }
+  const handleForgotPassword = () => {
+    const email = formData.email?.trim();
+    navigate(`/reset-password?from=school${email ? `&email=${encodeURIComponent(email)}` : ""}`);
 
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
-        redirectTo: `${window.location.origin}/school-login`,
-      });
-
-      if (error) throw error;
-
-      toastHook({
-        title: "Check your email",
-        description: "We've sent you a password reset link",
-      });
-    } catch (error: any) {
-      toastHook({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to send reset email",
-      });
-    }
   };
 
   return (

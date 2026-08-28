@@ -87,35 +87,11 @@ export default function MobileAuthForm() {
   };
 
   const handleForgotPassword = async () => {
-    if (!formData.email) {
-      toast({
-        title: "Email required",
-        description: "Please enter your email address first",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      await handleHaptic();
-      const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
-        redirectTo: `${window.location.origin}/auth`,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Check your email",
-        description: "We've sent you a password reset link",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to send reset email",
-        variant: "destructive",
-      });
-    }
+    await handleHaptic();
+    const email = formData.email?.trim();
+    navigate(`/reset-password${email ? `?email=${encodeURIComponent(email)}` : ""}`);
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

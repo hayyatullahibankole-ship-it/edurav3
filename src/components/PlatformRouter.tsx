@@ -36,6 +36,7 @@ const BetaTest = lazy(() => import("@/pages/BetaTest"));
 
 const Privacy = lazy(() => import("@/pages/Privacy"));
 const DeleteAccount = lazy(() => import("@/pages/DeleteAccount"));
+const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
 const Terms = lazy(() => import("@/pages/Terms"));
 const AnswerReview = lazy(() => import("@/pages/AnswerReview"));
 const PaymentSuccess = lazy(() => import("@/pages/PaymentSuccess"));
@@ -160,6 +161,7 @@ const AkboyRoutes = () => {
       <Route path="/ebooks" element={<EbookLibrary />} />
       <Route path="/ebooks/:slug" element={<EbookReader />} />
       <Route path="/auth" element={<Auth />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/contact" element={<AkboyContact />} />
 
       {/* Registration aliases */}
@@ -233,6 +235,7 @@ const EduraRoutes = () => {
 
       
       <Route path="/auth" element={<Layout showNavbar={false}><Auth /></Layout>} />
+      <Route path="/reset-password" element={<Layout showNavbar={false}><ResetPassword /></Layout>} />
       <Route path="/choose" element={<Navigate to="/dashboard" replace />} />
       <Route path="/mobile-home" element={<Navigate to="/dashboard" replace />} />
       <Route path="/cbt" element={

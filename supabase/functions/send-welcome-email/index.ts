@@ -18,8 +18,8 @@ interface WelcomeEmailRequest {
 }
 
 const createWelcomeEmailHtml = (firstName: string, dashboardUrl: string, unsubscribeToken?: string) => {
-  const unsubscribeUrl = unsubscribeToken 
-    ? `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovableproject.com')}/unsubscribe?token=${unsubscribeToken}`
+  const unsubscribeUrl = unsubscribeToken
+    ? `https://edura.com.ng/#/unsubscribe?token=${unsubscribeToken}`
     : null;
   return `
     <!DOCTYPE html>
@@ -27,95 +27,49 @@ const createWelcomeEmailHtml = (firstName: string, dashboardUrl: string, unsubsc
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-          body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4; }
-          .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
-          .header { background: linear-gradient(135deg, #1e40af 0%, #059669 100%); padding: 40px 30px; text-align: center; }
-          .header h1 { color: white; margin: 0; font-size: 32px; font-weight: bold; }
-          .content { padding: 40px 30px; }
-          .content h2 { color: #111827; margin: 0 0 20px 0; font-size: 24px; }
-          .message-box { background: #f9fafb; padding: 24px; border-radius: 12px; margin-bottom: 30px; line-height: 1.6; color: #374151; }
-          .cta-button { 
-            display: inline-block; 
-            background: linear-gradient(135deg, #1e40af 0%, #059669 100%); 
-            color: white; 
-            padding: 16px 40px; 
-            text-decoration: none; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            font-size: 16px;
-            margin: 20px 0;
-          }
-          .cta-button:hover { opacity: 0.9; }
-          .plans-section { margin: 30px 0; }
-          .plan-card { 
-            background: #f9fafb; 
-            border: 2px solid #e5e7eb; 
-            border-radius: 12px; 
-            padding: 20px; 
-            margin: 15px 0;
-          }
-          .plan-card h3 { color: #1e40af; margin: 0 0 10px 0; font-size: 20px; }
-          .plan-card .price { color: #059669; font-size: 24px; font-weight: bold; margin: 10px 0; }
-          .plan-card ul { margin: 15px 0; padding-left: 20px; color: #374151; }
-          .plan-card li { margin: 8px 0; }
-          .footer { background-color: #111827; padding: 24px 30px; text-align: center; }
-          .footer p { color: #9ca3af; font-size: 12px; margin: 0; }
-        </style>
       </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🎉 Welcome to Edura!</h1>
-          </div>
-          <div class="content">
-            <h2>Hello ${firstName},</h2>
-            <div class="message-box">
-              <p><strong>Congratulations on creating your Edura account!</strong></p>
-              <p>We're thrilled to have you join our community of learners. Edura is your comprehensive platform for exam preparation, featuring practice tests, study materials, and progress tracking.</p>
-              <p>Ready to get started? Click the button below to access your dashboard and explore everything Edura has to offer.</p>
-            </div>
-            
-            <div style="text-align: center;">
-              <a href="${dashboardUrl}" class="cta-button">Go to My Dashboard</a>
-            </div>
+      <body style="margin:0;padding:24px;background:#f4f6f8;font-family:Helvetica,Arial,sans-serif;color:#1f2933">
+        <div style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e3e8ee;border-radius:10px;padding:32px">
+          <p style="margin:0 0 24px;font-size:18px;font-weight:700;color:#08121F;letter-spacing:0.5px">Edura</p>
 
-            <div class="plans-section">
-              <h3 style="color: #111827; font-size: 22px; margin-bottom: 20px;">📚 Choose Your Plan</h3>
-              <p style="color: #374151; margin-bottom: 20px;">Unlock your full potential with our premium features:</p>
-              
-              <div class="plan-card">
-                <h3>Free Plan</h3>
-                <div class="price">₦0</div>
-                <ul>
-                  <li>Access to basic practice questions</li>
-                  <li>Limited exam attempts</li>
-                  <li>Standard study materials</li>
-                </ul>
-              </div>
+          <h1 style="margin:0 0 12px;font-size:20px;color:#08121F">Welcome, ${firstName}</h1>
+          <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4b5563">
+            Your Edura account is ready. You can now practise past questions under exam conditions, follow a
+            structured study plan, track your progress and request exam services in one place.
+          </p>
 
-              <div class="plan-card" style="border-color: #1e40af; border-width: 3px;">
-                <h3>Premium Plan</h3>
-                <div class="price">From ₦5,000/month</div>
-                <ul>
-                  <li>Unlimited practice tests</li>
-                  <li>Advanced analytics & progress tracking</li>
-                  <li>Premium study materials & video lessons</li>
-                  <li>Priority support</li>
-                  <li>Downloadable resources</li>
-                </ul>
-              </div>
-            </div>
+          <p style="margin:24px 0">
+            <a href="${dashboardUrl}" style="background:#12B76A;color:#ffffff;padding:12px 26px;border-radius:6px;text-decoration:none;display:inline-block;font-weight:600">Open my dashboard</a>
+          </p>
 
-            <p style="color: #6b7280; font-size: 14px; margin-top: 30px; text-align: center;">
-              Visit your dashboard to explore subscription options and start your learning journey today!
-            </p>
-          </div>
-          <div class="footer">
-            <p>© ${new Date().getFullYear()} Edura. All rights reserved.</p>
-            <p style="margin-top: 10px;">Need help? Contact us at support@edura.com.ng</p>
-            ${unsubscribeUrl ? `<p style="margin-top: 15px;"><a href="${unsubscribeUrl}" style="color: #9ca3af; font-size: 11px; text-decoration: underline;">Unsubscribe from these emails</a></p>` : ''}
-          </div>
+          <table role="presentation" width="100%" style="border-collapse:collapse;margin:8px 0 24px">
+            <tr>
+              <td style="padding:12px 0;border-top:1px solid #eef1f5;font-size:14px;color:#4b5563">
+                <strong style="color:#08121F">Practice</strong> &mdash; JAMB, WAEC, NECO and NABTEB CBT practice with instant scoring.
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:12px 0;border-top:1px solid #eef1f5;font-size:14px;color:#4b5563">
+                <strong style="color:#08121F">Study tools</strong> &mdash; lessons, study decks and performance reports.
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:12px 0;border-top:1px solid #eef1f5;font-size:14px;color:#4b5563">
+                <strong style="color:#08121F">Services</strong> &mdash; result checker cards, admissions support and wallet payments.
+              </td>
+            </tr>
+          </table>
+
+          <p style="margin:0;font-size:14px;line-height:1.6;color:#6b7280">
+            Need help getting started? Reply to this email or contact support@edura.com.ng.
+          </p>
+
+          <hr style="border:none;border-top:1px solid #e5e9ef;margin:28px 0" />
+          <p style="margin:0;font-size:12px;line-height:1.6;color:#8a94a6">
+            &copy; ${new Date().getFullYear()} Edura &middot; support@edura.com.ng &middot; 0705 075 7085<br />
+            <a href="https://edura.com.ng" style="color:#12B76A;text-decoration:none">edura.com.ng</a>
+            ${unsubscribeUrl ? `&middot; <a href="${unsubscribeUrl}" style="color:#8a94a6;text-decoration:underline">Unsubscribe</a>` : ''}
+          </p>
         </div>
       </body>
     </html>
@@ -177,14 +131,14 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     const displayName = firstName || 'there';
-    const dashboardUrl = `${supabaseUrl.replace('.supabase.co', '.lovableproject.com')}/dashboard` || 'https://edura.com.ng/dashboard';
+    const dashboardUrl = 'https://edura.com.ng/#/dashboard';
 
     const emailHtml = createWelcomeEmailHtml(displayName, dashboardUrl, prefs?.unsubscribe_token);
 
     const emailResponse = await resend.emails.send({
       from: fromEmail,
       to: [email],
-      subject: "🎉 Welcome to Edura - Start Your Learning Journey!",
+      subject: "Welcome to Edura",
       html: emailHtml,
     });
 
@@ -197,7 +151,7 @@ const handler = async (req: Request): Promise<Response> => {
       user_id: userId,
       recipient_email: email,
       email_type: 'welcome',
-      subject: "🎉 Welcome to Edura - Start Your Learning Journey!",
+      subject: "Welcome to Edura",
       status: 'sent',
       provider_message_id: emailResponse.data?.id,
       sent_at: new Date().toISOString()
