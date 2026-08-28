@@ -372,6 +372,11 @@ const EduraRoutes = () => {
           <CampusJourney />
         </ProtectedRoute>
       } />
+      <Route path="/campus/notifications" element={
+        <ProtectedRoute>
+          <CampusOnly><CampusNotifications /></CampusOnly>
+        </ProtectedRoute>
+      } />
       <Route path="/wallet" element={
         <ProtectedRoute>
           <Wallet />
