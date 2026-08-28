@@ -1243,6 +1243,121 @@ data-testid="resource-management-container">
           </Card>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={!!editingResource} onOpenChange={(open) => !open && setEditingResource(null)}>
+        <DialogContent className="sm:max-w-[560px]">
+          <DialogHeader>
+            <DialogTitle>Edit Resource</DialogTitle>
+          </DialogHeader>
+          {editingResource && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-title">Title</Label>
+                <Input
+                  id="edit-title"
+                  value={editingResource.title}
+                  onChange={(e) => setEditingResource({ ...editingResource, title: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-description">Description</Label>
+                <Textarea
+                  id="edit-description"
+                  rows={3}
+                  value={editingResource.description || ''}
+                  onChange={(e) => setEditingResource({ ...editingResource, description: e.target.value })}
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <Label>Subject</Label>
+                  <Select
+                    value={editingResource.subject_id || ''}
+                    onValueChange={(value) => setEditingResource({ ...editingResource, subject_id: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select subject" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {subjects.map((subject) => (
+                        <SelectItem key={subject.id} value={subject.id}>{subject.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Access level</Label>
+                  <Select
+                    value={editingResource.access_level}
+                    onValueChange={(value) => setEditingResource({ ...editingResource, access_level: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="free">Free</SelectItem>
+                      <SelectItem value="premium">Premium</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div>
+                <Label>Status</Label>
+                <Select
+                  value={editingResource.is_active ? 'active' : 'inactive'}
+                  onValueChange={(value) => setEditingResource({ ...editingResource, is_active: value === 'active' })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" onClick={() => setEditingResource(null)} disabled={isSavingEdit}>
+                  Cancel
+                </Button>
+                <Button
+                  disabled={isSavingEdit || !editingResource.title.trim()}
+                  onClick={async () => {
+                    if (!editingResource) return;
+                    setIsSavingEdit(true);
+                    try {
+                      const { error } = await supabase
+                        .from('resources')
+                        .update({
+                          title: editingResource.title.trim(),
+                          description: editingResource.description,
+                          subject_id: editingResource.subject_id || null,
+                          access_level: editingResource.access_level,
+                          is_active: editingResource.is_active,
+                        })
+                        .eq('id', editingResource.id);
+                      if (error) throw error;
+                      toast({ title: "Saved", description: "Resource updated successfully" });
+                      setEditingResource(null);
+                      fetchData();
+                    } catch (error) {
+                      toast({
+                        title: "Error",
+                        description: "Failed to update resource",
+                        variant: "destructive",
+                      });
+                    } finally {
+                      setIsSavingEdit(false);
+                    }
+                  }}
+                >
+                  {isSavingEdit ? 'Saving...' : 'Save changes'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
