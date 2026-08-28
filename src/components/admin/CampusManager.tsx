@@ -52,6 +52,15 @@ const CampusManager = () => {
 
   useEffect(() => { load(); }, []);
 
+  const pending = library.filter((m) => m.review_status === "pending" && !m.is_published);
+
+  const openAdminFile = async (path?: string | null) => {
+    if (!path) return;
+    const { data, error } = await supabase.storage.from("campus-files").createSignedUrl(path, 600);
+    if (error || !data) return toast.error("Could not open file");
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  };
+
   const saveOpp = async () => {
     if (!form.title.trim()) return toast.error("Title is required");
     setSaving(true);
@@ -111,12 +120,29 @@ const CampusManager = () => {
     setLibrary((prev) => prev.filter((m) => m.id !== id));
   };
 
+  const reviewSubmission = async (id: string, approve: boolean) => {
+    const { error } = await supabase
+      .from("campus_materials")
+      .update({
+        review_status: approve ? "approved" : "rejected",
+        is_published: approve,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(approve ? "Published to the library" : "Submission rejected");
+    load();
+  };
+
   return (
     <div className="space-y-4">
       <Tabs defaultValue="opportunities">
         <TabsList>
           <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
           <TabsTrigger value="library">Library</TabsTrigger>
+          <TabsTrigger value="submissions">
+            Submissions{pending.length > 0 ? ` (${pending.length})` : ""}
+          </TabsTrigger>
           <TabsTrigger value="students">Campus students</TabsTrigger>
         </TabsList>
 
@@ -218,7 +244,7 @@ const CampusManager = () => {
           </Dialog>
 
           <div className="grid gap-3 md:grid-cols-2">
-            {library.map((m) => (
+            {library.filter((m) => m.is_published).map((m) => (
               <Card key={m.id}><CardContent className="p-4 flex items-center gap-3">
                 <FileText className="h-4 w-4 text-primary shrink-0" />
                 <div className="min-w-0 flex-1">
@@ -230,8 +256,31 @@ const CampusManager = () => {
                 <Button size="icon" variant="ghost" onClick={() => removeMaterial(m.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
               </CardContent></Card>
             ))}
-            {library.length === 0 && <p className="text-sm text-muted-foreground">No library materials yet.</p>}
+            {library.filter((m) => m.is_published).length === 0 && <p className="text-sm text-muted-foreground">No library materials yet.</p>}
           </div>
+        </TabsContent>
+
+        <TabsContent value="submissions" className="mt-4 space-y-3">
+          {pending.length === 0 && <p className="text-sm text-muted-foreground">No student submissions waiting for review.</p>}
+          {pending.map((m) => (
+            <Card key={m.id}><CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <FileText className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium">{m.title}</p>
+                  <p className="text-xs text-muted-foreground capitalize">
+                    {String(m.kind).replace("_", " ")}{m.course_code ? ` · ${m.course_code}` : ""}{m.department ? ` · ${m.department}` : ""}
+                  </p>
+                  {m.description && <p className="mt-1 text-xs text-muted-foreground">{m.description}</p>}
+                </div>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={() => openAdminFile(m.file_url)}>Preview file</Button>
+                <Button size="sm" onClick={() => reviewSubmission(m.id, true)}>Approve &amp; publish</Button>
+                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => reviewSubmission(m.id, false)}>Reject</Button>
+              </div>
+            </CardContent></Card>
+          ))}
         </TabsContent>
 
         <TabsContent value="students" className="mt-4">
