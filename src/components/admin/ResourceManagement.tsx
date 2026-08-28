@@ -1018,12 +1018,7 @@ data-testid="resource-management-container">
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        onClick={() => {
-                          toast({
-                            title: "Edit Resource",
-                            description: "Edit functionality coming soon"
-                          });
-                        }}
+                        onClick={() => setEditingResource(resource)}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
