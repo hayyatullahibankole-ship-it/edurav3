@@ -399,6 +399,9 @@ export default function MobileAuthForm() {
                 onClick={async () => {
                   await handleHaptic();
                   if (!validateStep(3)) return;
+                  // From here a session can appear mid-wizard; keep the app on
+                  // this form until the password step is done.
+                  startSignupFlow();
                   setEmailSent(true);
                 }}
               >
