@@ -19,9 +19,9 @@ Replace generic "Something went wrong" / silent console errors in the notificati
 Rework the mobile sign-up into a multi-step flow with a progress bar and step counter, one card per step, Back / Continue, and validation per step so users never see a wall of fields:
 
 ```text
-Sign up:  1 Account (email + password)
-          2 About you (name, phone)
-          3 Your path (JAMB/WAEC candidate vs undergraduate/graduate + level details)
+Sign up:  1 About you (name, phone)
+          2 Your path (JAMB/WAEC candidate vs undergraduate/graduate + level details)
+          3 Account (email + password)
           4 Verify email (OTP)
 Login:    stays a single quick form
 ```
