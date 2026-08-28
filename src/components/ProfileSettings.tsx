@@ -366,21 +366,13 @@ export default function ProfileSettings() {
             
             <div className="flex items-center justify-between pt-4 border-t">
               <div>
-                <h4 className="font-medium text-red-600">Delete Account</h4>
+                <h4 className="font-medium">Close Account</h4>
                 <p className="text-sm text-muted-foreground">
-                  Permanently delete your account and all data
+                  Email support@edura.com.ng to request account deletion
                 </p>
               </div>
-              <Button variant="destructive" onClick={() => {
-                if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
-                  toast({
-                    title: "Account deletion requested",
-                    description: "Please contact support to complete account deletion.",
-                  });
-                }
-              }}>
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Account
+              <Button variant="outline" asChild>
+                <a href="mailto:support@edura.com.ng?subject=Delete%20my%20account">Contact support</a>
               </Button>
             </div>
           </div>
