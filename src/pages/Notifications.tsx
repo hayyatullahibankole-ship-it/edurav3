@@ -37,7 +37,7 @@ export default function Notifications() {
       if (error) throw error;
       setNotifications((data as Notification[]) || []);
     } catch (e) {
-      setError(e);
+      setError(new Error(getSpecificError(e, "notification", "We couldn't load your notifications. Check your connection and try again.")));
     } finally {
       setLoading(false);
     }
@@ -54,13 +54,19 @@ export default function Notifications() {
       .on(
         "postgres_changes",
         {
-          event: "INSERT",
+          event: "*",
           schema: "public",
           table: "notifications",
           filter: `user_id=eq.${userProfile.id}`,
         },
         (payload) => {
-          setNotifications((prev) => [payload.new as Notification, ...prev]);
+          if (payload.eventType === "INSERT") {
+            setNotifications((prev) => [payload.new as Notification, ...prev]);
+          } else if (payload.eventType === "UPDATE") {
+            setNotifications((prev) => prev.map((item) => item.id === (payload.new as Notification).id ? payload.new as Notification : item));
+          } else if (payload.eventType === "DELETE") {
+            setNotifications((prev) => prev.filter((item) => item.id !== (payload.old as Notification).id));
+          }
         }
       )
       .subscribe();
@@ -74,6 +80,7 @@ export default function Notifications() {
       const { error } = await supabase.from("notifications").update({ is_read: true }).eq("id", id);
       if (error) throw error;
       setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
+      window.dispatchEvent(new Event("edura:notifications-change"));
     } catch (e) {
       toast({
         title: "Could not mark as read",
@@ -93,6 +100,7 @@ export default function Notifications() {
         .eq("is_read", false);
       if (error) throw error;
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      window.dispatchEvent(new Event("edura:notifications-change"));
     } catch (e) {
       toast({
         title: "Could not mark all as read",
@@ -107,6 +115,7 @@ export default function Notifications() {
       const { error } = await supabase.from("notifications").delete().eq("id", id);
       if (error) throw error;
       setNotifications((prev) => prev.filter((n) => n.id !== id));
+      window.dispatchEvent(new Event("edura:notifications-change"));
     } catch (e) {
       toast({
         title: "Could not delete",

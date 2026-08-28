@@ -42,16 +42,22 @@ const emailToggles: { key: keyof Preferences; label: string; description: string
 ];
 
 export const NotificationPreferences = () => {
-  const { userProfile } = useAuth();
+  const { userProfile, loading: authLoading } = useAuth();
   const { toast } = useToast();
-  const { permissionStatus, requestPermission, isSupported } = usePushNotifications();
+  const { permissionStatus, requestPermission, disableNotifications, isSupported } = usePushNotifications();
   const [prefs, setPrefs] = useState<Preferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<unknown>(null);
 
   const fetchPrefs = async () => {
-    if (!userProfile?.id) return;
+    if (!userProfile?.id) {
+      if (!authLoading) {
+        setLoading(false);
+        setError(new Error("profile_unavailable"));
+      }
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -59,9 +65,26 @@ export const NotificationPreferences = () => {
         .from("user_preferences")
         .select("email_test_reminders, email_results, email_study_tips, email_subscription_updates, push_notifications")
         .eq("user_id", userProfile.id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
-      setPrefs(data as Preferences);
+      if (!data) {
+        const defaults: Preferences = {
+          email_test_reminders: true,
+          email_results: true,
+          email_study_tips: true,
+          email_subscription_updates: true,
+          push_notifications: false,
+        };
+        const { data: created, error: createError } = await supabase
+          .from("user_preferences")
+          .upsert({ user_id: userProfile.id, ...defaults }, { onConflict: "user_id" })
+          .select("email_test_reminders, email_results, email_study_tips, email_subscription_updates, push_notifications")
+          .single();
+        if (createError) throw createError;
+        setPrefs((created as Preferences) || defaults);
+      } else {
+        setPrefs(data as Preferences);
+      }
     } catch (e) {
       setError(e);
     } finally {
@@ -71,7 +94,7 @@ export const NotificationPreferences = () => {
 
   useEffect(() => {
     fetchPrefs();
-  }, [userProfile?.id]);
+  }, [userProfile?.id, authLoading]);
 
   const update = async (key: keyof Preferences, value: boolean) => {
     if (!userProfile?.id || !prefs) return;
@@ -111,6 +134,7 @@ export const NotificationPreferences = () => {
       }
     } else {
       await update("push_notifications", false);
+      await disableNotifications();
     }
   };
 
@@ -127,7 +151,9 @@ export const NotificationPreferences = () => {
     return (
       <div className="flex h-40 flex-col items-center justify-center gap-3 px-6 text-center">
         <AlertCircle className="h-8 w-8 text-destructive" />
-        <p className="text-sm text-destructive">{getSpecificError(error, "preferences")}</p>
+        <p className="text-sm text-destructive">
+          {getSpecificError(error, "preferences", "Your notification preferences are not available yet. Refresh your profile and try again.")}
+        </p>
         <Button variant="outline" size="sm" onClick={fetchPrefs}>
           Try again
         </Button>

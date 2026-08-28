@@ -49,12 +49,16 @@ const knownMessages: Record<string, Record<string, string>> = {
       "We couldn't update that notification. Please try again.",
     delete_failed:
       "We couldn't delete that notification. Please try again.",
+    permission_denied:
+      "You don't have permission to access these notifications. Sign in again and retry.",
   },
   preferences: {
     load_failed:
       "We couldn't load your preferences. Check your connection and try again.",
     save_failed:
       "We couldn't save your preferences. Please try again.",
+    permission_denied:
+      "You don't have permission to change these preferences. Sign in again and retry.",
   },
   network: {
     offline:
@@ -116,11 +120,16 @@ export function getSpecificError(
   }
 
   if (code) {
-    const mapped = knownMessages[context]?.[code] || knownMessages.generic.unknown;
+    const mapped = knownMessages[context]?.[code] || fallback || knownMessages.generic.unknown;
     return mapped;
   }
 
   if (fallback) return fallback;
+
+  if (context === "notification") return knownMessages.notification.load_failed;
+  if (context === "preferences") return knownMessages.preferences.load_failed;
+  if (context === "auth") return "We couldn't complete that account action. Please check your details and try again.";
+  if (context === "otp") return knownMessages.auth.otp_incorrect;
 
   return knownMessages.generic.unknown;
 }

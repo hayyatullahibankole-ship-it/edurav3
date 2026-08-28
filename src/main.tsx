@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { registerAppServiceWorker } from "./lib/registerAppServiceWorker";
+import { isSignupInProgress } from "./lib/signupFlow";
 
 const isInIframe = (() => {
   try {
@@ -30,6 +31,7 @@ void registerAppServiceWorker();
 // reload once so the browser fetches the fresh asset manifest.
 const RELOAD_FLAG = "edura:chunk-reload";
 const recoverFromStaleChunk = () => {
+  if (isSignupInProgress()) return;
   if (sessionStorage.getItem(RELOAD_FLAG)) return;
   sessionStorage.setItem(RELOAD_FLAG, "1");
   window.location.reload();

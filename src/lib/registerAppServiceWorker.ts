@@ -1,4 +1,5 @@
 import { registerSW } from "virtual:pwa-register";
+import { isSignupInProgress } from "@/lib/signupFlow";
 
 const isPreviewOrDevelopment = () => {
   const hostname = window.location.hostname;
@@ -50,6 +51,7 @@ export const registerAppServiceWorker = async () => {
   registerSW({
     immediate: true,
     onNeedRefresh() {
+      if (isSignupInProgress()) return;
       window.location.reload();
     },
     onRegisteredSW(_url, registration) {

@@ -5,6 +5,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
+import { resolveNotificationRoute } from '@/lib/notificationRoutes';
 
 // Firebase is configured (android/app/google-services.json is present), so native
 // push registration is enabled. Web builds are skipped automatically.
@@ -25,6 +26,12 @@ const getDeviceId = () => {
 
 const isSafeRoute = (route: unknown): route is string =>
   typeof route === 'string' && route.startsWith('/') && !route.startsWith('//');
+
+const notificationDestination = (data: Record<string, any> | undefined) => {
+  const explicit = data?.route;
+  if (isSafeRoute(explicit)) return explicit;
+  return resolveNotificationRoute({ type: data?.type, metadata: data }, { campus: data?.campus === true });
+};
 
 export const usePushNotifications = () => {
   const [permissionStatus, setPermissionStatus] = useState<PushPermission>('prompt');
@@ -101,8 +108,7 @@ export const usePushNotifications = () => {
             }
           }),
           PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
-            const route = notification.notification.data?.route;
-            window.location.hash = isSafeRoute(route) ? `#${route}` : '#/dashboard';
+            window.location.hash = `#${notificationDestination(notification.notification.data)}`;
           }),
         ]);
         if (cancelled) {
@@ -113,8 +119,8 @@ export const usePushNotifications = () => {
 
         try {
           const localTap = await LocalNotifications.addListener('localNotificationActionPerformed', (event) => {
-            const route = (event.notification.extra as Record<string, unknown> | undefined)?.route;
-            if (isSafeRoute(route)) window.location.hash = `#${route}`;
+            const data = event.notification.extra as Record<string, any> | undefined;
+            window.location.hash = `#${notificationDestination(data)}`;
           });
           if (cancelled) void localTap.remove();
           else handles.push(localTap);

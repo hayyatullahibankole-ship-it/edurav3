@@ -66,7 +66,7 @@ export const EmailOtpVerify = ({
       if (error) throw error;
       setVerified(true);
       toast({ title: "Email verified", description: "Your email address is confirmed." });
-      setTimeout(onVerified, 700);
+      onVerified();
     } catch (e: any) {
       toast({
         title: "Invalid code",
