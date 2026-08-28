@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { passwordSchema } from "@/utils/inputValidation";
 import { getOtpCooldown, guardOtpSend, OTP_COOLDOWN_SECONDS } from "@/lib/otpRateLimit";
+import { getAuthError, getOtpError } from "@/lib/errors";
 import eduraLogo from "@/assets/edura-logo.png";
 
 type Step = "email" | "code" | "password" | "done";
@@ -43,7 +44,6 @@ export default function ResetPassword() {
     if (pending > 0) setCooldown(pending);
   }, [email]);
 
-
   const sendCode = async () => {
     if (!email.trim()) {
       toast({ title: "Email required", description: "Enter the email on your account.", variant: "destructive" });
@@ -66,7 +66,7 @@ export default function ResetPassword() {
       setCooldown(OTP_COOLDOWN_SECONDS);
       toast({ title: "Code sent", description: "Check your inbox for a 6-digit reset code." });
     } catch (e: any) {
-      toast({ title: "Could not send code", description: e?.message, variant: "destructive" });
+      toast({ title: "Could not send code", description: getOtpError(e), variant: "destructive" });
     } finally {
       setBusy(false);
     }
@@ -86,7 +86,7 @@ export default function ResetPassword() {
       setCode("");
       toast({
         title: "Invalid code",
-        description: e?.message || "That code is incorrect or expired.",
+        description: getOtpError(e),
         variant: "destructive",
       });
     } finally {
@@ -116,21 +116,23 @@ export default function ResetPassword() {
       await supabase.auth.signOut();
       setStep("done");
     } catch (e: any) {
-      toast({ title: "Could not update password", description: e?.message, variant: "destructive" });
+      toast({ title: "Could not update password", description: getAuthError(e), variant: "destructive" });
     } finally {
       setBusy(false);
     }
   };
 
+  const progressPct = cooldown > 0 ? Math.round((cooldown / OTP_COOLDOWN_SECONDS) * 100) : 0;
+
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Helmet>
         <title>Reset your Edura password</title>
         <meta name="description" content="Reset your Edura account password with a secure one-time code." />
       </Helmet>
 
       <div className="w-full max-w-md">
-        <div className="text-center mb-4">
+        <div className="mb-4 text-center">
           <Link to={backTo} className="inline-flex items-center gap-2 hover:opacity-80">
             <img src={eduraLogo} alt="Edura" className="h-20 w-auto" />
           </Link>
@@ -197,16 +199,31 @@ export default function ResetPassword() {
                   {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Verify code
                 </Button>
-                <div className="flex items-center justify-between text-sm">
+                <div className="space-y-2">
                   <button
                     type="button"
-                    className="text-primary disabled:text-muted-foreground"
+                    className="flex w-full flex-col items-center gap-1 rounded-lg py-2 text-sm text-primary transition-colors disabled:text-muted-foreground"
                     disabled={cooldown > 0 || busy}
                     onClick={sendCode}
                   >
-                    {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend code"}
+                    {cooldown > 0 ? (
+                      <>
+                        <span className="font-medium">Resend code in {cooldown}s</span>
+                        <div className="h-1 w-32 overflow-hidden rounded-full bg-muted">
+                          <div
+                            className="h-full rounded-full bg-primary transition-all duration-1000"
+                            style={{ width: `${progressPct}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-muted-foreground">You can request a new code once the timer ends.</span>
+                      </>
+                    ) : busy ? (
+                      <span className="flex items-center gap-2"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending…</span>
+                    ) : (
+                      "Resend code"
+                    )}
                   </button>
-                  <button type="button" className="text-muted-foreground underline" onClick={() => setStep("email")}>
+                  <button type="button" className="w-full text-center text-sm text-muted-foreground underline" onClick={() => setStep("email")}>
                     Change email
                   </button>
                 </div>
