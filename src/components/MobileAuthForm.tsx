@@ -66,6 +66,9 @@ export default function MobileAuthForm() {
     }
   }, [searchParams]);
 
+  // Leaving the sign-up wizard should never leave the redirect suppression on.
+  useEffect(() => () => endSignupFlow(), []);
+
   useEffect(() => {
     const preferred = localStorage.getItem("preferredJourney");
     if (preferred && !formData.academicStage) {
