@@ -129,7 +129,7 @@ const JambCBTInterface: React.FC<JambCBTInterfaceProps> = ({
         (e.ctrlKey && e.shiftKey && e.key === 'I')
       ) {
         e.preventDefault();
-        alert('This action is not allowed during the exam.');
+        toast.error('Action not allowed during the exam');
       }
     };
 
