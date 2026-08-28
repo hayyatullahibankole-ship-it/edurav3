@@ -22,6 +22,7 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { emailSchema, passwordSchema, nameSchema, phoneSchema } from "@/utils/inputValidation";
 import eduraLogo from "@/assets/edura-logo.png";
+import EmailOtpVerify from "@/components/auth/EmailOtpVerify";
 import { generateSessionToken, storeSessionToken, setSessionToken } from "@/utils/sessionManager";
 import { ACADEMIC_STAGES, STUDY_LEVELS, isCampusStage } from "@/lib/academicStages";
 
@@ -65,6 +66,7 @@ export default function AuthForm() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [pendingOtpEmail, setPendingOtpEmail] = useState<string | null>(null);
 
   useEffect(() => {
     // Capture referral code from URL
@@ -363,7 +365,21 @@ export default function AuthForm() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {referralCode && !isLogin && (
+            {pendingOtpEmail && (
+              <EmailOtpVerify
+                email={pendingOtpEmail}
+                type="signup"
+                onVerified={() => {
+                  setPendingOtpEmail(null);
+                  navigate('/dashboard', { replace: true });
+                }}
+                onCancel={() => {
+                  setPendingOtpEmail(null);
+                  setIsLogin(true);
+                }}
+              />
+            )}
+            {!pendingOtpEmail && referralCode && !isLogin && (
               <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 text-sm">
                 <p className="text-primary font-medium">🎉 Referral code applied: {referralCode}</p>
                 <p className="text-muted-foreground mt-1">You'll earn bonus points when you sign up!</p>
