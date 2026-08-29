@@ -210,67 +210,58 @@ export default function AkboyBlogPost() {
         <meta property="twitter:image" content={ogImage} />
       </Helmet>
 
-      {/* Floating Back Button */}
-      <Link to="/blog" className="fixed top-24 left-4 z-50 animate-fade-in">
-        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xl hover:shadow-emerald-500/50 transition-all hover:scale-105 rounded-full px-6 py-6">
-          <ArrowLeft className="w-5 h-5 mr-2" />
-          Back to Blog
-        </Button>
-      </Link>
+      {/* Editorial header */}
+      <header className="border-b border-akboy-line bg-akboy-paper">
+        <div className="mx-auto max-w-4xl px-4 py-10 md:py-14">
+          <Link to="/" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-akboy-forest hover:underline">
+            <ArrowLeft className="h-4 w-4" /> Back to Campus Hub
+          </Link>
 
-      {/* Hero Section with Featured Image */}
-      <div className="relative h-[60vh] min-h-[500px] overflow-hidden bg-emerald-100">
-        {post.featured_image_url ? (
-          <>
-            <img
-              src={post.featured_image_url}
-              alt={post.title}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
+          <div className="flex items-start gap-4">
+            <InstitutionLogo
+              school={post.school}
+              title={post.title}
+              tags={post.tags}
+              institution_type={post.institution_type}
+              size={64}
+              rounded="rounded-none"
+              className="shrink-0"
             />
-            <div className="absolute inset-0 bg-black"></div>
-          </>
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-9xl">📝</span>
-          </div>
-        )}
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-4xl mx-auto px-4 pb-12 w-full">
-            {post.category && (
-              <span className="inline-block bg-emerald-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
-                {post.category}
-              </span>
-            )}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 font-poppins">
-              {post.title}
-            </h1>
-            <div className="flex flex-wrap items-center gap-6 text-white/90">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                <span>{new Date(post.created_at).toLocaleDateString('en-US', { 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}</span>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] uppercase tracking-[0.18em] text-akboy-muted">
+                {post.category && <span className="font-semibold text-akboy-forest">{post.category}</span>}
+                {post.school && <><span aria-hidden>·</span><span>{post.school}</span></>}
               </div>
-              {post.read_time && (
-                <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5" />
-                  <span>{post.read_time} min read</span>
-                </div>
-              )}
-              {post.author && (
-                <div className="flex items-center gap-2">
-                  <span>By {post.author}</span>
-                </div>
-              )}
+              <h1 className="mt-2 font-display text-3xl leading-tight text-akboy-forest md:text-5xl">
+                {post.title}
+              </h1>
             </div>
           </div>
+
+          <div className="mt-6 flex flex-wrap items-center gap-5 text-sm text-akboy-muted">
+            <span className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              {new Date(post.created_at).toLocaleDateString('en-NG', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </span>
+            {post.read_time && (
+              <span className="flex items-center gap-2"><Clock className="h-4 w-4" />{post.read_time} min read</span>
+            )}
+            {post.author && <span>By {post.author}</span>}
+          </div>
+
+          {post.featured_image_url && (
+            <div className="mt-8 aspect-[16/9] w-full overflow-hidden border border-akboy-line bg-akboy-bone">
+              <img
+                src={post.featured_image_url}
+                alt={post.title}
+                className="h-full w-full object-cover"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            </div>
+          )}
         </div>
-      </div>
+      </header>
+
 
       {/* Content Section */}
       <article className="py-16 px-4">
