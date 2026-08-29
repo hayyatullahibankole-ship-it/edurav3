@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { InstitutionLogo, useInstitutionOverrides } from "@/components/InstitutionLogo";
 import { resolveInstitutionLogo } from "@/lib/institutionLogos";
 import { PostImage } from "@/components/akboy/PostImage";
+import { headlineText } from "@/lib/editorialText";
 
 // Function to format plain text content into proper HTML
 const formatBlogContent = (content: string): string => {
@@ -216,14 +217,14 @@ export default function AkboyBlogPost() {
     <AkboyLayout>
       <Helmet>
         {/* Primary Meta Tags */}
-        <title>{post.title} | AKBOY Blog</title>
-        <meta name="title" content={post.title} />
+        <title>{headlineText(post.title)} | AKBOY Blog</title>
+        <meta name="title" content={headlineText(post.title)} />
         <meta name="description" content={ogDescription} />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="article" />
         <meta property="og:url" content={currentUrl} />
-        <meta property="og:title" content={post.title} />
+        <meta property="og:title" content={headlineText(post.title)} />
         <meta property="og:description" content={ogDescription} />
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
@@ -239,7 +240,7 @@ export default function AkboyBlogPost() {
         {/* Twitter */}
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:url" content={currentUrl} />
-        <meta property="twitter:title" content={post.title} />
+        <meta property="twitter:title" content={headlineText(post.title)} />
         <meta property="twitter:description" content={ogDescription} />
         <meta property="twitter:image" content={ogImage} />
       </Helmet>
@@ -254,7 +255,7 @@ export default function AkboyBlogPost() {
           <div className="flex items-start gap-4">
             <InstitutionLogo
               school={post.school}
-              title={post.title}
+              title={headlineText(post.title)}
               tags={post.tags}
               institution_type={post.institution_type}
               size={64}
@@ -267,7 +268,7 @@ export default function AkboyBlogPost() {
                 {post.school && <><span aria-hidden>·</span><span>{post.school}</span></>}
               </div>
               <h1 className="mt-2 font-display text-3xl leading-tight text-akboy-forest md:text-5xl">
-                {post.title}
+                {headlineText(post.title)}
               </h1>
             </div>
           </div>
@@ -287,7 +288,7 @@ export default function AkboyBlogPost() {
             <div className="mt-8 aspect-[16/9] w-full overflow-hidden border border-akboy-line bg-akboy-bone">
               <img
                 src={post.featured_image_url}
-                alt={post.title}
+                alt={headlineText(post.title)}
                 className="h-full w-full object-cover"
                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
@@ -362,9 +363,9 @@ export default function AkboyBlogPost() {
                 <Link key={r.id} to={`/blog/${r.slug || r.id}`} className="group block">
                   <PostImage
                     src={r.featured_image_url}
-                    alt={r.title}
+                    alt={headlineText(r.title)}
                     school={r.school}
-                    title={r.title}
+                    title={headlineText(r.title)}
                     tags={r.tags}
                     institution_type={r.institution_type}
                     aspect="aspect-[4/5]"
@@ -373,7 +374,7 @@ export default function AkboyBlogPost() {
                     {r.category || "News"}
                   </p>
                   <h4 className="mt-2 font-editorial text-xl leading-snug text-akboy-forest transition-colors group-hover:text-akboy-moss">
-                    {r.title}
+                    {headlineText(r.title)}
                   </h4>
                 </Link>
               ))}

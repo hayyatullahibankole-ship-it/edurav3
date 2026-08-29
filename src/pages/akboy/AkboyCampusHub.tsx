@@ -48,7 +48,7 @@ const timeAgo = (d?: string) => {
 };
 
 const standfirst = (p: CampusPost, len = 170) => {
-  const raw = (p.excerpt || p.content?.replace(/<[^>]*>/g, " ") || "").replace(/\s+/g, " ").trim();
+  const raw = bodyText(p.excerpt || p.content || "");
   return raw.length > len ? `${raw.slice(0, len)}…` : raw;
 };
 
