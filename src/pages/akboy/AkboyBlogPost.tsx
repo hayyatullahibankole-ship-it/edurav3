@@ -84,6 +84,7 @@ const parseTags = (tags: any): string[] => {
 export default function AkboyBlogPost() {
   const { slug } = useParams();
   const [post, setPost] = useState<any>(null);
+  const [related, setRelated] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -115,6 +116,7 @@ export default function AkboyBlogPost() {
 
       if (fetchError) throw fetchError;
       setPost(data);
+      if (data) fetchRelated(data);
     } catch (err) {
       console.error("Error fetching blog post:", err);
       setError("Failed to load blog post. Please try again.");
@@ -122,6 +124,32 @@ export default function AkboyBlogPost() {
       setLoading(false);
     }
   };
+
+  const fetchRelated = async (current: any) => {
+    try {
+      let q = supabase
+        .from("blog_posts")
+        .select("id, title, slug, excerpt, featured_image_url, category, tags, created_at, school, institution_type")
+        .eq("is_published", true)
+        .neq("id", current.id)
+        .order("created_at", { ascending: false })
+        .limit(3);
+      if (current.category) q = q.eq("category", current.category);
+      const { data } = await q;
+      if (data && data.length) { setRelated(data); return; }
+      const { data: fallback } = await supabase
+        .from("blog_posts")
+        .select("id, title, slug, excerpt, featured_image_url, category, tags, created_at, school, institution_type")
+        .eq("is_published", true)
+        .neq("id", current.id)
+        .order("created_at", { ascending: false })
+        .limit(3);
+      setRelated(fallback || []);
+    } catch (err) {
+      console.error("Error fetching related posts:", err);
+    }
+  };
+
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
