@@ -8,6 +8,7 @@ import { Calendar, Clock, ArrowLeft, Tag, Share2, Copy, MessageCircle } from "lu
 import { useToast } from "@/hooks/use-toast";
 import { InstitutionLogo, useInstitutionOverrides } from "@/components/InstitutionLogo";
 import { resolveInstitutionLogo } from "@/lib/institutionLogos";
+import { PostImage } from "@/components/akboy/PostImage";
 
 // Function to format plain text content into proper HTML
 const formatBlogContent = (content: string): string => {

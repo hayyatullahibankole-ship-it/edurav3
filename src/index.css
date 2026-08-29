@@ -694,3 +694,61 @@ All colors MUST be HSL for consistency across light/dark modes.
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------- Akboy editorial article typography ---------- */
+.akboy-article {
+  color: hsl(var(--akboy-forest));
+  font-size: 1.0625rem;
+  line-height: 1.85;
+}
+.akboy-article p { margin: 0 0 1.5rem; color: hsl(var(--akboy-forest) / 0.86); }
+.akboy-article > p:first-of-type::first-letter {
+  float: left;
+  font-family: Fraunces, "Playfair Display", Georgia, serif;
+  font-size: 4.25rem;
+  line-height: 0.82;
+  font-weight: 600;
+  padding: 0.32rem 0.7rem 0 0;
+  color: hsl(var(--akboy-forest));
+}
+.akboy-article h1,
+.akboy-article h2,
+.akboy-article h3 {
+  font-family: Fraunces, "Playfair Display", Georgia, serif;
+  color: hsl(var(--akboy-forest));
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 2.75rem 0 1rem;
+}
+.akboy-article h1 { font-size: 2.25rem; }
+.akboy-article h2 { font-size: 1.875rem; }
+.akboy-article h3 { font-size: 1.375rem; }
+.akboy-article a {
+  color: hsl(var(--akboy-forest));
+  text-decoration: underline;
+  text-decoration-color: hsl(var(--akboy-butter));
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.akboy-article ul,
+.akboy-article ol { margin: 0 0 1.5rem 1.25rem; }
+.akboy-article ul { list-style: disc; }
+.akboy-article ol { list-style: decimal; }
+.akboy-article li { margin-bottom: 0.6rem; color: hsl(var(--akboy-forest) / 0.86); }
+.akboy-article blockquote {
+  margin: 2.25rem 0;
+  padding: 0 0 0 1.5rem;
+  border-left: 3px solid hsl(var(--akboy-butter));
+  font-family: Fraunces, "Playfair Display", Georgia, serif;
+  font-size: 1.4rem;
+  line-height: 1.45;
+}
+.akboy-article img { width: 100%; margin: 2rem 0; border: 1px solid hsl(var(--akboy-line)); }
+.akboy-article strong { font-weight: 600; color: hsl(var(--akboy-forest)); }
+.akboy-article hr { margin: 2.5rem 0; border-color: hsl(var(--akboy-line)); }
+@media (max-width: 640px) {
+  .akboy-article { font-size: 1rem; }
+  .akboy-article > p:first-of-type::first-letter { font-size: 3.25rem; }
+  .akboy-article h1 { font-size: 1.75rem; }
+  .akboy-article h2 { font-size: 1.5rem; }
+}
