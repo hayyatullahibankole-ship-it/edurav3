@@ -13,7 +13,7 @@ const NotFound = () => {
           .map((registration) => registration.update()),
       );
     }
-    window.location.assign(`${window.location.origin}${window.location.pathname}#/dashboard`);
+    window.location.assign(`${window.location.origin}/dashboard`);
   };
 
   const location = useLocation();

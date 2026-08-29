@@ -108,7 +108,7 @@ export const usePushNotifications = () => {
             }
           }),
           PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
-            window.location.hash = `#${notificationDestination(notification.notification.data)}`;
+            window.location.assign(notificationDestination(notification.notification.data));
           }),
         ]);
         if (cancelled) {
@@ -120,7 +120,7 @@ export const usePushNotifications = () => {
         try {
           const localTap = await LocalNotifications.addListener('localNotificationActionPerformed', (event) => {
             const data = event.notification.extra as Record<string, any> | undefined;
-            window.location.hash = `#${notificationDestination(data)}`;
+            window.location.assign(notificationDestination(data));
           });
           if (cancelled) void localTap.remove();
           else handles.push(localTap);

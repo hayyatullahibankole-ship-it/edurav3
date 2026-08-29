@@ -116,7 +116,7 @@ export default function BetaTestingManager() {
   };
 
   const copyLink = (code: string) => {
-    const url = `${window.location.origin}/#/test/${code}`;
+    const url = `${window.location.origin}/test/${code}`;
     navigator.clipboard.writeText(url);
     toast({ title: "Invite link copied", description: url });
   };

@@ -19,7 +19,7 @@ interface WelcomeEmailRequest {
 
 const createWelcomeEmailHtml = (firstName: string, dashboardUrl: string, unsubscribeToken?: string) => {
   const unsubscribeUrl = unsubscribeToken
-    ? `https://edura.com.ng/#/unsubscribe?token=${unsubscribeToken}`
+    ? `https://edura.com.ng/unsubscribe?token=${unsubscribeToken}`
     : null;
   return `
     <!DOCTYPE html>
@@ -131,7 +131,7 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     const displayName = firstName || 'there';
-    const dashboardUrl = 'https://edura.com.ng/#/dashboard';
+    const dashboardUrl = 'https://edura.com.ng/dashboard';
 
     const emailHtml = createWelcomeEmailHtml(displayName, dashboardUrl, prefs?.unsubscribe_token);
 
