@@ -25,6 +25,15 @@ if ("serviceWorker" in navigator && (isInIframe || isPreviewHost)) {
     .catch(() => undefined);
 }
 
+// Legacy hash routes (#/dashboard) -> clean paths (/dashboard)
+{
+  const legacyHash = window.location.hash;
+  if (/^#!?\//.test(legacyHash)) {
+    const target = legacyHash.replace(/^#!?/, "");
+    window.history.replaceState(null, "", `${window.location.pathname.replace(/\/$/, "")}${target}` || target);
+  }
+}
+
 void registerAppServiceWorker();
 
 // Recover from stale lazy-chunk references after a new deploy:
