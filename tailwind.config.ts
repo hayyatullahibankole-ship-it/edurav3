@@ -15,6 +15,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Manrope', 'DM Sans', 'system-ui', 'sans-serif'],
+        editorial: ['Fraunces', 'Playfair Display', 'Georgia', 'serif'],
         display: ['Sora', 'Manrope', 'system-ui', 'sans-serif'],
         inter: ['Manrope', 'DM Sans', 'sans-serif'],
         poppins: ['Sora', 'Space Grotesk', 'sans-serif'],
