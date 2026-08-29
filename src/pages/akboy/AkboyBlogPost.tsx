@@ -6,6 +6,8 @@ import { AkboyLayout } from "@/components/akboy/AkboyLayout";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, ArrowLeft, Tag, Share2, Copy, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { InstitutionLogo, useInstitutionOverrides } from "@/components/InstitutionLogo";
+import { resolveInstitutionLogo } from "@/lib/institutionLogos";
 
 // Function to format plain text content into proper HTML
 const formatBlogContent = (content: string): string => {
@@ -85,6 +87,7 @@ export default function AkboyBlogPost() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  useInstitutionOverrides();
 
   useEffect(() => {
     fetchPost();
@@ -174,7 +177,9 @@ export default function AkboyBlogPost() {
   }
 
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const ogImage = post.featured_image_url || 'https://zqapbmllkywsuywpfava.supabase.co/storage/v1/object/public/resources/og-default.png';
+  const ogImage = post.featured_image_url
+    || resolveInstitutionLogo({ school: post.school, title: post.title, tags: post.tags, institution_type: post.institution_type }, 512).src
+    || '';
   const ogDescription = post.excerpt || post.content?.substring(0, 160).replace(/<[^>]*>/g, '') || 'Read this article on AKBOY Blog';
   const postTags = parseTags(post.tags);
 
