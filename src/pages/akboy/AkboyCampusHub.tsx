@@ -10,6 +10,7 @@ import { AkboyLayout } from "@/components/akboy/AkboyLayout";
 import { useDomainDetection } from "@/hooks/useDomainDetection";
 import { useReveal } from "@/hooks/useReveal";
 import { InstitutionLogo, useInstitutionOverrides } from "@/components/InstitutionLogo";
+import { headlineText, bodyText } from "@/lib/editorialText";
 import { PostImage } from "@/components/akboy/PostImage";
 import {
   Search, ArrowRight, ArrowUpRight, MessageCircle, ChevronLeft, ChevronRight, Newspaper,
@@ -214,7 +215,7 @@ export default function AkboyCampusHub() {
   const shareOnWhatsApp = (e: React.MouseEvent, post: CampusPost) => {
     e.preventDefault(); e.stopPropagation();
     const url = `${window.location.origin}${postPath(post)}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(`${post.title}\n\nRead: ${url}\n\nvia Akboy Campus Hub`)}`, "_blank");
+    window.open(`https://wa.me/?text=${encodeURIComponent(`${headlineText(post.title)}\n\nRead: ${url}\n\nvia Akboy Campus Hub`)}`, "_blank");
   };
 
   const goToFeed = () => document.getElementById("feed")?.scrollIntoView({ behavior: "smooth" });
@@ -295,9 +296,9 @@ export default function AkboyCampusHub() {
                 <Link to={postPath(lead)} className="group block">
                   <PostImage
                     src={lead.featured_image_url}
-                    alt={lead.title}
+                    alt={headlineText(lead.title)}
                     school={lead.school}
-                    title={lead.title}
+                    title={headlineText(lead.title)}
                     tags={lead.tags}
                     institution_type={lead.institution_type}
                     aspect="aspect-[16/10]"
@@ -305,7 +306,7 @@ export default function AkboyCampusHub() {
                   <div className="relative z-10 -mt-10 ml-0 max-w-2xl bg-akboy-paper p-6 md:-mt-16 md:ml-10 md:p-9">
                     <Kicker post={lead} />
                     <Headline className="mt-3 text-[clamp(1.75rem,4.4vw,3.4rem)] font-semibold leading-[1.03] tracking-[-0.015em]">
-                      {lead.title}
+                      {headlineText(lead.title)}
                     </Headline>
                     <p className="mt-4 max-w-xl text-[15px] leading-[1.75] text-akboy-muted">{standfirst(lead, 230)}</p>
                     <span className="mt-5 inline-flex items-center gap-2 border-b-2 border-akboy-butter pb-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-akboy-forest">
@@ -343,7 +344,7 @@ export default function AkboyCampusHub() {
                         <span className="font-editorial text-2xl leading-none text-akboy-butter">{String(i + 1).padStart(2, "0")}</span>
                         <div className="min-w-0">
                           <Kicker post={post} />
-                          <Headline className="mt-1.5 text-lg font-medium leading-snug">{post.title}</Headline>
+                          <Headline className="mt-1.5 text-lg font-medium leading-snug">{headlineText(post.title)}</Headline>
                         </div>
                       </Link>
                     </li>
@@ -365,9 +366,9 @@ export default function AkboyCampusHub() {
                 <Link key={post.id} to={postPath(post)} className={`group block ${i === 0 ? "md:col-span-1" : ""}`}>
                   <PostImage
                     src={post.featured_image_url}
-                    alt={post.title}
+                    alt={headlineText(post.title)}
                     school={post.school}
-                    title={post.title}
+                    title={headlineText(post.title)}
                     tags={post.tags}
                     institution_type={post.institution_type}
                     aspect="aspect-[4/5]"
@@ -375,7 +376,7 @@ export default function AkboyCampusHub() {
                   />
                   <div className="pt-5">
                     <Kicker post={post} />
-                    <Headline className="mt-2 text-[1.4rem] font-medium leading-[1.15]">{post.title}</Headline>
+                    <Headline className="mt-2 text-[1.4rem] font-medium leading-[1.15]">{headlineText(post.title)}</Headline>
                     <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-akboy-muted">{standfirst(post, 150)}</p>
                   </div>
                 </Link>
@@ -499,9 +500,9 @@ export default function AkboyCampusHub() {
                       <Link to={postPath(post)} className="group flex gap-5 py-7">
                         <PostImage
                           src={post.featured_image_url}
-                          alt={post.title}
+                          alt={headlineText(post.title)}
                           school={post.school}
-                          title={post.title}
+                          title={headlineText(post.title)}
                           tags={post.tags}
                           institution_type={post.institution_type}
                           aspect="aspect-[4/5]"
@@ -509,7 +510,7 @@ export default function AkboyCampusHub() {
                         />
                         <div className="min-w-0 flex-1">
                           <Kicker post={post} />
-                          <Headline className="mt-2 text-lg font-medium leading-snug sm:text-[1.375rem]">{post.title}</Headline>
+                          <Headline className="mt-2 text-lg font-medium leading-snug sm:text-[1.375rem]">{headlineText(post.title)}</Headline>
                           <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-akboy-muted sm:line-clamp-3">{standfirst(post)}</p>
                           <div className="mt-3 flex items-center gap-5">
                             <button
@@ -574,7 +575,7 @@ export default function AkboyCampusHub() {
                       <Link to={postPath(post)} className="group flex gap-3">
                         <span className="font-editorial text-xl leading-none text-akboy-butter">{String(idx + 1).padStart(2, "0")}</span>
                         <div className="min-w-0">
-                          <Headline className="line-clamp-2 text-sm font-medium leading-snug">{post.title}</Headline>
+                          <Headline className="line-clamp-2 text-sm font-medium leading-snug">{headlineText(post.title)}</Headline>
                           <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-akboy-muted">{timeAgo(post.created_at)}</p>
                         </div>
                       </Link>
