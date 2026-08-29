@@ -51,24 +51,26 @@ export function PostImage({
           }`}
         />
       ) : (
-        <div className={`flex h-full w-full flex-col items-center justify-center gap-3 ${toneCls}`}>
-          {resolved.src ? (
-            <img
-              src={resolved.src}
-              alt={`${resolved.label} logo`}
-              loading="lazy"
-              className="max-h-[46%] max-w-[52%] object-contain"
-            />
-          ) : (
-            <span className="font-editorial text-[clamp(2rem,7vw,4.5rem)] font-semibold leading-none tracking-tight">
-              {resolved.short}
+        <div className={`flex h-full w-full flex-col items-center justify-center gap-4 px-6 ${toneCls}`}>
+          {resolved.src && (
+            <span className="flex h-14 w-14 items-center justify-center bg-white/95 p-2">
+              <img
+                src={resolved.src}
+                alt={`${resolved.label} logo`}
+                loading="lazy"
+                className="h-full w-full object-contain"
+              />
             </span>
           )}
+          <span className="font-editorial text-[clamp(2rem,6vw,4rem)] font-semibold leading-none tracking-tight">
+            {resolved.short}
+          </span>
           <span className="max-w-[80%] text-center text-[10px] font-semibold uppercase tracking-[0.28em] opacity-80">
             {resolved.label}
           </span>
         </div>
       )}
+
     </div>
   );
 }
