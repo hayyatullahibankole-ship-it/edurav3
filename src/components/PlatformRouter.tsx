@@ -200,6 +200,7 @@ const CampusHubRoutes = () => {
       <Route path="/campus-hub" element={<AkboyCampusHub />} />
       <Route path="/blog" element={<Navigate to="/" replace />} />
       <Route path="/blog/:slug" element={<AkboyBlogPost />} />
+      <Route path="/post/:slug" element={<AkboyBlogPost />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
     </Suspense>
@@ -494,6 +495,7 @@ const EduraRoutes = () => {
       <Route path="/blog" element={<Navigate to="/campus-hub" replace />} />
       <Route path="/campus-hub" element={<AkboyCampusHub />} />
       <Route path="/blog/:slug" element={<AkboyBlogPost />} />
+      <Route path="/post/:slug" element={<AkboyBlogPost />} />
       
       <Route path="/terms" element={<Layout><Terms /></Layout>} />
       <Route path="/privacy" element={<Layout><Privacy /></Layout>} />
