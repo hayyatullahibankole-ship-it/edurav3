@@ -49,7 +49,7 @@ export default function AdminLogin() {
   }
 
   if (user && isAdmin) {
-    return <Navigate to="/#/admin" replace />;
+    return <Navigate to="/admin" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -122,7 +122,7 @@ export default function AdminLogin() {
         });
 
         // Navigate immediately since auth state will handle the rest
-        navigate('/#/admin', { replace: true });
+        navigate('/admin', { replace: true });
       }
     } catch (error) {
       console.error('Login process error:', error);

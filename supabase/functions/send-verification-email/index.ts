@@ -59,7 +59,7 @@ serve(async (req) => {
 
     const supaUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const siteUrl = "https://edura.com.ng";
-    const redirect = redirect_to || `${siteUrl}/#/dashboard`;
+    const redirect = redirect_to || `${siteUrl}/dashboard`;
     const verificationUrl = `${supaUrl}/auth/v1/verify?token=${token_hash}&type=${email_action_type}&redirect_to=${redirect}`;
 
     const isRecovery = email_action_type === "recovery";
