@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,10 +8,11 @@ import {
 } from "@/components/ui/select";
 import { AkboyLayout } from "@/components/akboy/AkboyLayout";
 import { useDomainDetection } from "@/hooks/useDomainDetection";
+import { useReveal } from "@/hooks/useReveal";
 import { InstitutionLogo, useInstitutionOverrides } from "@/components/InstitutionLogo";
+import { PostImage } from "@/components/akboy/PostImage";
 import {
-  Search, ArrowRight, ArrowUpRight, TrendingUp, MessageCircle,
-  ChevronLeft, ChevronRight, Newspaper,
+  Search, ArrowRight, ArrowUpRight, MessageCircle, ChevronLeft, ChevronRight, Newspaper,
 } from "lucide-react";
 import { CampusHubAdvancedSection, WhatsAppConsultButton } from "@/components/akboy/CampusHubAdvanced";
 
@@ -31,15 +31,14 @@ interface CampusPost {
   year?: number | null;
 }
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 10;
 
 const formatDate = (d?: string) =>
   d ? new Date(d).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" }) : "Recent";
 
 const timeAgo = (d?: string) => {
   if (!d) return "";
-  const diff = Date.now() - new Date(d).getTime();
-  const h = Math.floor(diff / 3_600_000);
+  const h = Math.floor((Date.now() - new Date(d).getTime()) / 3_600_000);
   if (h < 1) return "just now";
   if (h < 24) return `${h}h ago`;
   const days = Math.floor(h / 24);
@@ -47,8 +46,44 @@ const timeAgo = (d?: string) => {
   return formatDate(d);
 };
 
-const plain = (p: CampusPost, len = 160) =>
-  (p.excerpt || p.content?.replace(/<[^>]*>/g, "") || "").trim().slice(0, len);
+const standfirst = (p: CampusPost, len = 170) => {
+  const raw = (p.excerpt || p.content?.replace(/<[^>]*>/g, " ") || "").replace(/\s+/g, " ").trim();
+  return raw.length > len ? `${raw.slice(0, len)}…` : raw;
+};
+
+const namedSchool = (s?: string | null) => (s && !["Other", "Other University"].includes(s) ? s : null);
+
+/* ---------------- shared editorial bits ---------------- */
+
+const Kicker = ({ post, invert = false }: { post: CampusPost; invert?: boolean }) => (
+  <div
+    className={`flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] font-semibold uppercase tracking-[0.24em] ${
+      invert ? "text-akboy-butter" : "text-akboy-muted"
+    }`}
+  >
+    <span className={invert ? "text-akboy-butter" : "text-akboy-forest"}>{post.category || "News"}</span>
+    {namedSchool(post.school) && (<><span aria-hidden className="opacity-50">/</span><span>{post.school}</span></>)}
+    <span aria-hidden className="opacity-50">/</span>
+    <span className="font-medium tracking-[0.12em]">{timeAgo(post.created_at)}</span>
+  </div>
+);
+
+const SectionRule = ({ label, note }: { label: string; note?: string }) => (
+  <div className="mb-8 flex items-end justify-between border-b border-akboy-forest/25 pb-3">
+    <h2 className="font-editorial text-2xl leading-none text-akboy-forest md:text-[2rem]">{label}</h2>
+    {note && <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-akboy-muted">{note}</span>}
+  </div>
+);
+
+const Headline = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+  <h3 className={`font-editorial text-akboy-forest ${className}`}>
+    <span className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 group-hover:bg-[length:100%_1px]">
+      {children}
+    </span>
+  </h3>
+);
+
+/* ---------------- page ---------------- */
 
 export default function AkboyCampusHub() {
   const { isCampusHub } = useDomainDetection();
@@ -62,6 +97,10 @@ export default function AkboyCampusHub() {
   const [error, setError] = useState<string | null>(null);
   const [leadIndex, setLeadIndex] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const leadReveal = useReveal<HTMLDivElement>();
+  const featureReveal = useReveal<HTMLDivElement>(80);
+  const feedReveal = useReveal<HTMLDivElement>();
 
   const postPath = (p: CampusPost) => `/blog/${p.slug || p.id}`;
 
@@ -87,7 +126,7 @@ export default function AkboyCampusHub() {
       setPosts((data as any) || []);
     } catch (err) {
       console.error("Error fetching campus posts:", err);
-      setError("Failed to load posts. Please try again.");
+      setError("We couldn't load the stories. Check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -99,37 +138,35 @@ export default function AkboyCampusHub() {
     setSearchParams(next, { replace: true });
   };
 
-  const filtered = useMemo(() => {
-    return posts.filter((p) => {
-      const text = `${p.title || ""} ${p.excerpt || ""} ${p.school || ""}`.toLowerCase();
-      const matchSearch = !searchTerm || text.includes(searchTerm.toLowerCase());
-      const matchCat = selectedCategory === "All" || (p.category || "News & Updates") === selectedCategory;
-      const matchSchool = selectedSchool === "All" || (p.school || "Other") === selectedSchool;
-      return matchSearch && matchCat && matchSchool;
-    });
-  }, [posts, searchTerm, selectedCategory, selectedSchool]);
+  const filtered = useMemo(() => posts.filter((p) => {
+    const text = `${p.title || ""} ${p.excerpt || ""} ${p.school || ""}`.toLowerCase();
+    const matchSearch = !searchTerm || text.includes(searchTerm.toLowerCase());
+    const matchCat = selectedCategory === "All" || (p.category || "News & Updates") === selectedCategory;
+    const matchSchool = selectedSchool === "All" || (p.school || "Other") === selectedSchool;
+    return matchSearch && matchCat && matchSchool;
+  }), [posts, searchTerm, selectedCategory, selectedSchool]);
 
   const isFiltering = selectedCategory !== "All" || selectedSchool !== "All" || Boolean(searchTerm);
 
-  const leadPool = useMemo(() => (isFiltering ? filtered : posts).slice(0, 5), [filtered, posts, isFiltering]);
+  const leadPool = useMemo(() => posts.slice(0, 5), [posts]);
   const lead = leadPool[leadIndex % Math.max(1, leadPool.length)];
-  const secondary = useMemo(
-    () => (isFiltering ? filtered : posts).filter(p => p.id !== lead?.id).slice(0, 3),
-    [filtered, posts, isFiltering, lead]
-  );
-
-  useEffect(() => { setLeadIndex(0); }, [isFiltering, selectedCategory, selectedSchool, searchTerm]);
+  const briefs = useMemo(() => posts.filter(p => p.id !== lead?.id).slice(0, 4), [posts, lead]);
+  const featureBlock = useMemo(() => {
+    const skip = new Set<string>([lead?.id, ...briefs.map(b => b.id)].filter(Boolean) as string[]);
+    return posts.filter(p => !skip.has(p.id)).slice(0, 3);
+  }, [posts, lead, briefs]);
 
   useEffect(() => {
     if (leadPool.length < 2) return;
-    const t = setInterval(() => setLeadIndex(i => (i + 1) % leadPool.length), 7000);
-    return () => clearInterval(t);
+    const t = window.setInterval(() => setLeadIndex(i => (i + 1) % leadPool.length), 8000);
+    return () => window.clearInterval(t);
   }, [leadPool.length]);
 
   const feedSource = useMemo(() => {
-    const skip = new Set<string>([lead?.id, ...secondary.map(s => s.id)].filter(Boolean) as string[]);
-    return isFiltering ? filtered : filtered.filter(p => !skip.has(p.id));
-  }, [filtered, isFiltering, lead, secondary]);
+    if (isFiltering) return filtered;
+    const skip = new Set<string>([lead?.id, ...briefs.map(b => b.id), ...featureBlock.map(f => f.id)].filter(Boolean) as string[]);
+    return filtered.filter(p => !skip.has(p.id));
+  }, [filtered, isFiltering, lead, briefs, featureBlock]);
 
   const totalPages = Math.ceil(feedSource.length / ITEMS_PER_PAGE);
   const paginatedFeed = useMemo(() => {
@@ -160,110 +197,86 @@ export default function AkboyCampusHub() {
 
   const schoolList = useMemo(() => {
     const counts: Record<string, number> = {};
-    posts.forEach(p => { if (p.school) counts[p.school] = (counts[p.school] || 0) + 1; });
+    posts.forEach(p => { if (namedSchool(p.school)) counts[p.school as string] = (counts[p.school as string] || 0) + 1; });
     return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([school, count]) => ({ school, count }));
   }, [posts]);
 
-  const featuredSchools = useMemo(
-    () => schoolList.filter(s => !["Other", "Other University"].includes(s.school)).slice(0, 12),
-    [schoolList]
-  );
+  const featuredSchools = useMemo(() => schoolList.slice(0, 14), [schoolList]);
+  const mostRead = useMemo(() => posts.slice(0, 5), [posts]);
 
-  const trending = useMemo(() => posts.slice(0, 6), [posts]);
-
-  const selectCategory = (c: string) => {
-    setSelectedCategory(c);
-    updateParam("category", c);
-    setCurrentPage(1);
-  };
-
+  const selectCategory = (c: string) => { setSelectedCategory(c); updateParam("category", c); setCurrentPage(1); };
+  const selectSchool = (s: string) => { setSelectedSchool(s); updateParam("school", s); setCurrentPage(1); };
   const clearAll = () => {
     setSelectedCategory("All"); setSelectedSchool("All"); setSearchTerm("");
-    setSearchParams({}, { replace: true });
-    setCurrentPage(1);
+    setSearchParams({}, { replace: true }); setCurrentPage(1);
   };
 
   const shareOnWhatsApp = (e: React.MouseEvent, post: CampusPost) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); e.stopPropagation();
     const url = `${window.location.origin}${postPath(post)}`;
-    const text = `${post.title}\n\nRead more: ${url}\n\nvia Akboy Campus Hub`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+    window.open(`https://wa.me/?text=${encodeURIComponent(`${post.title}\n\nRead: ${url}\n\nvia Akboy Campus Hub`)}`, "_blank");
   };
 
   const goToFeed = () => document.getElementById("feed")?.scrollIntoView({ behavior: "smooth" });
 
-  const Kicker = ({ post }: { post: CampusPost }) => (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] uppercase tracking-[0.18em] text-akboy-muted">
-      <span className="font-semibold text-akboy-forest">{post.category || "News"}</span>
-      {post.school && !["Other", "Other University"].includes(post.school) && (
-        <>
-          <span aria-hidden>·</span>
-          <span>{post.school}</span>
-        </>
-      )}
-      <span aria-hidden>·</span>
-      <span>{timeAgo(post.created_at)}</span>
-    </div>
-  );
-
   return (
     <AkboyLayout
-      title={isCampusHub ? "Campus Hub — Admissions, Scholarships & Campus News" : "Campus Hub — Nigerian Admissions, Scholarships & Education News"}
-      description="Latest admission updates, scholarships, JAMB/WAEC news and academic calendars from Nigerian universities, polytechnics and colleges. All in one hub."
+      title={isCampusHub ? "Campus Hub — Admissions, Scholarships & Campus Journalism" : "Campus Hub — Nigerian Admissions, Scholarships & Education Stories"}
+      description="An Akboy publication: admission lists, scholarships, JAMB and WAEC updates and academic calendars from Nigerian universities, polytechnics and colleges."
     >
-      {/* ============ MASTHEAD ============ */}
-      <section className="border-b border-akboy-line bg-akboy-paper">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 md:py-14">
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-2xl">
-              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-akboy-muted">
-                {new Date().toLocaleDateString("en-NG", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
-              </p>
-              <h1 className="font-display text-4xl leading-[1.05] text-akboy-forest md:text-6xl">
-                Campus Hub
-              </h1>
-              <p className="mt-4 max-w-xl text-base leading-relaxed text-akboy-muted">
-                Admission lists, scholarships, JAMB and WAEC updates, and academic calendars from Nigerian
-                universities, polytechnics and colleges — verified and published daily.
-              </p>
-            </div>
+      {/* ================= MASTHEAD ================= */}
+      <section className="bg-akboy-paper">
+        <div className="mx-auto max-w-[1240px] px-5 pt-10 sm:px-8 md:pt-16">
+          <div className="flex items-center justify-between border-b border-akboy-forest/20 pb-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-akboy-muted">
+            <span>An Akboy publication</span>
+            <span className="hidden sm:inline">
+              {new Date().toLocaleDateString("en-NG", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+            </span>
+            <span>Lagos · Nigeria</span>
+          </div>
 
-            <div className="w-full md:max-w-sm">
+          <div className="py-8 text-center md:py-12">
+            <h1 className="font-editorial text-[clamp(3rem,11vw,7rem)] font-semibold leading-[0.88] tracking-[-0.02em] text-akboy-forest">
+              Campus&nbsp;Hub
+            </h1>
+            <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-akboy-muted md:text-base">
+              Admission lists, scholarships, JAMB &amp; WAEC updates and academic calendars —
+              reported and published for Nigerian students, daily.
+            </p>
+
+            <div className="mx-auto mt-7 max-w-lg">
               <label className="relative block">
                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-akboy-muted" />
                 <Input
                   value={searchTerm}
                   onChange={(e) => { setSearchTerm(e.target.value); updateParam("q", e.target.value); setCurrentPage(1); }}
-                  placeholder="Search a school, course or keyword"
-                  className="h-12 rounded-none border-akboy-forest/30 bg-white pl-11 text-sm focus-visible:ring-akboy-forest"
+                  placeholder="Search a school, scholarship or keyword"
+                  className="h-12 rounded-none border-0 border-b border-akboy-forest/30 bg-transparent px-11 text-center text-sm focus-visible:border-akboy-forest focus-visible:ring-0"
                 />
               </label>
               {searchTerm && (
-                <button onClick={goToFeed} className="mt-2 text-xs font-semibold text-akboy-forest hover:underline">
-                  {filtered.length} result{filtered.length === 1 ? "" : "s"} — jump to the feed →
+                <button onClick={goToFeed} className="mt-3 text-xs font-semibold uppercase tracking-[0.18em] text-akboy-forest hover:underline">
+                  {filtered.length} result{filtered.length === 1 ? "" : "s"} — read them →
                 </button>
               )}
             </div>
           </div>
 
-          {/* Category rail */}
-          <div className="-mx-4 mt-8 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-            <div className="flex min-w-max items-center gap-2 pb-1">
-              {categoryOptions.slice(0, 10).map((c) => {
+          {/* category rail */}
+          <div className="-mx-5 overflow-x-auto border-y border-akboy-forest/20 px-5 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex min-w-max items-center justify-start gap-7 py-3.5 sm:justify-center">
+              {categoryOptions.slice(0, 9).map((c) => {
                 const active = selectedCategory === c;
                 return (
                   <button
                     key={c}
                     onClick={() => { selectCategory(c); if (c !== "All") goToFeed(); }}
-                    className={`whitespace-nowrap border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-colors ${
-                      active
-                        ? "border-akboy-forest bg-akboy-butter text-akboy-forest"
-                        : "border-akboy-line bg-white text-akboy-muted hover:border-akboy-forest hover:text-akboy-forest"
+                    className={`relative whitespace-nowrap pb-1 text-[11px] font-semibold uppercase tracking-[0.2em] transition-colors ${
+                      active ? "text-akboy-forest" : "text-akboy-muted hover:text-akboy-forest"
                     }`}
                   >
                     {c === "All" ? "All stories" : c}
-                    {c !== "All" && <span className="ml-2 text-akboy-muted/70">{categoryCounts[c] || 0}</span>}
+                    {active && <span className="absolute inset-x-0 -bottom-0.5 h-[3px] bg-akboy-butter" />}
                   </button>
                 );
               })}
@@ -272,133 +285,173 @@ export default function AkboyCampusHub() {
         </div>
       </section>
 
-      {/* ============ LEAD STORY ============ */}
+      {/* ================= LEAD + BRIEFS ================= */}
       {!loading && lead && (
-        <section className="border-b border-akboy-line bg-white">
-          <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 md:py-14">
-            <div className="grid gap-10 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-              {/* Lead */}
-              <article>
-                <div className="mb-5 flex items-center justify-between">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-akboy-muted">Lead story</p>
-                  {leadPool.length > 1 && (
-                    <div className="flex items-center gap-1">
-                      <button
-                        aria-label="Previous story"
-                        onClick={() => setLeadIndex(i => (i - 1 + leadPool.length) % leadPool.length)}
-                        className="grid h-8 w-8 place-items-center border border-akboy-line text-akboy-forest hover:bg-akboy-bone"
-                      ><ChevronLeft className="h-4 w-4" /></button>
-                      <button
-                        aria-label="Next story"
-                        onClick={() => setLeadIndex(i => (i + 1) % leadPool.length)}
-                        className="grid h-8 w-8 place-items-center border border-akboy-line text-akboy-forest hover:bg-akboy-bone"
-                      ><ChevronRight className="h-4 w-4" /></button>
-                    </div>
-                  )}
-                </div>
-
+        <section className="bg-akboy-paper">
+          <div ref={leadReveal.ref} className={`mx-auto max-w-[1240px] px-5 py-12 sm:px-8 md:py-16 ${leadReveal.cls}`}>
+            <div className="grid gap-12 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
+              {/* lead */}
+              <article className="relative">
                 <Link to={postPath(lead)} className="group block">
-                  <div className="flex items-start gap-4">
-                    <InstitutionLogo
-                      school={lead.school}
-                      title={lead.title}
-                      tags={lead.tags}
-                      institution_type={lead.institution_type}
-                      size={64}
-                      rounded="rounded-none"
-                      className="shrink-0"
-                    />
-                    <div className="min-w-0">
-                      <Kicker post={lead} />
-                      <h2 className="mt-2 font-display text-2xl leading-tight text-akboy-forest transition-colors group-hover:text-akboy-moss md:text-4xl">
-                        {lead.title}
-                      </h2>
-                    </div>
+                  <PostImage
+                    src={lead.featured_image_url}
+                    alt={lead.title}
+                    school={lead.school}
+                    title={lead.title}
+                    tags={lead.tags}
+                    institution_type={lead.institution_type}
+                    aspect="aspect-[16/10]"
+                  />
+                  <div className="relative z-10 -mt-10 ml-0 max-w-2xl bg-akboy-paper p-6 md:-mt-16 md:ml-10 md:p-9">
+                    <Kicker post={lead} />
+                    <Headline className="mt-3 text-[clamp(1.75rem,4.4vw,3.4rem)] font-semibold leading-[1.03] tracking-[-0.015em]">
+                      {lead.title}
+                    </Headline>
+                    <p className="mt-4 max-w-xl text-[15px] leading-[1.75] text-akboy-muted">{standfirst(lead, 230)}</p>
+                    <span className="mt-5 inline-flex items-center gap-2 border-b-2 border-akboy-butter pb-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-akboy-forest">
+                      Read the story <ArrowRight className="h-3.5 w-3.5" />
+                    </span>
                   </div>
-
-                  {lead.featured_image_url && (
-                    <div className="mt-6 aspect-[16/9] w-full overflow-hidden border border-akboy-line bg-akboy-bone">
-                      <img
-                        src={lead.featured_image_url}
-                        alt={lead.title}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                      />
-                    </div>
-                  )}
-
-                  <p className="mt-5 max-w-2xl text-[15px] leading-relaxed text-akboy-muted">
-                    {plain(lead, 240)}…
-                  </p>
-                  <span className="mt-4 inline-flex items-center gap-2 border-b-2 border-akboy-butter pb-0.5 text-sm font-semibold text-akboy-forest">
-                    Read the full story <ArrowRight className="h-4 w-4" />
-                  </span>
                 </Link>
+
+                {leadPool.length > 1 && (
+                  <div className="mt-2 flex items-center gap-2 md:ml-10">
+                    <button
+                      aria-label="Previous lead story"
+                      onClick={() => setLeadIndex(i => (i - 1 + leadPool.length) % leadPool.length)}
+                      className="grid h-9 w-9 place-items-center border border-akboy-forest/25 text-akboy-forest transition-colors hover:bg-akboy-forest hover:text-white"
+                    ><ChevronLeft className="h-4 w-4" /></button>
+                    <button
+                      aria-label="Next lead story"
+                      onClick={() => setLeadIndex(i => (i + 1) % leadPool.length)}
+                      className="grid h-9 w-9 place-items-center border border-akboy-forest/25 text-akboy-forest transition-colors hover:bg-akboy-forest hover:text-white"
+                    ><ChevronRight className="h-4 w-4" /></button>
+                    <span className="ml-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-akboy-muted">
+                      {String(leadIndex + 1).padStart(2, "0")} / {String(leadPool.length).padStart(2, "0")}
+                    </span>
+                  </div>
+                )}
               </article>
 
-              {/* Secondary column */}
-              <div className="lg:border-l lg:border-akboy-line lg:pl-10">
-                <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.28em] text-akboy-muted">Also this week</p>
-                <div className="divide-y divide-akboy-line">
-                  {secondary.map((post) => (
-                    <Link key={post.id} to={postPath(post)} className="group flex gap-4 py-5 first:pt-0">
-                      <InstitutionLogo
-                        school={post.school}
-                        title={post.title}
-                        tags={post.tags}
-                        institution_type={post.institution_type}
-                        size={48}
-                        rounded="rounded-none"
-                        className="shrink-0"
-                      />
-                      <div className="min-w-0">
-                        <Kicker post={post} />
-                        <h3 className="mt-1.5 font-display text-lg leading-snug text-akboy-forest transition-colors group-hover:text-akboy-moss">
-                          {post.title}
-                        </h3>
-                      </div>
-                    </Link>
+              {/* briefs */}
+              <aside className="lg:border-l lg:border-akboy-forest/20 lg:pl-10">
+                <p className="mb-6 text-[10px] font-semibold uppercase tracking-[0.3em] text-akboy-muted">The briefs</p>
+                <ol className="divide-y divide-akboy-line">
+                  {briefs.map((post, i) => (
+                    <li key={post.id}>
+                      <Link to={postPath(post)} className="group flex gap-4 py-5 first:pt-0">
+                        <span className="font-editorial text-2xl leading-none text-akboy-butter">{String(i + 1).padStart(2, "0")}</span>
+                        <div className="min-w-0">
+                          <Kicker post={post} />
+                          <Headline className="mt-1.5 text-lg font-medium leading-snug">{post.title}</Headline>
+                        </div>
+                      </Link>
+                    </li>
                   ))}
-                  {secondary.length === 0 && (
-                    <p className="py-5 text-sm text-akboy-muted">More stories coming shortly.</p>
-                  )}
-                </div>
+                </ol>
+              </aside>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ================= FEATURE TRIO ================= */}
+      {!loading && featureBlock.length > 0 && (
+        <section className="border-t border-akboy-line bg-akboy-bone">
+          <div ref={featureReveal.ref} className={`mx-auto max-w-[1240px] px-5 py-14 sm:px-8 md:py-20 ${featureReveal.cls}`}>
+            <SectionRule label="In focus" note="Selected reading" />
+            <div className="grid gap-10 md:grid-cols-3">
+              {featureBlock.map((post, i) => (
+                <Link key={post.id} to={postPath(post)} className={`group block ${i === 0 ? "md:col-span-1" : ""}`}>
+                  <PostImage
+                    src={post.featured_image_url}
+                    alt={post.title}
+                    school={post.school}
+                    title={post.title}
+                    tags={post.tags}
+                    institution_type={post.institution_type}
+                    aspect="aspect-[4/5]"
+                    tone={i === 1 ? "butter" : "forest"}
+                  />
+                  <div className="pt-5">
+                    <Kicker post={post} />
+                    <Headline className="mt-2 text-[1.4rem] font-medium leading-[1.15]">{post.title}</Headline>
+                    <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-akboy-muted">{standfirst(post, 150)}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ================= INSTITUTIONS STRIP ================= */}
+      {featuredSchools.length > 0 && (
+        <section className="border-y border-akboy-line bg-akboy-paper">
+          <div className="mx-auto max-w-[1240px] px-5 py-8 sm:px-8">
+            <div className="mb-5 flex items-center justify-between">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-akboy-muted">Browse by institution</p>
+              {selectedSchool !== "All" && (
+                <button onClick={() => selectSchool("All")} className="text-[11px] font-semibold uppercase tracking-[0.18em] text-akboy-forest hover:underline">
+                  Clear
+                </button>
+              )}
+            </div>
+            <div className="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="flex min-w-max items-center gap-3 pb-1">
+                {featuredSchools.map(({ school, count }) => {
+                  const active = selectedSchool === school;
+                  return (
+                    <button
+                      key={school}
+                      onClick={() => { selectSchool(school); goToFeed(); }}
+                      className={`group flex items-center gap-3 border px-3.5 py-2.5 transition-colors ${
+                        active ? "border-akboy-forest bg-akboy-forest text-white" : "border-akboy-line bg-white text-akboy-forest hover:border-akboy-forest"
+                      }`}
+                    >
+                      <InstitutionLogo school={school} size={28} rounded="rounded-none" className="shrink-0" />
+                      <span className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.12em]">{school}</span>
+                      <span className={`text-[10px] ${active ? "text-white/70" : "text-akboy-muted"}`}>{count}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
         </section>
       )}
 
-      {/* ============ FEED + RAIL ============ */}
-      <section id="feed" className="scroll-mt-24 bg-akboy-bone">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 md:py-16">
-          <div className="mb-6 flex flex-col gap-4 border-b border-akboy-line pb-5 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-akboy-muted">The feed</p>
-              <h2 className="mt-2 font-display text-2xl text-akboy-forest md:text-3xl">Latest campus updates</h2>
-              <p className="mt-1 text-sm text-akboy-muted">
-                {feedSource.length} update{feedSource.length === 1 ? "" : "s"} · page {currentPage} of {totalPages || 1}
-              </p>
+      {/* ================= FEED + RAIL ================= */}
+      <section id="feed" className="scroll-mt-24 bg-akboy-paper">
+        <div className="mx-auto max-w-[1240px] px-5 py-14 sm:px-8 md:py-20">
+          <SectionRule
+            label={isFiltering ? "Results" : "Latest"}
+            note={`${feedSource.length} stor${feedSource.length === 1 ? "y" : "ies"} · page ${currentPage} of ${totalPages || 1}`}
+          />
+
+          <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-2 text-[11px]">
+              {searchTerm && <span className="border border-akboy-line bg-white px-3 py-1.5 uppercase tracking-[0.14em] text-akboy-forest">“{searchTerm}”</span>}
+              {selectedCategory !== "All" && <span className="border border-akboy-line bg-white px-3 py-1.5 uppercase tracking-[0.14em] text-akboy-forest">{selectedCategory}</span>}
+              {selectedSchool !== "All" && <span className="border border-akboy-line bg-white px-3 py-1.5 uppercase tracking-[0.14em] text-akboy-forest">{selectedSchool}</span>}
+              {isFiltering && (
+                <button onClick={clearAll} className="font-semibold uppercase tracking-[0.16em] text-akboy-forest underline underline-offset-4">Clear all</button>
+              )}
             </div>
 
-            <div className="flex w-full flex-col gap-2 sm:flex-row md:w-auto">
+            <div className="flex w-full gap-2 sm:w-auto">
               <Select value={selectedCategory} onValueChange={selectCategory}>
-                <SelectTrigger className="h-11 w-full rounded-none border-akboy-line bg-white sm:w-52">
+                <SelectTrigger className="h-11 w-full rounded-none border-akboy-line bg-white text-xs uppercase tracking-[0.12em] sm:w-48">
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
                   {categoryOptions.map(c => (
-                    <SelectItem key={c} value={c}>
-                      {c === "All" ? "All categories" : `${c} (${categoryCounts[c] || 0})`}
-                    </SelectItem>
+                    <SelectItem key={c} value={c}>{c === "All" ? "All categories" : `${c} (${categoryCounts[c] || 0})`}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-
-              <Select
-                value={selectedSchool}
-                onValueChange={(v) => { setSelectedSchool(v); updateParam("school", v); setCurrentPage(1); }}
-              >
-                <SelectTrigger className="h-11 w-full rounded-none border-akboy-line bg-white sm:w-52">
+              <Select value={selectedSchool} onValueChange={selectSchool}>
+                <SelectTrigger className="h-11 w-full rounded-none border-akboy-line bg-white text-xs uppercase tracking-[0.12em] sm:w-48">
                   <SelectValue placeholder="Institution" />
                 </SelectTrigger>
                 <SelectContent className="max-h-80">
@@ -411,77 +464,77 @@ export default function AkboyCampusHub() {
             </div>
           </div>
 
-          {isFiltering && (
-            <div className="mb-6 flex flex-wrap items-center gap-2 text-xs">
-              {searchTerm && <span className="border border-akboy-line bg-white px-3 py-1.5 text-akboy-forest">“{searchTerm}”</span>}
-              {selectedCategory !== "All" && <span className="border border-akboy-line bg-white px-3 py-1.5 text-akboy-forest">{selectedCategory}</span>}
-              {selectedSchool !== "All" && <span className="border border-akboy-line bg-white px-3 py-1.5 text-akboy-forest">{selectedSchool}</span>}
-              <button onClick={clearAll} className="font-semibold text-akboy-forest underline underline-offset-4">Clear filters</button>
-            </div>
-          )}
-
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
-            {/* Feed */}
-            <div>
+          <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_300px]">
+            {/* feed */}
+            <div ref={feedReveal.ref} className={feedReveal.cls}>
               {loading ? (
-                <div className="space-y-3">
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="h-24 animate-pulse bg-white" />
+                <div className="space-y-8">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex gap-5">
+                      <div className="h-24 w-20 animate-pulse bg-akboy-bone sm:h-32 sm:w-28" />
+                      <div className="flex-1 space-y-3 py-1">
+                        <div className="h-3 w-28 animate-pulse bg-akboy-bone" />
+                        <div className="h-5 w-full animate-pulse bg-akboy-bone" />
+                        <div className="h-4 w-4/5 animate-pulse bg-akboy-bone" />
+                      </div>
+                    </div>
                   ))}
                 </div>
               ) : error ? (
-                <Card className="rounded-none border border-akboy-line bg-white p-8 text-center">
-                  <p className="font-medium text-akboy-forest">{error}</p>
-                  <Button onClick={fetchPosts} className="mt-4 rounded-none bg-akboy-forest hover:bg-akboy-moss">Retry</Button>
-                </Card>
+                <div className="border border-akboy-line bg-white p-10 text-center">
+                  <p className="font-editorial text-xl text-akboy-forest">{error}</p>
+                  <Button onClick={fetchPosts} className="mt-5 rounded-none bg-akboy-forest px-6 uppercase tracking-[0.16em] hover:bg-akboy-moss">Try again</Button>
+                </div>
               ) : paginatedFeed.length === 0 ? (
-                <Card className="rounded-none border border-dashed border-akboy-line bg-white p-12 text-center">
-                  <Newspaper className="mx-auto mb-3 h-10 w-10 text-akboy-muted" />
-                  <p className="font-display text-lg text-akboy-forest">No matching updates</p>
-                  <p className="mt-1 text-sm text-akboy-muted">Try a different search term or clear the filters.</p>
-                </Card>
+                <div className="border border-dashed border-akboy-line bg-white p-14 text-center">
+                  <Newspaper className="mx-auto mb-4 h-9 w-9 text-akboy-muted" />
+                  <p className="font-editorial text-2xl text-akboy-forest">Nothing matches that yet</p>
+                  <p className="mt-2 text-sm text-akboy-muted">Try another keyword, or clear the filters to see everything.</p>
+                  <button onClick={clearAll} className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-akboy-forest underline underline-offset-4">Clear filters</button>
+                </div>
               ) : (
-                <div className="divide-y divide-akboy-line border-y border-akboy-line bg-white">
+                <div className="divide-y divide-akboy-line border-t border-akboy-line">
                   {paginatedFeed.map((post) => (
-                    <Link key={post.id} to={postPath(post)} className="group flex gap-4 p-4 transition-colors hover:bg-akboy-bone sm:p-5">
-                      <InstitutionLogo
-                        school={post.school}
-                        title={post.title}
-                        tags={post.tags}
-                        institution_type={post.institution_type}
-                        size={56}
-                        rounded="rounded-none"
-                        className="shrink-0"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <Kicker post={post} />
-                        <h3 className="mt-1.5 font-display text-base leading-snug text-akboy-forest transition-colors group-hover:text-akboy-moss sm:text-lg">
-                          {post.title}
-                        </h3>
-                        <p className="mt-1 line-clamp-2 text-sm text-akboy-muted">{plain(post, 150)}</p>
-                        <div className="mt-3 flex items-center gap-4">
-                          <button
-                            onClick={(e) => shareOnWhatsApp(e, post)}
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-akboy-forest hover:underline"
-                          >
-                            <MessageCircle className="h-3.5 w-3.5" /> Share
-                          </button>
-                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-akboy-muted group-hover:text-akboy-forest">
-                            Read <ArrowUpRight className="h-3.5 w-3.5" />
-                          </span>
+                    <article key={post.id}>
+                      <Link to={postPath(post)} className="group flex gap-5 py-7">
+                        <PostImage
+                          src={post.featured_image_url}
+                          alt={post.title}
+                          school={post.school}
+                          title={post.title}
+                          tags={post.tags}
+                          institution_type={post.institution_type}
+                          aspect="aspect-[4/5]"
+                          className="w-[88px] shrink-0 sm:w-[132px]"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <Kicker post={post} />
+                          <Headline className="mt-2 text-lg font-medium leading-snug sm:text-[1.375rem]">{post.title}</Headline>
+                          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-akboy-muted sm:line-clamp-3">{standfirst(post)}</p>
+                          <div className="mt-3 flex items-center gap-5">
+                            <button
+                              onClick={(e) => shareOnWhatsApp(e, post)}
+                              className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-akboy-forest hover:underline"
+                            >
+                              <MessageCircle className="h-3.5 w-3.5" /> Share
+                            </button>
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-akboy-muted transition-colors group-hover:text-akboy-forest">
+                              Read <ArrowUpRight className="h-3.5 w-3.5" />
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    </article>
                   ))}
                 </div>
               )}
 
               {totalPages > 1 && (
-                <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+                <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
                   <button
                     onClick={() => { setCurrentPage(Math.max(1, currentPage - 1)); goToFeed(); }}
                     disabled={currentPage === 1}
-                    className="border border-akboy-line bg-white px-4 py-2 text-sm font-semibold text-akboy-forest disabled:opacity-40"
+                    className="border border-akboy-line bg-white px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-akboy-forest disabled:opacity-40"
                   >Previous</button>
                   {Array.from({ length: Math.min(5, totalPages) }).map((_, idx) => {
                     let pageNum = idx + 1;
@@ -494,7 +547,7 @@ export default function AkboyCampusHub() {
                       <button
                         key={pageNum}
                         onClick={() => { setCurrentPage(pageNum); goToFeed(); }}
-                        className={`min-w-[40px] border px-3 py-2 text-sm font-semibold transition-colors ${
+                        className={`min-w-[40px] border px-3 py-2 text-[11px] font-semibold transition-colors ${
                           currentPage === pageNum
                             ? "border-akboy-forest bg-akboy-forest text-white"
                             : "border-akboy-line bg-white text-akboy-forest hover:bg-akboy-bone"
@@ -505,27 +558,24 @@ export default function AkboyCampusHub() {
                   <button
                     onClick={() => { setCurrentPage(Math.min(totalPages, currentPage + 1)); goToFeed(); }}
                     disabled={currentPage === totalPages}
-                    className="border border-akboy-line bg-white px-4 py-2 text-sm font-semibold text-akboy-forest disabled:opacity-40"
+                    className="border border-akboy-line bg-white px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-akboy-forest disabled:opacity-40"
                   >Next</button>
                 </div>
               )}
             </div>
 
-            {/* Rail */}
-            <aside className="space-y-8">
-              <div className="border border-akboy-line bg-white p-6">
-                <div className="mb-4 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-akboy-forest" />
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-akboy-muted">Trending now</p>
-                </div>
-                <ol className="space-y-4">
-                  {trending.map((post, idx) => (
+            {/* rail */}
+            <aside className="space-y-10 lg:border-l lg:border-akboy-line lg:pl-8">
+              <div>
+                <p className="mb-5 border-b border-akboy-forest/25 pb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-akboy-muted">Most read</p>
+                <ol className="space-y-5">
+                  {mostRead.map((post, idx) => (
                     <li key={post.id}>
                       <Link to={postPath(post)} className="group flex gap-3">
-                        <span className="font-display text-lg leading-none text-akboy-butter">{String(idx + 1).padStart(2, "0")}</span>
+                        <span className="font-editorial text-xl leading-none text-akboy-butter">{String(idx + 1).padStart(2, "0")}</span>
                         <div className="min-w-0">
-                          <p className="line-clamp-2 text-sm font-medium text-akboy-forest group-hover:text-akboy-moss">{post.title}</p>
-                          <p className="mt-1 text-[11px] uppercase tracking-[0.16em] text-akboy-muted">{timeAgo(post.created_at)}</p>
+                          <Headline className="line-clamp-2 text-sm font-medium leading-snug">{post.title}</Headline>
+                          <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-akboy-muted">{timeAgo(post.created_at)}</p>
                         </div>
                       </Link>
                     </li>
@@ -533,36 +583,17 @@ export default function AkboyCampusHub() {
                 </ol>
               </div>
 
-              {featuredSchools.length > 0 && (
-                <div className="border border-akboy-line bg-white p-6">
-                  <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.24em] text-akboy-muted">Browse by institution</p>
-                  <div className="space-y-1">
-                    {featuredSchools.map(({ school, count }) => (
-                      <button
-                        key={school}
-                        onClick={() => { setSelectedSchool(school); updateParam("school", school); setCurrentPage(1); goToFeed(); }}
-                        className="flex w-full items-center gap-3 border-b border-akboy-line/60 py-2 text-left last:border-0 hover:text-akboy-moss"
-                      >
-                        <InstitutionLogo school={school} size={28} rounded="rounded-none" className="shrink-0" />
-                        <span className="flex-1 truncate text-sm font-medium text-akboy-forest">{school}</span>
-                        <span className="text-xs text-akboy-muted">{count}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="border border-akboy-line bg-akboy-forest p-6 text-white">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-akboy-butter">Need guidance?</p>
-                <h3 className="mt-2 font-display text-xl leading-snug">Talk to an Akboy admission consultant</h3>
-                <p className="mt-2 text-sm text-white/75">
-                  Course choice, JAMB change of institution, post-UTME and admission processing — we handle it.
+              <div className="bg-akboy-forest p-7 text-white">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-akboy-butter">Need guidance?</p>
+                <h3 className="mt-3 font-editorial text-2xl leading-tight">Talk to an Akboy admission consultant</h3>
+                <p className="mt-3 text-sm leading-relaxed text-white/75">
+                  Course choice, change of institution, post-UTME and admission processing — handled by people who do it daily.
                 </p>
                 <a
                   href="https://wa.me/2347050757085"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center gap-2 bg-akboy-butter px-4 py-2.5 text-sm font-semibold text-akboy-forest hover:bg-akboy-butter/85"
+                  className="mt-5 inline-flex items-center gap-2 bg-akboy-butter px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-akboy-forest transition-colors hover:bg-white"
                 >
                   <MessageCircle className="h-4 w-4" /> Chat on WhatsApp
                 </a>
@@ -572,7 +603,7 @@ export default function AkboyCampusHub() {
         </div>
       </section>
 
-      {/* ============ TOOLS, BOOKING & NEWSLETTER ============ */}
+      {/* ================= TOOLS ================= */}
       <CampusHubAdvancedSection posts={posts} schools={featuredSchools} />
 
       <WhatsAppConsultButton />
