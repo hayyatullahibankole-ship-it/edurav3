@@ -78,7 +78,7 @@ const SectionRule = ({ label, note }: { label: string; note?: string }) => (
 
 const Headline = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
   <h3 className={`font-editorial text-akboy-forest ${className}`}>
-    <span className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 group-hover:bg-[length:100%_1px]">
+    <span className="box-decoration-clone border-b border-transparent transition-colors duration-300 group-hover:border-akboy-butter">
       {children}
     </span>
   </h3>
