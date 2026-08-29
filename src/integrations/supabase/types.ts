@@ -2816,6 +2816,45 @@ export type Database = {
           },
         ]
       }
+      institution_logos: {
+        Row: {
+          aliases: string[]
+          created_at: string
+          domain: string | null
+          id: string
+          institution_type: string | null
+          is_active: boolean
+          logo_url: string | null
+          name: string
+          short_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          aliases?: string[]
+          created_at?: string
+          domain?: string | null
+          id?: string
+          institution_type?: string | null
+          is_active?: boolean
+          logo_url?: string | null
+          name: string
+          short_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          aliases?: string[]
+          created_at?: string
+          domain?: string | null
+          id?: string
+          institution_type?: string | null
+          is_active?: boolean
+          logo_url?: string | null
+          name?: string
+          short_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       institutions: {
         Row: {
           created_at: string

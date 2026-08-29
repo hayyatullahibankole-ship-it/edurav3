@@ -24,10 +24,10 @@ export const WhatsAppConsultButton = () => {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 z-40 group flex items-center gap-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white pl-4 pr-5 py-3 shadow-2xl shadow-emerald-700/40 transition-all hover:scale-105"
+      className="fixed bottom-6 right-6 z-40 group flex items-center gap-2 rounded-full bg-akboy-forest hover:bg-akboy-moss text-white pl-4 pr-5 py-3 shadow-2xl shadow-akboy-forest/30 transition-all hover:scale-105"
       aria-label="Chat on WhatsApp"
     >
-      <span className="absolute inset-0 rounded-full bg-emerald-400 blur-xl opacity-50 -z-10 animate-pulse" />
+      <span className="absolute inset-0 rounded-full bg-akboy-butter blur-xl opacity-50 -z-10 animate-pulse" />
       <MessageCircle className="w-5 h-5" />
       <span className="text-sm font-bold hidden sm:inline">Free Consult</span>
     </a>
@@ -89,7 +89,7 @@ export const ConsultationBookingForm = ({ trigger }: { trigger?: React.ReactNode
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
+          <Button size="lg" className="bg-akboy-forest hover:bg-akboy-moss text-white font-bold">
             <GraduationCap className="w-4 h-4 mr-2" /> Book Free Consultation
           </Button>
         )}
@@ -114,13 +114,13 @@ export const ConsultationBookingForm = ({ trigger }: { trigger?: React.ReactNode
             <Input placeholder="Target course" value={form.target_course} onChange={(e) => setForm({ ...form, target_course: e.target.value })} />
           </div>
           <Textarea placeholder="Anything else we should know?" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
-          <Button type="submit" disabled={submitting} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
+          <Button type="submit" disabled={submitting} className="w-full bg-akboy-forest hover:bg-akboy-moss text-white font-bold">
             {submitting ? "Submitting…" : "Submit & Get Reply"}
           </Button>
           <a
             href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hi AKBOY, I'd like to book a consultation.")}`}
             target="_blank" rel="noopener noreferrer"
-            className="block text-center text-sm font-semibold text-emerald-700 hover:underline"
+            className="block text-center text-sm font-semibold text-akboy-forest hover:underline"
           >
             Or chat with us directly on WhatsApp →
           </a>
@@ -153,17 +153,17 @@ export const EligibilityChecker = () => {
   const insufficientOLevel = parseInt(oLevel, 10) < 5;
 
   return (
-    <Card className="p-6 md:p-8 bg-white border-2 border-emerald-100 rounded-3xl shadow-sm">
+    <Card className="p-6 md:p-8 bg-white border border-akboy-line rounded-3xl shadow-sm">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white grid place-items-center">
+        <div className="w-12 h-12 rounded-2xl bg-akboy-forest text-white grid place-items-center">
           <CalcIcon className="w-5 h-5" />
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-emerald-700 font-bold">Free Tool</p>
-          <h3 className="text-xl font-bold text-slate-900">Admission Eligibility Checker</h3>
+          <p className="text-xs uppercase tracking-[0.2em] text-akboy-forest font-bold">Free Tool</p>
+          <h3 className="text-xl font-bold text-akboy-forest">Admission Eligibility Checker</h3>
         </div>
       </div>
-      <p className="text-sm text-slate-600 mb-4">Enter your JAMB score and O'Level credits to see which schools you may qualify for.</p>
+      <p className="text-sm text-akboy-muted mb-4">Enter your JAMB score and O'Level credits to see which schools you may qualify for.</p>
       <div className="grid sm:grid-cols-2 gap-3">
         <Input type="number" placeholder="JAMB score (e.g. 230)" value={score} onChange={(e) => setScore(e.target.value)} />
         <Select value={oLevel} onValueChange={setOLevel}>
@@ -177,7 +177,7 @@ export const EligibilityChecker = () => {
       {num > 0 && (
         <div className="mt-5">
           {insufficientOLevel ? (
-            <p className="text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3">
+            <p className="text-sm font-semibold text-akboy-forest bg-akboy-butter/30 border border-akboy-line rounded-xl p-3">
               You'll typically need at least 5 O'Level credits (including English and Maths) for university admission.
             </p>
           ) : matches.length === 0 ? (
@@ -186,12 +186,12 @@ export const EligibilityChecker = () => {
             </p>
           ) : (
             <>
-              <p className="text-sm font-bold text-emerald-800 mb-2">You may qualify for {matches.length} of these tracks:</p>
+              <p className="text-sm font-bold text-akboy-forest mb-2">You may qualify for {matches.length} of these tracks:</p>
               <ul className="space-y-1.5">
                 {matches.map((s) => (
                   <li key={s.name} className="flex items-center gap-2 text-sm text-slate-700">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                    <span><strong>{s.name}</strong> <span className="text-xs text-slate-500">(cutoff ~{s.cutoff})</span></span>
+                    <CheckCircle2 className="w-4 h-4 text-akboy-forest flex-shrink-0" />
+                    <span><strong>{s.name}</strong> <span className="text-xs text-akboy-muted">(cutoff ~{s.cutoff})</span></span>
                   </li>
                 ))}
               </ul>
@@ -199,14 +199,14 @@ export const EligibilityChecker = () => {
           )}
           <ConsultationBookingForm
             trigger={
-              <Button className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
+              <Button className="mt-4 bg-akboy-forest hover:bg-akboy-moss text-white font-semibold">
                 Get personalized advice <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
             }
           />
         </div>
       )}
-      <p className="mt-4 text-[11px] text-slate-500">* Cut-offs are indicative — actual departmental cut-offs vary year to year.</p>
+      <p className="mt-4 text-[11px] text-akboy-muted">* Cut-offs are indicative — actual departmental cut-offs vary year to year.</p>
     </Card>
   );
 };
@@ -241,21 +241,21 @@ export const NewsletterSignup = () => {
   };
 
   return (
-    <div id="newsletter" className="rounded-3xl bg-emerald-700 text-white p-8 md:p-10 shadow-xl">
+    <div id="newsletter" className="rounded-3xl bg-akboy-forest text-white p-8 md:p-10 shadow-xl">
       <div className="flex items-center gap-3 mb-3">
         <Mail className="w-6 h-6" />
         <h3 className="text-xl md:text-2xl font-bold">Get admission alerts first</h3>
       </div>
-      <p className="text-emerald-50/85 text-sm mb-5">Drop your email and (optionally) WhatsApp — we'll send fresh scholarships, JAMB news and admission updates.</p>
+      <p className="text-white/80 text-sm mb-5">Drop your email and (optionally) WhatsApp — we'll send fresh scholarships, JAMB news and admission updates.</p>
       {done ? (
-        <div className="flex items-center gap-2 bg-white/10 rounded-xl p-4 text-emerald-50 font-semibold">
+        <div className="flex items-center gap-2 bg-white/10 rounded-xl p-4 text-white/80 font-semibold">
           <CheckCircle2 className="w-5 h-5" /> You're subscribed.
         </div>
       ) : (
         <form onSubmit={submit} className="grid sm:grid-cols-[1fr_1fr_auto] gap-3">
-          <Input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-white text-slate-900 border-0 h-12" />
-          <Input type="tel" placeholder="WhatsApp (optional)" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} className="bg-white text-slate-900 border-0 h-12" />
-          <Button type="submit" disabled={busy} className="bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold h-12 px-6">
+          <Input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-white text-akboy-forest border-0 h-12" />
+          <Input type="tel" placeholder="WhatsApp (optional)" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} className="bg-white text-akboy-forest border-0 h-12" />
+          <Button type="submit" disabled={busy} className="bg-akboy-butter hover:bg-akboy-butter/80 text-akboy-forest font-bold h-12 px-6">
             {busy ? "…" : "Subscribe"}
           </Button>
         </form>
@@ -299,17 +299,17 @@ export const PersonalizedRecommendations = ({
   }, [posts, prefs]);
 
   return (
-    <Card className="p-6 md:p-8 bg-white border-2 border-emerald-100 rounded-3xl shadow-sm">
+    <Card className="p-6 md:p-8 bg-white border border-akboy-line rounded-3xl shadow-sm">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white grid place-items-center">
+        <div className="w-12 h-12 rounded-2xl bg-akboy-forest text-white grid place-items-center">
           <Star className="w-5 h-5" />
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-emerald-700 font-bold">For You</p>
-          <h3 className="text-xl font-bold text-slate-900">Personalized recommendations</h3>
+          <p className="text-xs uppercase tracking-[0.2em] text-akboy-forest font-bold">For You</p>
+          <h3 className="text-xl font-bold text-akboy-forest">Personalized recommendations</h3>
         </div>
       </div>
-      <p className="text-sm text-slate-600 mb-4">Pick your school and main interest — we'll surface the most relevant posts.</p>
+      <p className="text-sm text-akboy-muted mb-4">Pick your school and main interest — we'll surface the most relevant posts.</p>
 
       <div className="grid sm:grid-cols-2 gap-3 mb-4">
         <Select value={prefs.school || "any"} onValueChange={(v) => save({ ...prefs, school: v === "any" ? undefined : v })}>
@@ -329,13 +329,13 @@ export const PersonalizedRecommendations = ({
       </div>
 
       {recs.length === 0 ? (
-        <p className="text-sm text-slate-500 italic">Pick at least one preference above to see your feed.</p>
+        <p className="text-sm text-akboy-muted italic">Pick at least one preference above to see your feed.</p>
       ) : (
         <div className="grid sm:grid-cols-2 gap-3">
           {recs.map((p) => (
-            <Link key={p.id} to={`/blog/${p.slug || p.id}`} className="group block rounded-2xl border border-slate-200 p-3 hover:border-emerald-400 hover:bg-emerald-50/50 transition">
-              <p className="text-[10px] font-bold text-emerald-700 uppercase mb-1">{p.category || "News"}</p>
-              <p className="text-sm font-semibold text-slate-900 line-clamp-2 group-hover:text-emerald-700">{p.title}</p>
+            <Link key={p.id} to={`/blog/${p.slug || p.id}`} className="group block rounded-2xl border border-akboy-line p-3 hover:border-akboy-forest hover:bg-akboy-bone transition">
+              <p className="text-[10px] font-bold text-akboy-forest uppercase mb-1">{p.category || "News"}</p>
+              <p className="text-sm font-semibold text-akboy-forest line-clamp-2 group-hover:text-akboy-forest">{p.title}</p>
             </Link>
           ))}
         </div>
@@ -349,14 +349,14 @@ export const CampusHubAdvancedSection = ({
   posts, schools,
 }: { posts: any[]; schools: { school: string; count: number }[] }) => {
   return (
-    <section className="py-14 md:py-20 px-4 bg-emerald-50/40">
+    <section className="py-14 md:py-20 px-4 bg-akboy-bone">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-akboy-bone text-akboy-forest text-xs font-bold uppercase tracking-wider mb-3">
             <Sparkles className="w-3.5 h-3.5" /> Smart Tools
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-emerald-950">Get into the right school, faster</h2>
-          <p className="text-slate-600 mt-2 max-w-2xl mx-auto">Free tools, expert guidance, and personalized updates — built for Nigerian students.</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-akboy-forest">Get into the right school, faster</h2>
+          <p className="text-akboy-muted mt-2 max-w-2xl mx-auto">Free tools, expert guidance, and personalized updates — built for Nigerian students.</p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6 mb-8">
@@ -365,18 +365,18 @@ export const CampusHubAdvancedSection = ({
         </div>
 
         <div className="grid lg:grid-cols-[1.2fr_1fr] gap-6">
-          <Card className="p-6 md:p-8 bg-emerald-950 text-white rounded-3xl shadow-xl border-0">
+          <Card className="p-6 md:p-8 bg-akboy-forest text-white rounded-3xl shadow-xl border-0">
             <div className="flex items-center gap-3 mb-3">
-              <GraduationCap className="w-6 h-6 text-emerald-300" />
+              <GraduationCap className="w-6 h-6 text-akboy-butter" />
               <h3 className="text-xl md:text-2xl font-bold">Free Admission Consultation</h3>
             </div>
-            <p className="text-emerald-50/85 text-sm md:text-base mb-5">
+            <p className="text-white/80 text-sm md:text-base mb-5">
               Stuck on choosing a course, school or how to use your JAMB score? Talk to AKBOY's admission team — guidance tailored to you.
             </p>
             <div className="flex flex-wrap gap-3">
               <ConsultationBookingForm
                 trigger={
-                  <Button size="lg" className="bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold">
+                  <Button size="lg" className="bg-akboy-butter hover:bg-akboy-butter/80 text-akboy-forest font-bold">
                     Book Free Consultation
                   </Button>
                 }
