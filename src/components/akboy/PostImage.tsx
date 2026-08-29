@@ -51,9 +51,9 @@ export function PostImage({
           }`}
         />
       ) : (
-        <div className={`flex h-full w-full flex-col items-center justify-center gap-4 px-6 ${toneCls}`}>
+        <div className={`flex h-full w-full flex-col items-center justify-center gap-3 px-5 py-6 sm:gap-4 ${toneCls}`}>
           {resolved.src && (
-            <span className="flex h-14 w-14 items-center justify-center bg-white/95 p-2">
+            <span className="flex h-11 w-11 sm:h-14 sm:w-14 items-center justify-center bg-white/95 p-2">
               <img
                 src={resolved.src}
                 alt={`${resolved.label} logo`}
@@ -65,7 +65,7 @@ export function PostImage({
           <span className="font-editorial text-[clamp(2rem,6vw,4rem)] font-semibold leading-none tracking-tight">
             {resolved.short}
           </span>
-          <span className="max-w-[80%] text-center text-[10px] font-semibold uppercase tracking-[0.28em] opacity-80">
+          <span className="line-clamp-2 max-w-[86%] text-center text-[9px] font-semibold uppercase leading-relaxed tracking-[0.22em] opacity-80 sm:text-[10px] sm:tracking-[0.28em]">
             {resolved.label}
           </span>
         </div>
