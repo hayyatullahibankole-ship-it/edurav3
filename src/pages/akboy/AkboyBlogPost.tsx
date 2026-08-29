@@ -297,100 +297,90 @@ export default function AkboyBlogPost() {
 
 
       {/* Content Section */}
-      <article className="py-16 px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Tags */}
+      <article className="bg-akboy-paper px-5 py-14 sm:px-8 md:py-20">
+        <div className="mx-auto max-w-[68ch]">
           {postTags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-8">
+            <div className="mb-9 flex flex-wrap gap-2">
               {postTags.map((tag: string) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium"
+                  className="inline-flex items-center gap-1.5 border border-akboy-line bg-white px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-akboy-forest"
                 >
-                  <Tag className="w-3 h-3" />
+                  <Tag className="h-3 w-3" />
                   {tag}
                 </span>
               ))}
             </div>
           )}
 
-          {/* Post Content */}
-          <div className="prose prose-lg prose-emerald max-w-none">
-            <div 
-              className="blog-post-content space-y-6"
-              dangerouslySetInnerHTML={{ __html: formatBlogContent(post.content) }}
-            />
-          </div>
+          <div
+            className="akboy-article blog-post-content"
+            dangerouslySetInnerHTML={{ __html: formatBlogContent(post.content) }}
+          />
 
-          {/* Share Section */}
-          <div className="mt-16 pt-8 border-t border-gray-200">
-            <div className="flex flex-col gap-4 mb-6">
-              <h3 className="text-xl font-semibold text-gray-900">Share this article</h3>
-              <p className="text-sm text-gray-600">Sharing with image: {post.featured_image_url ? '✓' : '(no featured image)'}</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Button
-                onClick={() => handleShare('whatsapp')}
-                className="bg-[#25D366] hover:bg-[#20BD5A] text-white"
-              >
-                <MessageCircle className="w-4 h-4 mr-2" />
-                WhatsApp
-              </Button>
-              <Button
-                onClick={() => handleShare('facebook')}
-                className="bg-[#1877F2] hover:bg-[#166FE5] text-white"
-              >
-                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                Facebook
-              </Button>
-              <Button
-                onClick={() => handleShare('twitter')}
-                className="bg-[#1DA1F2] hover:bg-[#1A91DA] text-white"
-              >
-                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                X (Twitter)
-              </Button>
-              <Button
-                onClick={() => handleShare('linkedin')}
-                className="bg-[#0A66C2] hover:bg-[#095196] text-white"
-              >
-                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                LinkedIn
-              </Button>
-              <Button
-                onClick={() => handleShare('telegram')}
-                className="bg-[#0088CC] hover:bg-[#0077B5] text-white"
-              >
-                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-                Telegram
-              </Button>
-              <Button
+          {/* Share */}
+          <div className="mt-16 border-t border-akboy-forest/25 pt-8">
+            <h3 className="font-editorial text-xl text-akboy-forest">Share this story</h3>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {[
+                { key: "whatsapp", label: "WhatsApp" },
+                { key: "facebook", label: "Facebook" },
+                { key: "twitter", label: "X" },
+                { key: "linkedin", label: "LinkedIn" },
+                { key: "telegram", label: "Telegram" },
+              ].map((s) => (
+                <button
+                  key={s.key}
+                  onClick={() => handleShare(s.key)}
+                  className="border border-akboy-line bg-white px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-akboy-forest transition-colors hover:border-akboy-forest hover:bg-akboy-bone"
+                >
+                  {s.label}
+                </button>
+              ))}
+              <button
                 onClick={handleCopyLink}
-                variant="outline"
-                className="border-emerald-600 text-emerald-600 hover:bg-emerald-50"
+                className="inline-flex items-center gap-2 border border-akboy-forest bg-akboy-forest px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition-colors hover:bg-akboy-moss"
               >
-                <Copy className="w-4 h-4 mr-2" />
-                Copy Link
-              </Button>
+                <Copy className="h-3.5 w-3.5" /> Copy link
+              </button>
             </div>
-          </div>
-
-          {/* Back to Blog CTA */}
-          <div className="mt-12 p-8 bg-emerald-50 rounded-2xl text-center">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4 font-poppins">
-              Explore More Articles
-            </h3>
-            <p className="text-gray-600 mb-6 font-lato">
-              Discover more insights on education, design, and technology
-            </p>
-            <Link to="/blog">
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-lg px-8 py-6">
-                View All Posts
-              </Button>
-            </Link>
           </div>
         </div>
+
+        {/* Related */}
+        {related.length > 0 && (
+          <div className="mx-auto mt-20 max-w-[1240px]">
+            <div className="mb-8 flex items-end justify-between border-b border-akboy-forest/25 pb-3">
+              <h3 className="font-editorial text-2xl text-akboy-forest md:text-[2rem]">Keep reading</h3>
+              <Link to="/" className="text-[10px] font-semibold uppercase tracking-[0.24em] text-akboy-forest hover:underline">
+                All stories
+              </Link>
+            </div>
+            <div className="grid gap-10 md:grid-cols-3">
+              {related.map((r) => (
+                <Link key={r.id} to={`/blog/${r.slug || r.id}`} className="group block">
+                  <PostImage
+                    src={r.featured_image_url}
+                    alt={r.title}
+                    school={r.school}
+                    title={r.title}
+                    tags={r.tags}
+                    institution_type={r.institution_type}
+                    aspect="aspect-[4/5]"
+                  />
+                  <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.24em] text-akboy-muted">
+                    {r.category || "News"}
+                  </p>
+                  <h4 className="mt-2 font-editorial text-xl leading-snug text-akboy-forest transition-colors group-hover:text-akboy-moss">
+                    {r.title}
+                  </h4>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </article>
+
     </AkboyLayout>
   );
 }
