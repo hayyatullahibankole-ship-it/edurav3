@@ -19,6 +19,8 @@ const AKBOY_DOMAINS = [
 const CAMPUS_HUB_DOMAINS = [
   'campushub.akboy.space',
   'www.campushub.akboy.space',
+  'campushub.akboy.com.ng',
+  'www.campushub.akboy.com.ng',
 ];
 
 const EDURA_DOMAINS = [
