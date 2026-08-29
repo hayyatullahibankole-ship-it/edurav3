@@ -28,6 +28,7 @@ import { CouponManager } from '@/components/admin/CouponManager';
 import { AkboyServicesManager } from '@/components/admin/AkboyServicesManager';
 import { AkboyPortfolioManager } from '@/components/admin/AkboyPortfolioManager';
 import { AkboyEventsManager } from '@/components/admin/AkboyEventsManager';
+import { InstitutionLogosManager } from '@/components/admin/InstitutionLogosManager';
 import EbooksManager from '@/components/admin/EbooksManager';
 import { AkboyInquiriesManager } from '@/components/admin/AkboyInquiriesManager';
 import { AkboyTutorialsManager } from '@/components/admin/AkboyTutorialsManager';
@@ -94,6 +95,7 @@ const NAV: NavSection[] = [
       { key: 'akboy-registrations', label: 'Registrations', icon: ClipboardList },
       { key: 'akboy-inquiries', label: 'Inquiries', icon: Mail },
       { key: 'akboy-newsletter', label: 'Subscribers', icon: Mail },
+      { key: 'institution-logos', label: 'Institution Logos', icon: School },
     ],
   },
   {
@@ -218,6 +220,7 @@ export default function AdminPortal() {
       case 'akboy-services': return <AkboyServicesManager />;
       case 'akboy-portfolio': return <AkboyPortfolioManager />;
       case 'akboy-events': return <AkboyEventsManager />;
+      case 'institution-logos': return <InstitutionLogosManager />;
       case 'akboy-ebooks': return <EbooksManager />;
       case 'akboy-inquiries': return <AkboyInquiriesManager />;
       case 'akboy-newsletter': return <AkboyNewsletterSubscribersManager />;
