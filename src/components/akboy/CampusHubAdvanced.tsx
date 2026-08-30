@@ -24,10 +24,9 @@ export const WhatsAppConsultButton = () => {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 z-40 group flex items-center gap-2 rounded-full bg-akboy-forest hover:bg-akboy-moss text-white pl-4 pr-5 py-3 shadow-2xl shadow-akboy-forest/30 transition-all hover:scale-105"
+      className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full border border-akboy-paper/20 bg-akboy-forest py-3 pl-4 pr-5 text-akboy-paper shadow-lg transition-transform hover:scale-[1.03] hover:bg-akboy-moss"
       aria-label="Chat on WhatsApp"
     >
-      <span className="absolute inset-0 rounded-full bg-akboy-butter blur-xl opacity-50 -z-10 animate-pulse" />
       <MessageCircle className="w-5 h-5" />
       <span className="text-sm font-bold hidden sm:inline">Free Consult</span>
     </a>
@@ -153,9 +152,9 @@ export const EligibilityChecker = () => {
   const insufficientOLevel = parseInt(oLevel, 10) < 5;
 
   return (
-    <Card className="p-6 md:p-8 bg-white border border-akboy-line ">
+    <Card className="rounded-xl border border-akboy-line bg-akboy-paper p-6 shadow-none md:p-8">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-12 h-12 rounded-none bg-akboy-forest text-white grid place-items-center">
+        <div className="grid h-12 w-12 place-items-center rounded-lg bg-akboy-forest text-akboy-paper">
           <CalcIcon className="w-5 h-5" />
         </div>
         <div>
@@ -241,7 +240,7 @@ export const NewsletterSignup = () => {
   };
 
   return (
-    <div id="newsletter" className=" bg-akboy-forest text-white p-8 md:p-10 ">
+    <div id="newsletter" className="rounded-xl bg-akboy-forest p-8 text-akboy-paper md:p-10">
       <div className="flex items-center gap-3 mb-3">
         <Mail className="w-6 h-6" />
         <h3 className="font-editorial text-2xl md:text-3xl font-semibold">Get admission alerts first</h3>
@@ -253,8 +252,8 @@ export const NewsletterSignup = () => {
         </div>
       ) : (
         <form onSubmit={submit} className="grid sm:grid-cols-[1fr_1fr_auto] gap-3">
-          <Input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-white text-akboy-forest border-0 h-12" />
-          <Input type="tel" placeholder="WhatsApp (optional)" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} className="bg-white text-akboy-forest border-0 h-12" />
+          <Input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} className="h-12 border-0 bg-akboy-paper text-akboy-forest" />
+          <Input type="tel" placeholder="WhatsApp (optional)" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} className="h-12 border-0 bg-akboy-paper text-akboy-forest" />
           <Button type="submit" disabled={busy} className="bg-akboy-butter hover:bg-akboy-butter/80 text-akboy-forest font-bold h-12 px-6">
             {busy ? "…" : "Subscribe"}
           </Button>
@@ -299,9 +298,9 @@ export const PersonalizedRecommendations = ({
   }, [posts, prefs]);
 
   return (
-    <Card className="p-6 md:p-8 bg-white border border-akboy-line ">
+    <Card className="rounded-xl border border-akboy-line bg-akboy-paper p-6 shadow-none md:p-8">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-12 h-12 rounded-none bg-akboy-forest text-white grid place-items-center">
+        <div className="grid h-12 w-12 place-items-center rounded-lg bg-akboy-forest text-akboy-paper">
           <Star className="w-5 h-5" />
         </div>
         <div>
@@ -349,14 +348,14 @@ export const CampusHubAdvancedSection = ({
   posts, schools,
 }: { posts: any[]; schools: { school: string; count: number }[] }) => {
   return (
-    <section className="border-t border-akboy-line bg-akboy-bone px-5 py-16 sm:px-8 md:py-24">
+    <section className="border-t border-akboy-line bg-akboy-mist px-5 py-16 sm:px-8 md:py-24">
       <div className="mx-auto max-w-[1240px]">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 border border-akboy-line bg-white text-akboy-forest text-[10px] font-semibold uppercase tracking-[0.24em] mb-3">
+        <div className="mb-10 max-w-2xl">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-akboy-line bg-akboy-paper px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-akboy-forest">
             <Sparkles className="w-3.5 h-3.5" /> Smart Tools
           </div>
-          <h2 className="font-editorial text-[clamp(2rem,4.5vw,3rem)] font-semibold leading-tight text-akboy-forest">Get into the right school, faster</h2>
-          <p className="text-akboy-muted mt-2 max-w-2xl mx-auto">Free tools, expert guidance, and personalized updates — built for Nigerian students.</p>
+          <h2 className="font-editorial text-[clamp(2rem,4.5vw,3rem)] font-semibold leading-tight text-akboy-forest">Useful tools for your next move</h2>
+          <p className="mt-2 text-akboy-muted">Check your options, personalize your reading and speak with an admission consultant.</p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6 mb-8">
@@ -365,7 +364,7 @@ export const CampusHubAdvancedSection = ({
         </div>
 
         <div className="grid lg:grid-cols-[1.2fr_1fr] gap-6">
-          <Card className="p-6 md:p-8 bg-akboy-forest text-white border border-akboy-forest">
+          <Card className="rounded-xl border border-akboy-forest bg-akboy-forest p-6 text-akboy-paper shadow-none md:p-8">
             <div className="flex items-center gap-3 mb-3">
               <GraduationCap className="w-6 h-6 text-akboy-butter" />
               <h3 className="font-editorial text-2xl md:text-3xl font-semibold">Free Admission Consultation</h3>
