@@ -92,14 +92,16 @@ All colors MUST be HSL for consistency across light/dark modes.
     --gradient-feature: hsl(152 82% 39% / 0.08);
 
     /* AKBOY Creative Hub brand tokens (Forest Authority) */
-    --akboy-forest: 162 61% 15%;
-    --akboy-forest-deep: 163 62% 10%;
-    --akboy-moss: 160 72% 25%;
-    --akboy-butter: 50 82% 72%;
-    --akboy-bone: 45 27% 95%;
-    --akboy-paper: 40 20% 99%;
-    --akboy-line: 150 12% 88%;
-    --akboy-muted: 158 10% 40%;
+    --akboy-forest: 162 70% 22%;
+    --akboy-forest-deep: 162 72% 13%;
+    --akboy-moss: 162 58% 29%;
+    --akboy-butter: 79 69% 66%;
+    --akboy-lime: 79 69% 66%;
+    --akboy-bone: 156 26% 93%;
+    --akboy-mist: 156 26% 93%;
+    --akboy-paper: 180 33% 99%;
+    --akboy-line: 157 24% 84%;
+    --akboy-muted: 160 16% 38%;
 
 
 
