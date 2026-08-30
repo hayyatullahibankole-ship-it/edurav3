@@ -153,11 +153,6 @@ export default function AkboyCampusHub() {
   const leadPool = useMemo(() => posts.slice(0, 5), [posts]);
   const lead = leadPool[leadIndex % Math.max(1, leadPool.length)];
   const briefs = useMemo(() => posts.filter(p => p.id !== lead?.id).slice(0, 4), [posts, lead]);
-  const featureBlock = useMemo(() => {
-    const skip = new Set<string>([lead?.id, ...briefs.map(b => b.id)].filter(Boolean) as string[]);
-    return posts.filter(p => !skip.has(p.id)).slice(0, 3);
-  }, [posts, lead, briefs]);
-
   useEffect(() => {
     if (leadPool.length < 2) return;
     const t = window.setInterval(() => setLeadIndex(i => (i + 1) % leadPool.length), 8000);
@@ -166,9 +161,9 @@ export default function AkboyCampusHub() {
 
   const feedSource = useMemo(() => {
     if (isFiltering) return filtered;
-    const skip = new Set<string>([lead?.id, ...briefs.map(b => b.id), ...featureBlock.map(f => f.id)].filter(Boolean) as string[]);
+    const skip = new Set<string>([lead?.id, ...briefs.slice(0, 3).map(b => b.id)].filter(Boolean) as string[]);
     return filtered.filter(p => !skip.has(p.id));
-  }, [filtered, isFiltering, lead, briefs, featureBlock]);
+  }, [filtered, isFiltering, lead, briefs]);
 
   const totalPages = Math.ceil(feedSource.length / ITEMS_PER_PAGE);
   const paginatedFeed = useMemo(() => {
