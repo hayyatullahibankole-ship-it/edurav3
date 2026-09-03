@@ -283,7 +283,7 @@ export default function AkboyCampusHub() {
       ) : lead ? (
         <section className="bg-white">
           <div ref={leadReveal.ref} className={`mx-auto max-w-[1320px] px-5 py-8 sm:px-8 md:py-12 ${leadReveal.cls}`}>
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start">
               {/* Lead story */}
               <article className="group relative overflow-hidden rounded-2xl border border-akboy-line bg-akboy-forest">
                 <Link to={postPath(lead)} className="block">
