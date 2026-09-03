@@ -19,6 +19,8 @@ import {
 import { CampusHubAdvancedSection, ConsultationBookingForm, WhatsAppConsultButton } from "@/components/akboy/CampusHubAdvanced";
 import { BreakingTicker } from "@/components/akboy/campus-hub/BreakingTicker";
 import { StoryCard, CategoryChip, MetaLine } from "@/components/akboy/campus-hub/StoryCard";
+import { Thumb } from "@/components/akboy/campus-hub/Thumb";
+
 import { StatsStrip } from "@/components/akboy/campus-hub/StatsStrip";
 import { CampusPost, namedSchool, postPath, standfirst, timeAgo } from "@/components/akboy/campus-hub/shared";
 
