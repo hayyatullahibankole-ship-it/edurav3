@@ -353,17 +353,10 @@ export default function AkboyCampusHub() {
                 <div className="divide-y divide-akboy-line">
                   {secondary.map((post) => (
                     <Link key={post.id} to={postPath(post)} className="group flex gap-4 p-4 transition-colors hover:bg-akboy-mist">
-                      <div className="w-[86px] shrink-0 overflow-hidden rounded-lg">
-                        <PostImage
-                          src={post.featured_image_url}
-                          alt={headlineText(post.title)}
-                          school={post.school}
-                          title={headlineText(post.title)}
-                          tags={post.tags}
-                          institution_type={post.institution_type}
-                          aspect="aspect-square"
-                        />
+                      <div className="w-[86px] shrink-0">
+                        <Thumb post={post} alt={headlineText(post.title)} />
                       </div>
+
                       <div className="min-w-0">
                         <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-akboy-moss">{post.category || "News"}</p>
                         <h3 className="mt-1 line-clamp-3 font-editorial text-[15px] font-semibold leading-snug text-akboy-forest transition-colors group-hover:text-akboy-moss">
