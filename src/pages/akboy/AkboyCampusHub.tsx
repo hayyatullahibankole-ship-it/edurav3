@@ -19,6 +19,8 @@ import {
 import { CampusHubAdvancedSection, ConsultationBookingForm, WhatsAppConsultButton } from "@/components/akboy/CampusHubAdvanced";
 import { BreakingTicker } from "@/components/akboy/campus-hub/BreakingTicker";
 import { StoryCard, CategoryChip, MetaLine } from "@/components/akboy/campus-hub/StoryCard";
+import { Thumb } from "@/components/akboy/campus-hub/Thumb";
+
 import { StatsStrip } from "@/components/akboy/campus-hub/StatsStrip";
 import { CampusPost, namedSchool, postPath, standfirst, timeAgo } from "@/components/akboy/campus-hub/shared";
 
@@ -281,7 +283,7 @@ export default function AkboyCampusHub() {
       ) : lead ? (
         <section className="bg-white">
           <div ref={leadReveal.ref} className={`mx-auto max-w-[1320px] px-5 py-8 sm:px-8 md:py-12 ${leadReveal.cls}`}>
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start">
               {/* Lead story */}
               <article className="group relative overflow-hidden rounded-2xl border border-akboy-line bg-akboy-forest">
                 <Link to={postPath(lead)} className="block">
@@ -353,17 +355,10 @@ export default function AkboyCampusHub() {
                 <div className="divide-y divide-akboy-line">
                   {secondary.map((post) => (
                     <Link key={post.id} to={postPath(post)} className="group flex gap-4 p-4 transition-colors hover:bg-akboy-mist">
-                      <div className="w-[86px] shrink-0 overflow-hidden rounded-lg">
-                        <PostImage
-                          src={post.featured_image_url}
-                          alt={headlineText(post.title)}
-                          school={post.school}
-                          title={headlineText(post.title)}
-                          tags={post.tags}
-                          institution_type={post.institution_type}
-                          aspect="aspect-square"
-                        />
+                      <div className="w-[86px] shrink-0">
+                        <Thumb post={post} alt={headlineText(post.title)} />
                       </div>
+
                       <div className="min-w-0">
                         <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-akboy-moss">{post.category || "News"}</p>
                         <h3 className="mt-1 line-clamp-3 font-editorial text-[15px] font-semibold leading-snug text-akboy-forest transition-colors group-hover:text-akboy-moss">
