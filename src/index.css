@@ -754,3 +754,17 @@ All colors MUST be HSL for consistency across light/dark modes.
   .akboy-article h1 { font-size: 1.75rem; }
   .akboy-article h2 { font-size: 1.5rem; }
 }
+
+/* Campus Hub breaking-news ticker */
+@keyframes akboy-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.akboy-marquee {
+  animation: akboy-marquee 45s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .akboy-marquee { animation: none; }
+}
