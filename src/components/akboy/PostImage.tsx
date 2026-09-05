@@ -53,7 +53,7 @@ export function PostImage({
       ) : (
         <div className={`flex h-full w-full flex-col items-center justify-center gap-3 px-5 py-6 sm:gap-4 ${toneCls}`}>
           {resolved.src && (
-            <span className="flex h-11 w-11 sm:h-14 sm:w-14 items-center justify-center bg-white/95 p-2">
+            <span className="flex h-11 w-11 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-white/95 p-2 shadow-sm">
               <img
                 src={resolved.src}
                 alt={`${resolved.label} logo`}
