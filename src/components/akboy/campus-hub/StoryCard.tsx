@@ -59,7 +59,7 @@ export function StoryCard({ post, onShare, compact = false }: StoryCardProps) {
       </Link>
       <div className="flex flex-1 flex-col p-5">
         <Link to={postPath(post)} className="block">
-          <h3 className="font-editorial text-[1.15rem] font-semibold leading-snug text-akboy-forest transition-colors group-hover:text-akboy-moss">
+          <h3 className="font-display text-[1.15rem] font-semibold leading-snug text-akboy-forest transition-colors group-hover:text-akboy-moss">
             {headlineText(post.title)}
           </h3>
           {!compact && (

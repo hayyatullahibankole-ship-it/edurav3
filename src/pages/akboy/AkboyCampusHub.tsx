@@ -30,7 +30,7 @@ const WHATSAPP_NUMBER = "2348101466977";
 const SectionRule = ({ label, note, action }: { label: string; note?: string; action?: React.ReactNode }) => (
   <div className="mb-7 flex flex-wrap items-end justify-between gap-3 border-b-2 border-akboy-forest pb-3">
     <div className="flex items-baseline gap-3">
-      <h2 className="font-editorial text-2xl font-semibold leading-none text-akboy-forest md:text-[2rem]">{label}</h2>
+      <h2 className="font-display text-2xl font-semibold leading-none text-akboy-forest md:text-[2rem]">{label}</h2>
       {note && <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-akboy-muted">{note}</span>}
     </div>
     {action}
@@ -214,7 +214,7 @@ export default function AkboyCampusHub() {
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-center">
             <div>
               <p className="text-[11px] font-black uppercase tracking-[0.28em] text-akboy-moss">An Akboy publication</p>
-              <h1 className="mt-2 font-editorial text-[clamp(2.4rem,6vw,4.2rem)] font-semibold leading-[0.95] tracking-tight text-akboy-forest">
+              <h1 className="mt-2 font-display text-[clamp(2.4rem,6vw,4.2rem)] font-semibold leading-[0.95] tracking-tight text-akboy-forest">
                 Campus Hub
               </h1>
               <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-akboy-muted">
@@ -300,7 +300,7 @@ export default function AkboyCampusHub() {
                     <div className="pointer-events-none absolute inset-0 bg-akboy-forest/55" />
                     <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
                       <CategoryChip label={lead.category || "Top story"} tone="solid" />
-                      <h2 className="mt-3 max-w-3xl font-editorial text-[clamp(1.6rem,3.4vw,2.9rem)] font-semibold leading-[1.06] text-white">
+                      <h2 className="mt-3 max-w-3xl font-display text-[clamp(1.6rem,3.4vw,2.9rem)] font-semibold leading-[1.06] text-white">
                         {headlineText(lead.title)}
                       </h2>
                       <p className="mt-3 hidden max-w-2xl text-sm leading-relaxed text-white/80 sm:block">
@@ -361,7 +361,7 @@ export default function AkboyCampusHub() {
 
                       <div className="min-w-0">
                         <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-akboy-moss">{post.category || "News"}</p>
-                        <h3 className="mt-1 line-clamp-3 font-editorial text-[15px] font-semibold leading-snug text-akboy-forest transition-colors group-hover:text-akboy-moss">
+                        <h3 className="mt-1 line-clamp-3 font-display text-[15px] font-semibold leading-snug text-akboy-forest transition-colors group-hover:text-akboy-moss">
                           {headlineText(post.title)}
                         </h3>
                         <p className="mt-1.5 text-[11px] text-akboy-muted">{timeAgo(post.created_at)}</p>
@@ -388,7 +388,7 @@ export default function AkboyCampusHub() {
                   <GraduationCap className="h-5 w-5" />
                 </div>
                 <p className="mt-6 text-[11px] font-black uppercase tracking-[0.24em] text-akboy-lime">Educational consultancy</p>
-                <h2 className="mt-3 max-w-xl font-editorial text-[clamp(1.7rem,3.2vw,2.6rem)] font-semibold leading-tight text-white">
+                <h2 className="mt-3 max-w-xl font-display text-[clamp(1.7rem,3.2vw,2.6rem)] font-semibold leading-tight text-white">
                   Make your next admission move with confidence.
                 </h2>
                 <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/75">
@@ -503,13 +503,13 @@ export default function AkboyCampusHub() {
                 </div>
               ) : error ? (
                 <div className="rounded-2xl border border-akboy-line bg-akboy-mist p-10 text-center">
-                  <p className="font-editorial text-xl text-akboy-forest">{error}</p>
+                  <p className="font-display text-xl text-akboy-forest">{error}</p>
                   <Button onClick={fetchPosts} className="mt-5 bg-akboy-forest text-akboy-paper hover:bg-akboy-moss">Try again</Button>
                 </div>
               ) : paginatedFeed.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-akboy-line bg-akboy-mist p-12 text-center">
                   <Newspaper className="mx-auto mb-4 h-9 w-9 text-akboy-muted" />
-                  <p className="font-editorial text-2xl text-akboy-forest">Nothing matches that yet</p>
+                  <p className="font-display text-2xl text-akboy-forest">Nothing matches that yet</p>
                   <p className="mt-2 text-sm text-akboy-muted">Try another keyword or clear the filters.</p>
                   <Button type="button" variant="link" onClick={clearAll} className="mt-3 text-akboy-forest">Clear filters</Button>
                 </div>
@@ -550,7 +550,7 @@ export default function AkboyCampusHub() {
                   {mostRead.map((post, index) => (
                     <li key={post.id}>
                       <Link to={postPath(post)} className="group flex gap-4 py-3.5 first:pt-0 last:pb-0">
-                        <span className="font-editorial text-2xl font-semibold leading-none text-akboy-line transition-colors group-hover:text-akboy-lime">
+                        <span className="font-display text-2xl font-semibold leading-none text-akboy-line transition-colors group-hover:text-akboy-lime">
                           {String(index + 1).padStart(2, "0")}
                         </span>
                         <div className="min-w-0">
@@ -589,7 +589,7 @@ export default function AkboyCampusHub() {
                 <div className="grid h-10 w-10 place-items-center rounded-xl bg-akboy-lime text-akboy-forest">
                   <Bell className="h-5 w-5" />
                 </div>
-                <h3 className="mt-4 font-editorial text-xl font-semibold leading-tight">Never miss an admission deadline.</h3>
+                <h3 className="mt-4 font-display text-xl font-semibold leading-tight">Never miss an admission deadline.</h3>
                 <p className="mt-2 text-sm leading-relaxed text-white/75">
                   Important dates and application guidance, sent straight from the Akboy desk.
                 </p>
