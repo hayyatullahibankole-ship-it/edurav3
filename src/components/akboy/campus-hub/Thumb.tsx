@@ -28,7 +28,7 @@ export function Thumb({ post, alt }: { post: CampusPost; alt: string }) {
             tags={post.tags}
             institution_type={post.institution_type}
             size={44}
-            rounded="rounded-md"
+            rounded="rounded-full"
           />
         </div>
       )}
