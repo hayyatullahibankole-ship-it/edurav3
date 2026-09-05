@@ -322,7 +322,7 @@ export default function AkboyBlogPost() {
 
           {/* Share */}
           <div className="mt-16 border-t border-akboy-forest/25 pt-8">
-            <h3 className="font-editorial text-xl text-akboy-forest">Share this story</h3>
+            <h3 className="font-display text-xl text-akboy-forest">Share this story</h3>
             <div className="mt-5 flex flex-wrap gap-2">
               {[
                 { key: "whatsapp", label: "WhatsApp" },
@@ -353,7 +353,7 @@ export default function AkboyBlogPost() {
         {related.length > 0 && (
           <div className="mx-auto mt-20 max-w-[1240px]">
             <div className="mb-8 flex items-end justify-between border-b border-akboy-forest/25 pb-3">
-              <h3 className="font-editorial text-2xl text-akboy-forest md:text-[2rem]">Keep reading</h3>
+              <h3 className="font-display text-2xl text-akboy-forest md:text-[2rem]">Keep reading</h3>
               <Link to="/" className="text-[10px] font-semibold uppercase tracking-[0.24em] text-akboy-forest hover:underline">
                 All stories
               </Link>
@@ -373,7 +373,7 @@ export default function AkboyBlogPost() {
                   <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.24em] text-akboy-muted">
                     {r.category || "News"}
                   </p>
-                  <h4 className="mt-2 font-editorial text-xl leading-snug text-akboy-forest transition-colors group-hover:text-akboy-moss">
+                  <h4 className="mt-2 font-display text-xl leading-snug text-akboy-forest transition-colors group-hover:text-akboy-moss">
                     {headlineText(r.title)}
                   </h4>
                 </Link>
