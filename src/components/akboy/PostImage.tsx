@@ -62,7 +62,7 @@ export function PostImage({
               />
             </span>
           )}
-          <span className="font-editorial text-[clamp(2rem,6vw,4rem)] font-semibold leading-none tracking-tight">
+          <span className="font-display text-[clamp(2rem,6vw,4rem)] font-bold leading-none tracking-tight">
             {resolved.short}
           </span>
           <span className="line-clamp-2 max-w-[86%] text-center text-[9px] font-semibold uppercase leading-relaxed tracking-[0.22em] opacity-80 sm:text-[10px] sm:tracking-[0.28em]">

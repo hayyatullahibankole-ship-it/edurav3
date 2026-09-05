@@ -9,6 +9,11 @@
  *   5. Forest-green monogram tile built from the initials
  */
 
+import akboyLogo from "@/assets/akboy-logo.png";
+
+/** Brand logo used for general Campus Hub posts and generic buckets. */
+const AKBOY_LOGO = akboyLogo;
+
 export type InstitutionType =
   | "university"
   | "polytechnic"
@@ -238,12 +243,12 @@ export function resolveInstitutionLogo(subject: LogoSubject, size = 128): Resolv
     return { src, label: entry.name, short: entry.short, type: entry.type, matched: true };
   }
 
-  // 4. Generic institution-type bucket
+  // 4. Generic institution-type bucket — brand with the Akboy logo
   const bucketKey = norm(school || String(subject.institution_type || ""));
   const bucket = GENERIC_BUCKETS[bucketKey];
   if (bucket) {
     return {
-      src: null,
+      src: AKBOY_LOGO,
       label: school || "Nigerian institutions",
       short: bucket === "university" ? "UNI" : bucket === "polytechnic" ? "POLY" : bucket === "college" ? "COL" : "NG",
       type: bucket,
@@ -251,7 +256,7 @@ export function resolveInstitutionLogo(subject: LogoSubject, size = 128): Resolv
     };
   }
 
-  // 5. Monogram
+  // 5. General Campus Hub post — Akboy logo, never a bare monogram
   const label = school || "Campus Hub";
-  return { src: null, label, short: initials(label), type: "other", matched: false };
+  return { src: AKBOY_LOGO, label, short: initials(label), type: "other", matched: false };
 }
