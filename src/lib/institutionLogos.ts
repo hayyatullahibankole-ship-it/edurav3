@@ -9,6 +9,11 @@
  *   5. Forest-green monogram tile built from the initials
  */
 
+import akboyLogo from "@/assets/akboy-logo.png";
+
+/** Brand logo used for general Campus Hub posts and generic buckets. */
+const AKBOY_LOGO = akboyLogo;
+
 export type InstitutionType =
   | "university"
   | "polytechnic"
