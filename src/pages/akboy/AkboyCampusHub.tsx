@@ -212,12 +212,12 @@ export default function AkboyCampusHub() {
       <section className="border-b border-akboy-line bg-white">
         <div className="mx-auto max-w-[1320px] px-5 py-7 sm:px-8 md:py-9">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-center">
-            <div>
+            <div className="text-center lg:text-left">
               <p className="text-[11px] font-black uppercase tracking-[0.28em] text-akboy-moss">An Akboy publication</p>
               <h1 className="mt-2 font-display text-[clamp(2.4rem,6vw,4.2rem)] font-semibold leading-[0.95] tracking-tight text-akboy-forest">
                 Campus Hub
               </h1>
-              <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-akboy-muted">
+              <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-relaxed text-akboy-muted lg:mx-0">
                 Credible admission lists, post-UTME notices, scholarships and exam updates from Nigerian universities,
                 polytechnics and colleges — verified before we publish.
               </p>
