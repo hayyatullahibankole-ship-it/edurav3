@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { normalizeExamBody } from "@/lib/examBody";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, Wifi, WifiOff, Check, Trash2 } from "lucide-react";
@@ -91,7 +92,8 @@ export const OfflineModeCard = () => {
       const { data: questions, error: questionsError } = await supabase
         .rpc('get_random_questions_for_subjects', {
           subject_ids: subjectIds,
-          per_subject_count: 10
+          per_subject_count: 10,
+          target_exam_body: normalizeExamBody(selectedExamType) ?? undefined,
         });
 
       if (questionsError) throw questionsError;

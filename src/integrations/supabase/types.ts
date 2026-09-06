@@ -6317,36 +6317,72 @@ export type Database = {
           explanation: string
         }[]
       }
-      get_random_questions_for_exam: {
-        Args: { target_exam_id: string }
-        Returns: {
-          difficulty_level: number
-          id: string
-          media_urls: Json
-          options: Json
-          points: number
-          question_text: string
-          subject_id: string
-          tags: Json
-          time_limit_seconds: number
-          type: Database["public"]["Enums"]["question_type"]
-        }[]
-      }
-      get_random_questions_for_subjects: {
-        Args: { per_subject_count?: number; subject_ids: string[] }
-        Returns: {
-          difficulty_level: number
-          id: string
-          media_urls: Json
-          options: Json
-          points: number
-          question_text: string
-          subject_id: string
-          tags: Json
-          time_limit_seconds: number
-          type: Database["public"]["Enums"]["question_type"]
-        }[]
-      }
+      get_random_questions_for_exam:
+        | {
+            Args: { target_exam_id: string }
+            Returns: {
+              difficulty_level: number
+              id: string
+              media_urls: Json
+              options: Json
+              points: number
+              question_text: string
+              subject_id: string
+              tags: Json
+              time_limit_seconds: number
+              type: Database["public"]["Enums"]["question_type"]
+            }[]
+          }
+        | {
+            Args: { target_exam_body?: string; target_exam_id: string }
+            Returns: {
+              difficulty_level: number
+              id: string
+              media_urls: Json
+              options: Json
+              points: number
+              question_text: string
+              subject_id: string
+              tags: Json
+              time_limit_seconds: number
+              type: Database["public"]["Enums"]["question_type"]
+            }[]
+          }
+      get_random_questions_for_subjects:
+        | {
+            Args: { per_subject_count?: number; subject_ids: string[] }
+            Returns: {
+              difficulty_level: number
+              id: string
+              media_urls: Json
+              options: Json
+              points: number
+              question_text: string
+              subject_id: string
+              tags: Json
+              time_limit_seconds: number
+              type: Database["public"]["Enums"]["question_type"]
+            }[]
+          }
+        | {
+            Args: {
+              per_subject_count?: number
+              subject_ids: string[]
+              target_exam_body?: string
+            }
+            Returns: {
+              difficulty_level: number
+              id: string
+              media_urls: Json
+              options: Json
+              points: number
+              question_text: string
+              subject_id: string
+              tags: Json
+              time_limit_seconds: number
+              type: Database["public"]["Enums"]["question_type"]
+            }[]
+          }
       get_registration_for_admit: {
         Args: { p_registration_number: string }
         Returns: Json
@@ -6466,6 +6502,15 @@ export type Database = {
         Returns: {
           question_count: number
           subject_id: string
+        }[]
+      }
+      get_subject_question_counts_by_exam: {
+        Args: { target_exam_body?: string }
+        Returns: {
+          question_count: number
+          subject_id: string
+          tagged_count: number
+          untagged_count: number
         }[]
       }
       get_user_effective_subscription: {

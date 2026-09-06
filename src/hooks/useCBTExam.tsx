@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { normalizeExamBody } from '@/lib/examBody';
 
 // Deterministic shuffle utilities to keep option order stable per attempt
 const strHash = (s: string) => {
@@ -107,10 +108,11 @@ export const useCBTExam = (attemptId: string | null) => {
           }
           questionsData = specificQs || [];
         } else if (attemptData.exam_id) {
-          // Standard exam - use exam blueprint
+          // Standard exam - use exam blueprint (restricted to the exam body)
           const { data: examQs, error: examError } = await supabase
             .rpc('get_random_questions_for_exam', { 
-              target_exam_id: attemptData.exam_id 
+              target_exam_id: attemptData.exam_id,
+              target_exam_body: normalizeExamBody(proctorData?.exam_type) ?? undefined,
             });
           
           if (examError) {
@@ -122,6 +124,7 @@ export const useCBTExam = (attemptId: string | null) => {
           // Practice mode - use selected subjects
           const subjects = attemptData.selected_subjects as any;
           const examType = proctorData?.exam_type;
+          const examBody = normalizeExamBody(examType);
           console.log('Selected subjects raw:', subjects, 'exam type:', examType);
           
           if (!subjects || (Array.isArray(subjects) && subjects.length === 0)) {
@@ -157,7 +160,8 @@ export const useCBTExam = (attemptId: string | null) => {
                 const { data: subjectQs, error: subjectError } = await supabase
                   .rpc('get_random_questions_for_subjects', { 
                     subject_ids: [subjectId],
-                    per_subject_count: questionCount
+                    per_subject_count: questionCount,
+                    target_exam_body: examBody ?? undefined,
                   });
                 if (subjectError) {
                   console.error('Subject RPC error:', subjectError);
@@ -173,7 +177,8 @@ export const useCBTExam = (attemptId: string | null) => {
             const { data: practiceQs, error: practiceError } = await supabase
               .rpc('get_random_questions_for_subjects', { 
                 subject_ids: subjectIds,
-                per_subject_count: questionCount
+                per_subject_count: questionCount,
+                target_exam_body: examBody ?? undefined,
               });
             
             if (practiceError) {

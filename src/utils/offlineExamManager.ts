@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { normalizeExamBody } from '@/lib/examBody';
 import { offlineStorage, OfflineExam, OfflineQuestion } from './offlineStorage';
 
 export class OfflineExamManager {
@@ -15,7 +16,8 @@ export class OfflineExamManager {
       const { data: questions, error } = await supabase
         .rpc('get_random_questions_for_subjects', {
           subject_ids: subjectIds,
-          per_subject_count: questionsPerSubject
+          per_subject_count: questionsPerSubject,
+          target_exam_body: normalizeExamBody(examType) ?? undefined,
         });
 
       if (error) throw error;
