@@ -1,3 +1,4 @@
+import { QuestionMedia } from '@/components/questions/QuestionMedia';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, XCircle, Clock, Lightbulb } from 'lucide-react';
@@ -64,6 +65,7 @@ export const QuestionReviewCard = ({ question, index }: QuestionReviewCardProps)
         <div>
           <h4 className="font-medium mb-2">Question:</h4>
           <p className="text-foreground">{question.question_text}</p>
+          <QuestionMedia media={(question as any).media_urls} className="mt-3" />
         </div>
 
         {question.options && question.options.length > 0 && (

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { normalizeOptionMedia } from '@/lib/questionMedia';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -42,6 +43,8 @@ export interface CleanQuestionReview {
   explanation: string;
   subject: string;
   timeSpentSeconds: number;
+  media?: any;
+  optionMedia?: (any | null)[];
 }
 
 export const useCleanAnswerReview = (attemptId: string | null) => {
@@ -205,7 +208,12 @@ export const useCleanAnswerReview = (attemptId: string | null) => {
             isCorrect: !!item.is_correct,
             explanation: item.explanation || 'No explanation available',
             subject: item.subject_name || 'Unknown',
-            timeSpentSeconds: item.time_spent_seconds || 0
+            timeSpentSeconds: item.time_spent_seconds || 0,
+            media: (item as any).media_urls ?? null,
+            optionMedia: (() => {
+              const om = normalizeOptionMedia((item as any).option_media);
+              return om.length ? shuffleMap.map(origIdx => om[origIdx] ?? null) : [];
+            })()
           };
         });
 

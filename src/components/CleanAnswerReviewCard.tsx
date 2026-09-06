@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, XCircle, Clock, Lightbulb } from 'lucide-react';
 import { CleanQuestionReview } from '@/hooks/useCleanAnswerReview';
 import { MathRenderer } from '@/components/ui/math-renderer';
+import { QuestionMedia, OptionMedia } from '@/components/questions/QuestionMedia';
 import { cn } from '@/lib/utils';
 
 interface CleanAnswerReviewCardProps {
@@ -45,6 +46,7 @@ export const CleanAnswerReviewCard = ({ question, index }: CleanAnswerReviewCard
         <div>
           <h4 className="font-medium mb-2">Question:</h4>
           <MathRenderer content={question.questionText} className="text-foreground" />
+          <QuestionMedia media={question.media} className="mt-3" />
         </div>
 
         {/* Options */}
