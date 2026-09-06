@@ -57,8 +57,10 @@ serve(async (req) => {
     const subjectId = body.subject_id || null;
     const searchTerm = body.search || null;
     const difficulty = body.difficulty || null;
+    // "JAMB" | "WAEC" | "NECO" | "POST_UTME" | "untagged" | null
+    const examBody = body.exam_body || null;
 
-    const baseSelect = `id, question_text, type, options, correct_answer, explanation, difficulty_level, tags, subject_id, is_active, points, created_at`;
+    const baseSelect = `id, question_text, type, options, correct_answer, explanation, difficulty_level, tags, subject_id, is_active, points, created_at, exam_body, exam_year, external_source`;
 
     let query = adminClient
       .from("questions")
@@ -68,6 +70,8 @@ serve(async (req) => {
     if (activeOnly) query = query.eq("is_active", true);
     if (subjectId) query = query.eq("subject_id", subjectId);
     if (difficulty) query = query.eq("difficulty_level", Number(difficulty));
+    if (examBody === "untagged") query = query.is("exam_body", null);
+    else if (examBody) query = query.eq("exam_body", examBody);
     if (searchTerm) query = query.ilike("question_text", `%${searchTerm}%`);
 
     const { data, error, count } = await query.range(offset, offset + limit - 1);
