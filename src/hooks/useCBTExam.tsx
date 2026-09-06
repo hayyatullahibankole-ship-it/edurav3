@@ -115,7 +115,7 @@ export const useCBTExam = (attemptId: string | null) => {
           const { data: examQs, error: examError } = await supabase
             .rpc('get_random_questions_for_exam', { 
               target_exam_id: attemptData.exam_id,
-              target_exam_body: normalizeExamBody(proctorData?.exam_type) ?? undefined,
+              target_exam_body: normalizeExamBody(proctorData?.exam_type) ?? null,
             });
           
           if (examError) {
@@ -164,7 +164,7 @@ export const useCBTExam = (attemptId: string | null) => {
                   .rpc('get_random_questions_for_subjects', { 
                     subject_ids: [subjectId],
                     per_subject_count: questionCount,
-                    target_exam_body: examBody ?? undefined,
+                    target_exam_body: examBody ?? null,
                   });
                 if (subjectError) {
                   console.error('Subject RPC error:', subjectError);
@@ -181,7 +181,7 @@ export const useCBTExam = (attemptId: string | null) => {
               .rpc('get_random_questions_for_subjects', { 
                 subject_ids: subjectIds,
                 per_subject_count: questionCount,
-                target_exam_body: examBody ?? undefined,
+                target_exam_body: examBody ?? null,
               });
             
             if (practiceError) {

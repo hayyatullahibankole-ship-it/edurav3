@@ -17,7 +17,7 @@ export class OfflineExamManager {
         .rpc('get_random_questions_for_subjects', {
           subject_ids: subjectIds,
           per_subject_count: questionsPerSubject,
-          target_exam_body: normalizeExamBody(examType) ?? undefined,
+          target_exam_body: normalizeExamBody(examType) ?? null,
         });
 
       if (error) throw error;

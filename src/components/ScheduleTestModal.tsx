@@ -96,7 +96,7 @@ const ScheduleTestModal: React.FC<ScheduleTestModalProps> = ({ children, default
       const [subjectsResp, questionCountsResp] = await Promise.all([
         supabase.from('subjects').select('*').eq('is_active', true),
         supabase.rpc('get_subject_question_counts_by_exam', {
-          target_exam_body: normalizeExamBody(examType) ?? undefined,
+          target_exam_body: normalizeExamBody(examType) ?? null,
         })
       ]);
 
