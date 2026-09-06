@@ -239,7 +239,8 @@ export default function SchoolAvailableExams() {
             const { data: questions, error: questionsError } = await supabase
               .rpc('get_random_questions_for_subjects', {
                 subject_ids: [examSubject.subject_id],
-                per_subject_count: examSubject.question_count
+                per_subject_count: examSubject.question_count,
+                target_exam_body: normalizeExamBody(exam.type) ?? undefined,
               });
             
             if (questionsError) {
@@ -294,7 +295,8 @@ export default function SchoolAvailableExams() {
               const { data: questions } = await supabase
                 .rpc('get_random_questions_for_subjects', {
                   subject_ids: [examSubject.subject_id],
-                  per_subject_count: examSubject.question_count
+                  per_subject_count: examSubject.question_count,
+                  target_exam_body: normalizeExamBody(exam.type) ?? undefined,
                 });
               if (questions && questions.length > 0) allQuestions.push(...questions);
             } catch (err) {

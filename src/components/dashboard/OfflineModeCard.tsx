@@ -91,7 +91,8 @@ export const OfflineModeCard = () => {
       const { data: questions, error: questionsError } = await supabase
         .rpc('get_random_questions_for_subjects', {
           subject_ids: subjectIds,
-          per_subject_count: 10
+          per_subject_count: 10,
+          target_exam_body: normalizeExamBody(selectedExamType) ?? undefined,
         });
 
       if (questionsError) throw questionsError;
