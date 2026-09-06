@@ -2644,6 +2644,122 @@ export type Database = {
           },
         ]
       }
+      external_question_mappings: {
+        Row: {
+          created_at: string | null
+          edura_subject_id: string | null
+          exam_body: string
+          external_subject_code: string | null
+          external_subject_name: string
+          id: string
+          is_active: boolean | null
+          provider: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          edura_subject_id?: string | null
+          exam_body: string
+          external_subject_code?: string | null
+          external_subject_name: string
+          id?: string
+          is_active?: boolean | null
+          provider: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          edura_subject_id?: string | null
+          exam_body?: string
+          external_subject_code?: string | null
+          external_subject_name?: string
+          id?: string
+          is_active?: boolean | null
+          provider?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "external_question_mappings_edura_subject_id_fkey"
+            columns: ["edura_subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      external_sync_logs: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          error_count: number | null
+          error_message: string | null
+          exam_body: string
+          id: string
+          imported_count: number | null
+          provider: string
+          requested_count: number | null
+          skipped_count: number | null
+          started_at: string | null
+          status: string
+          subject_id: string | null
+          updated_at: string | null
+          year: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          error_count?: number | null
+          error_message?: string | null
+          exam_body: string
+          id?: string
+          imported_count?: number | null
+          provider: string
+          requested_count?: number | null
+          skipped_count?: number | null
+          started_at?: string | null
+          status?: string
+          subject_id?: string | null
+          updated_at?: string | null
+          year?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          error_count?: number | null
+          error_message?: string | null
+          exam_body?: string
+          id?: string
+          imported_count?: number | null
+          provider?: string
+          requested_count?: number | null
+          skipped_count?: number | null
+          started_at?: string | null
+          status?: string
+          subject_id?: string | null
+          updated_at?: string | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "external_sync_logs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "external_sync_logs_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       forum_posts: {
         Row: {
           content: string
@@ -3583,7 +3699,11 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           difficulty_level: number | null
+          exam_body: string | null
+          exam_year: number | null
           explanation: string | null
+          external_id: string | null
+          external_source: string | null
           id: string
           is_active: boolean | null
           media_urls: Json | null
@@ -3601,7 +3721,11 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           difficulty_level?: number | null
+          exam_body?: string | null
+          exam_year?: number | null
           explanation?: string | null
+          external_id?: string | null
+          external_source?: string | null
           id?: string
           is_active?: boolean | null
           media_urls?: Json | null
@@ -3619,7 +3743,11 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           difficulty_level?: number | null
+          exam_body?: string | null
+          exam_year?: number | null
           explanation?: string | null
+          external_id?: string | null
+          external_source?: string | null
           id?: string
           is_active?: boolean | null
           media_urls?: Json | null
@@ -6133,6 +6261,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_daily_import_count: { Args: { _provider: string }; Returns: number }
       get_exam_questions: {
         Args: { exam_question_ids: string[] }
         Returns: {
