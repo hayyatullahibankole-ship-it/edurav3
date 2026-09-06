@@ -46,8 +46,9 @@ export const sdashapiAdapter: ProviderAdapter = {
     const seen = new Set<string>();
 
     // SdashAPI caps a single call at 50 questions; repeat until we have enough.
-    const rounds = Math.ceil(totalWanted / 50);
+    const rounds = Math.min(40, Math.ceil(totalWanted / 50) + 6);
     for (let i = 0; i < rounds; i++) {
+
       const remaining = totalWanted - collected.length;
       if (remaining <= 0) break;
 

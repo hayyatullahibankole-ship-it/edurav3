@@ -101,7 +101,7 @@ serve(async (req) => {
     }
 
     const examBody = body.exam_body.toUpperCase();
-    const limit = Math.min(Math.max(Number(body.limit) || 50, 1), 100);
+    const limit = Math.min(Math.max(Number(body.limit) || 50, 1), 500);
     const dryRun = Boolean(body.dry_run);
 
     // Resolve the mapping: Edura subject + provider subject code.

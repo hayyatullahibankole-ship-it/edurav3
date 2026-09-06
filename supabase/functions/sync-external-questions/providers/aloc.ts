@@ -50,55 +50,93 @@ export const alocAdapter: ProviderAdapter = {
   },
 
   async fetchQuestions(params: SyncRequest, config: ProviderConfig): Promise<NormalizedQuestion[]> {
-    const url = this.buildUrl(params, config);
-    console.log('[aloc] GET', safeUrl(url));
+    const target = Math.max(1, params.limit || 20);
+    const collected: NormalizedQuestion[] = [];
+    const seen = new Set<string>();
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        AccessToken: config.apiKey,
-      },
-    });
+    // ALOC returns at most 40 questions per call, so repeat pulls until we
+    // reach the target or the provider stops returning anything new.
+    const maxRounds = Math.min(40, Math.ceil(target / 40) + 6);
+    let emptyRounds = 0;
 
-    const text = await response.text();
-    if (!response.ok) {
-      console.error('[aloc] HTTP', response.status, text.slice(0, 400));
-      throw new Error(`ALOC HTTP ${response.status}: ${text.slice(0, 300)}`);
+    for (let round = 0; round < maxRounds; round++) {
+      const remaining = target - collected.length;
+      if (remaining <= 0) break;
+
+      const url = this.buildUrl({ ...params, limit: Math.min(remaining, 40) }, config);
+      console.log('[aloc] GET', safeUrl(url), 'round', round + 1);
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          AccessToken: config.apiKey,
+        },
+      });
+
+      const text = await response.text();
+      if (!response.ok) {
+        console.error('[aloc] HTTP', response.status, text.slice(0, 400));
+        if (collected.length > 0) break;
+        throw new Error(`ALOC HTTP ${response.status}: ${text.slice(0, 300)}`);
+      }
+
+      let payload: any;
+      try {
+        payload = JSON.parse(text);
+      } catch {
+        if (collected.length > 0) break;
+        throw new Error(`ALOC returned a non-JSON response: ${text.slice(0, 200)}`);
+      }
+
+      if (payload?.status && Number(payload.status) >= 400) {
+        if (collected.length > 0) break;
+        throw new Error(`ALOC error ${payload.status}: ${payload.message || payload.error || 'Unknown error'}`);
+      }
+
+      const rawData = payload?.data;
+      const items = Array.isArray(rawData) ? rawData : rawData ? [rawData] : [];
+      console.log('[aloc] received', items.length, 'items');
+
+      let added = 0;
+      for (const item of items) {
+        const options = extractOptions(item);
+        const examYear = item.examyear || item.year || params.year || null;
+        const externalId = String(
+          item.id ?? item.question_id ?? `${item.examyear || ''}-${String(item.question || '').slice(0, 40)}`,
+        );
+        if (seen.has(externalId)) continue;
+        seen.add(externalId);
+        added++;
+
+        collected.push({
+          external_id: externalId,
+          question_text: String(item.question ?? '').trim(),
+          options,
+          correct_answer: parseCorrectAnswer(item.answer ?? item.correct_answer, options),
+          explanation: item.solution || item.explanation || null,
+          exam_body: params.exam_body,
+          exam_year: examYear ? parseInt(String(examYear), 10) : null,
+          difficulty_level: 1,
+          tags: [String(item.examtype || normalizeExamBody(params.exam_body)).toUpperCase(), params.provider_subject || '']
+            .filter(Boolean),
+          media_urls: item.image ? [String(item.image)] : [],
+        });
+      }
+
+      if (added === 0) {
+        emptyRounds++;
+        if (emptyRounds >= 2) break;
+      } else {
+        emptyRounds = 0;
+      }
+
+      if (collected.length < target) {
+        await new Promise((r) => setTimeout(r, 250));
+      }
     }
 
-    let payload: any;
-    try {
-      payload = JSON.parse(text);
-    } catch {
-      throw new Error(`ALOC returned a non-JSON response: ${text.slice(0, 200)}`);
-    }
-
-    if (payload?.status && Number(payload.status) >= 400) {
-      throw new Error(`ALOC error ${payload.status}: ${payload.message || payload.error || 'Unknown error'}`);
-    }
-
-    const rawData = payload?.data;
-    const items = Array.isArray(rawData) ? rawData : rawData ? [rawData] : [];
-    console.log('[aloc] received', items.length, 'items');
-
-    return items.map((item: any) => {
-      const options = extractOptions(item);
-      const examYear = item.examyear || item.year || params.year || null;
-
-      return {
-        external_id: String(item.id ?? item.question_id ?? `${item.examyear || ''}-${String(item.question || '').slice(0, 40)}`),
-        question_text: String(item.question ?? '').trim(),
-        options,
-        correct_answer: parseCorrectAnswer(item.answer ?? item.correct_answer, options),
-        explanation: item.solution || item.explanation || null,
-        exam_body: params.exam_body,
-        exam_year: examYear ? parseInt(String(examYear), 10) : null,
-        difficulty_level: 1,
-        tags: [String(item.examtype || normalizeExamBody(params.exam_body)).toUpperCase(), params.provider_subject || '']
-          .filter(Boolean),
-        media_urls: item.image ? [String(item.image)] : [],
-      };
-    });
+    return collected.slice(0, target);
   },
+
 };

@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Download, Eye, RefreshCw, Database, AlertTriangle, CheckCircle, PlugZap } from 'lucide-react';
+import { Loader2, Download, Eye, RefreshCw, Database, AlertTriangle, CheckCircle, PlugZap, Layers } from 'lucide-react';
 
 /** Reads the real error message returned by the edge function body. */
 async function readFunctionError(error: any, fallback: string): Promise<string> {
@@ -68,6 +68,19 @@ const PROVIDERS = [
   { value: 'sdashapi', label: 'SdashAPI' },
 ];
 
+interface BulkJob {
+  key: string;
+  examBody: string;
+  subjectId: string;
+  subjectName: string;
+  year: number | null;
+  status: 'queued' | 'running' | 'done' | 'failed' | 'stopped';
+  imported: number;
+  skipped: number;
+  message?: string;
+}
+
+
 export default function ExternalQuestionImport() {
   const { toast } = useToast();
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -87,11 +100,33 @@ export default function ExternalQuestionImport() {
   const [testing, setTesting] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
 
+  // --- Bulk import state ---
+  const [allMappings, setAllMappings] = useState<Mapping[]>([]);
+  const [bulkBodies, setBulkBodies] = useState<string[]>(['JAMB']);
+  const [bulkSubjectIds, setBulkSubjectIds] = useState<string[]>([]); // empty = all mapped
+  const [bulkUseYears, setBulkUseYears] = useState(true);
+  const [bulkYearFrom, setBulkYearFrom] = useState(2015);
+  const [bulkYearTo, setBulkYearTo] = useState(new Date().getFullYear() - 1);
+  const [bulkTarget, setBulkTarget] = useState(40);
+  const [bulkJobs, setBulkJobs] = useState<BulkJob[]>([]);
+  const [bulkRunning, setBulkRunning] = useState(false);
+  const stopRef = React.useRef(false);
+
   useEffect(() => {
     fetchSubjects();
     fetchLogs();
     fetchDailyCount();
   }, []);
+
+  useEffect(() => {
+    supabase
+      .from('external_question_mappings')
+      .select('*')
+      .eq('provider', provider)
+      .eq('is_active', true)
+      .then(({ data }) => setAllMappings((data as Mapping[]) || []));
+  }, [provider]);
+
 
   useEffect(() => {
     if (subjectId) {
@@ -221,6 +256,118 @@ export default function ExternalQuestionImport() {
       setTesting(false);
     }
   };
+
+  // ---------------- Bulk import ----------------
+
+  const mappedSubjectIds = (body: string) =>
+    allMappings.filter((m) => m.exam_body === body).map((m) => m.edura_subject_id);
+
+  const buildJobs = (): BulkJob[] => {
+    const years: (number | null)[] = bulkUseYears
+      ? Array.from(
+          { length: Math.max(0, bulkYearTo - bulkYearFrom + 1) },
+          (_, i) => bulkYearFrom + i,
+        )
+      : [null];
+
+    const jobs: BulkJob[] = [];
+    for (const body of bulkBodies) {
+      const mapped = mappedSubjectIds(body);
+      const ids = bulkSubjectIds.length > 0 ? bulkSubjectIds.filter((id) => mapped.includes(id)) : mapped;
+      for (const id of ids) {
+        const name = subjects.find((s) => s.id === id)?.name || 'Subject';
+        for (const y of years) {
+          jobs.push({
+            key: `${body}-${id}-${y ?? 'any'}`,
+            examBody: body,
+            subjectId: id,
+            subjectName: name,
+            year: y,
+            status: 'queued',
+            imported: 0,
+            skipped: 0,
+          });
+        }
+      }
+    }
+    return jobs;
+  };
+
+  const startBulk = async () => {
+    const jobs = buildJobs();
+    if (jobs.length === 0) {
+      toast({
+        title: 'Nothing to import',
+        description: 'No mapped subjects match the selected exam bodies.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    stopRef.current = false;
+    setBulkRunning(true);
+    setBulkJobs(jobs);
+
+    const update = (key: string, patch: Partial<BulkJob>) =>
+      setBulkJobs((prev) => prev.map((j) => (j.key === key ? { ...j, ...patch } : j)));
+
+    for (const job of jobs) {
+      if (stopRef.current) {
+        update(job.key, { status: 'stopped' });
+        continue;
+      }
+      update(job.key, { status: 'running' });
+
+      try {
+        const { data, error } = await supabase.functions.invoke('sync-external-questions', {
+          body: {
+            provider,
+            exam_body: job.examBody,
+            subject_id: job.subjectId,
+            year: job.year ?? undefined,
+            limit: bulkTarget,
+          },
+        });
+
+        if (error) throw new Error(await readFunctionError(error, 'Import failed'));
+        if ((data as any)?.error) throw new Error(String((data as any).error));
+
+        update(job.key, {
+          status: 'done',
+          imported: Number((data as any)?.imported_count) || 0,
+          skipped: Number((data as any)?.skipped_count) || 0,
+        });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        update(job.key, { status: 'failed', message });
+        if (/daily import cap/i.test(message)) {
+          stopRef.current = true;
+          toast({ title: 'Daily cap reached', description: message, variant: 'destructive' });
+        }
+      }
+
+      await new Promise((r) => setTimeout(r, 400));
+    }
+
+    setBulkRunning(false);
+    fetchLogs();
+    fetchDailyCount();
+    toast({ title: stopRef.current ? 'Bulk import stopped' : 'Bulk import finished' });
+  };
+
+  const toggleBody = (body: string) =>
+    setBulkBodies((prev) => (prev.includes(body) ? prev.filter((b) => b !== body) : [...prev, body]));
+
+  const toggleBulkSubject = (id: string) =>
+    setBulkSubjectIds((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
+
+  const bulkTotals = bulkJobs.reduce(
+    (acc, j) => ({ imported: acc.imported + j.imported, skipped: acc.skipped + j.skipped }),
+    { imported: 0, skipped: 0 },
+  );
+  const bulkDone = bulkJobs.filter((j) => j.status !== 'queued' && j.status !== 'running').length;
+
+
 
   const currentSubject = subjects.find((s) => s.id === subjectId);
   const mapping = mappings[0];
@@ -400,6 +547,160 @@ export default function ExternalQuestionImport() {
           )}
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Layers className="h-5 w-5" />
+            Bulk import
+          </CardTitle>
+          <CardDescription>
+            Import many subjects and years in one run. Each job pulls repeatedly (40 per provider call) until it
+            reaches your target.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="space-y-2">
+            <Label>Exam bodies</Label>
+            <div className="flex flex-wrap gap-2">
+              {EXAM_BODIES.map((b) => (
+                <Button
+                  key={b}
+                  type="button"
+                  size="sm"
+                  variant={bulkBodies.includes(b) ? 'default' : 'outline'}
+                  onClick={() => toggleBody(b)}
+                  disabled={bulkRunning}
+                >
+                  {b}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Subjects</Label>
+            <p className="text-xs text-muted-foreground">
+              {bulkSubjectIds.length === 0
+                ? 'All mapped subjects will be imported. Tap subjects to narrow the list.'
+                : `${bulkSubjectIds.length} selected.`}
+            </p>
+            <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
+              {subjects.map((s) => (
+                <Button
+                  key={s.id}
+                  type="button"
+                  size="sm"
+                  variant={bulkSubjectIds.includes(s.id) ? 'default' : 'outline'}
+                  onClick={() => toggleBulkSubject(s.id)}
+                  disabled={bulkRunning}
+                >
+                  {s.name}
+                </Button>
+              ))}
+            </div>
+            {bulkSubjectIds.length > 0 && (
+              <Button variant="ghost" size="sm" onClick={() => setBulkSubjectIds([])} disabled={bulkRunning}>
+                Clear selection
+              </Button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div className="flex items-center gap-2">
+              <Switch id="bulk-years" checked={bulkUseYears} onCheckedChange={setBulkUseYears} disabled={bulkRunning} />
+              <Label htmlFor="bulk-years" className="cursor-pointer">
+                Use year range
+              </Label>
+            </div>
+            <div className="space-y-2">
+              <Label>From year</Label>
+              <Input
+                type="number"
+                value={bulkYearFrom}
+                min={2001}
+                max={2030}
+                disabled={!bulkUseYears || bulkRunning}
+                onChange={(e) => setBulkYearFrom(Number(e.target.value))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>To year</Label>
+              <Input
+                type="number"
+                value={bulkYearTo}
+                min={2001}
+                max={2030}
+                disabled={!bulkUseYears || bulkRunning}
+                onChange={(e) => setBulkYearTo(Number(e.target.value))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Questions per job</Label>
+              <Input
+                type="number"
+                value={bulkTarget}
+                min={1}
+                max={500}
+                disabled={bulkRunning}
+                onChange={(e) => setBulkTarget(Math.min(500, Math.max(1, Number(e.target.value))))}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Button onClick={startBulk} disabled={bulkRunning || bulkBodies.length === 0}>
+              {bulkRunning ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
+              Start bulk import
+            </Button>
+            {bulkRunning && (
+              <Button variant="destructive" onClick={() => { stopRef.current = true; }}>
+                Stop
+              </Button>
+            )}
+          </div>
+
+          {bulkJobs.length > 0 && (
+            <div className="space-y-3">
+              <div className="text-sm text-muted-foreground">
+                {bulkDone} / {bulkJobs.length} jobs finished · imported {bulkTotals.imported} · skipped{' '}
+                {bulkTotals.skipped}
+              </div>
+              <div className="max-h-72 overflow-y-auto border rounded-lg divide-y">
+                {bulkJobs.map((j) => (
+                  <div key={j.key} className="flex items-start justify-between gap-3 p-2 text-sm">
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">
+                        {j.examBody} · {j.subjectName} {j.year ? `· ${j.year}` : ''}
+                      </p>
+                      {j.message && <p className="text-xs text-destructive break-words">{j.message}</p>}
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {(j.status === 'done' || j.status === 'failed') && (
+                        <span className="text-xs text-muted-foreground">
+                          +{j.imported} / {j.skipped} skipped
+                        </span>
+                      )}
+                      <Badge
+                        variant={
+                          j.status === 'done'
+                            ? 'default'
+                            : j.status === 'failed'
+                            ? 'destructive'
+                            : 'secondary'
+                        }
+                      >
+                        {j.status === 'running' ? 'running…' : j.status}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
 
       <Card>
         <CardHeader>
