@@ -79,7 +79,7 @@ Deno.test('alocAdapter normalizes object options', async () => {
           {
             id: 'a1',
             question: 'Largest planet?',
-            options: { a: 'Earth', b: 'Mars', c: 'Jupiter' },
+            option: { a: 'Earth', b: 'Mars', c: 'Jupiter' },
             answer: 'c',
             explanation: 'Jupiter is the largest.',
             year: 2023,
@@ -101,31 +101,35 @@ Deno.test('alocAdapter normalizes object options', async () => {
   globalThis.fetch = originalFetch;
 });
 
-Deno.test('alocAdapter normalizes array options', async () => {
+Deno.test('alocAdapter builds a v2 URL with subject and type', () => {
+  const url = alocAdapter.buildUrl(
+    { provider: 'aloc', exam_body: 'JAMB', provider_subject: 'english', limit: 20, year: 2019 } as SyncRequest,
+    config,
+  );
+  assertEquals(url, 'http://localhost:9999/m?subject=english&type=utme&year=2019&limit=20');
+});
+
+Deno.test('sdashapiAdapter builds a URL with subject', () => {
+  const url = sdashapiAdapter.buildUrl(
+    { provider: 'sdashapi', exam_body: 'WAEC', provider_subject: 'biology', limit: 50 } as SyncRequest,
+    config,
+  );
+  assertEquals(url, 'http://localhost:9999/v1/q?subject=biology&type=wassce&limit=50');
+});
+
+Deno.test('sdashapiAdapter returns empty list when provider has no data', async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () =>
-    new Response(
-      JSON.stringify({
-        questions: [
-          {
-            id: 'a2',
-            question_text: 'Smallest continent?',
-            options: ['Australia', 'Europe', 'Antarctica'],
-            correct_answer: 0,
-            exam_year: 2020,
-          },
-        ],
-      }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
+    new Response(JSON.stringify({ status: 200, data: [] }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
 
-  const questions = await alocAdapter.fetchQuestions(
-    { provider: 'aloc', exam_body: 'NECO', limit: 1, year: 2020 } as SyncRequest,
-    config
+  const questions = await sdashapiAdapter.fetchQuestions(
+    { provider: 'sdashapi', exam_body: 'JAMB', provider_subject: 'english', limit: 10 } as SyncRequest,
+    config,
   );
-
-  assertEquals(questions.length, 1);
-  assertEquals(questions[0].correct_answer, 0);
+  assertEquals(questions.length, 0);
 
   globalThis.fetch = originalFetch;
 });

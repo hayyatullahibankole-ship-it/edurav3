@@ -9,7 +9,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Download, Eye, RefreshCw, Database, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Loader2, Download, Eye, RefreshCw, Database, AlertTriangle, CheckCircle, PlugZap } from 'lucide-react';
+
+/** Reads the real error message returned by the edge function body. */
+async function readFunctionError(error: any, fallback: string): Promise<string> {
+  try {
+    const res = error?.context;
+    if (res && typeof res.json === 'function') {
+      const body = await res.clone().json();
+      if (body?.error) {
+        return Array.isArray(body.details) && body.details.length
+          ? `${body.error}`
+          : String(body.error);
+      }
+    }
+    if (res && typeof res.text === 'function') {
+      const text = await res.clone().text();
+      if (text) return text.slice(0, 300);
+    }
+  } catch {
+    // ignore parse issues and fall through
+  }
+  return error?.message || fallback;
+}
 
 interface Subject {
   id: string;
@@ -62,6 +84,8 @@ export default function ExternalQuestionImport() {
   const [limit, setLimit] = useState(50);
   const [dryRun, setDryRun] = useState(false);
   const [preview, setPreview] = useState<any[]>([]);
+  const [testing, setTesting] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSubjects();
@@ -133,8 +157,14 @@ export default function ExternalQuestionImport() {
       });
 
       if (error) {
-        throw new Error(error.message || 'Sync failed');
+        throw new Error(await readFunctionError(error, 'Sync failed'));
       }
+
+      if ((data as any)?.error) {
+        throw new Error(String((data as any).error));
+      }
+
+      setLastError(null);
 
       if (isPreview) {
         setPreview(data?.preview || []);
@@ -151,6 +181,7 @@ export default function ExternalQuestionImport() {
       fetchDailyCount();
     } catch (err) {
       console.error('Sync error:', err);
+      setLastError(err instanceof Error ? err.message : 'Unknown error');
       toast({
         title: isPreview ? 'Preview failed' : 'Import failed',
         description: err instanceof Error ? err.message : 'Unknown error',
@@ -159,6 +190,35 @@ export default function ExternalQuestionImport() {
     } finally {
       setPreviewLoading(false);
       setLoading(false);
+    }
+  };
+
+  const testConnection = async () => {
+    setTesting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-external-questions', {
+        body: {
+          provider,
+          exam_body: examBody,
+          provider_subject: mappings[0]?.external_subject_name || 'english',
+          action: 'test_connection',
+        },
+      });
+
+      if (error) throw new Error(await readFunctionError(error, 'Connection test failed'));
+      if ((data as any)?.error) throw new Error(String((data as any).error));
+
+      setLastError(null);
+      toast({
+        title: 'Connection OK',
+        description: (data as any)?.message || `${provider} responded successfully.`,
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setLastError(message);
+      toast({ title: 'Connection failed', description: message, variant: 'destructive' });
+    } finally {
+      setTesting(false);
     }
   };
 
@@ -300,11 +360,22 @@ export default function ExternalQuestionImport() {
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
               Import {limit} Questions
             </Button>
+            <Button variant="outline" onClick={testConnection} disabled={testing || loading || previewLoading}>
+              {testing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <PlugZap className="h-4 w-4 mr-2" />}
+              Test connection
+            </Button>
             <Button variant="ghost" onClick={() => { fetchLogs(); fetchDailyCount(); }}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
             </Button>
           </div>
+
+          {lastError && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription className="break-words">{lastError}</AlertDescription>
+            </Alert>
+          )}
 
           <div className="text-sm text-muted-foreground">
             Daily import cap: {dailyCount} / {dailyCap} questions used today.
@@ -377,6 +448,9 @@ export default function ExternalQuestionImport() {
                         >
                           {log.status}
                         </Badge>
+                        {log.error_message && (
+                          <p className="text-xs text-destructive mt-1 max-w-xs break-words">{log.error_message}</p>
+                        )}
                       </td>
                     </tr>
                   ))}
