@@ -26,6 +26,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { playSuccessSound } from "@/utils/sounds";
+import { normalizeExamBody } from "@/lib/examBody";
 
 interface ScheduleTestModalProps {
   children: React.ReactNode;
@@ -63,7 +64,7 @@ const ScheduleTestModal: React.FC<ScheduleTestModalProps> = ({ children, default
 
   useEffect(() => {
     if (open) {
-      fetchSubjectsAndQuestions();
+      fetchSubjectsAndQuestions(testConfig.examType);
       // Set default exam type if provided and jump to next step for better UX
       if (defaultExamType && defaultExamType !== testConfig.examType) {
         const defaultLabel = examTypes.find(t => t.value === defaultExamType)?.label || 'Practice';
@@ -78,14 +79,16 @@ const ScheduleTestModal: React.FC<ScheduleTestModalProps> = ({ children, default
     }
   }, [open, defaultExamType]);
 
-  const fetchSubjectsAndQuestions = async () => {
+  const fetchSubjectsAndQuestions = async (examType?: string) => {
     try {
       setLoading(true);
       
       // Fetch subjects and question counts using the secure function
       const [subjectsResp, questionCountsResp] = await Promise.all([
         supabase.from('subjects').select('*').eq('is_active', true),
-        supabase.rpc('get_subject_question_counts')
+        supabase.rpc('get_subject_question_counts_by_exam', {
+          target_exam_body: normalizeExamBody(examType) ?? undefined,
+        })
       ]);
 
       // Check for errors in subjects fetch
