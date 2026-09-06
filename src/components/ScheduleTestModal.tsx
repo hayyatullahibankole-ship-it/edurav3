@@ -79,6 +79,15 @@ const ScheduleTestModal: React.FC<ScheduleTestModalProps> = ({ children, default
     }
   }, [open, defaultExamType]);
 
+  // Re-count available questions whenever the chosen exam changes
+  useEffect(() => {
+    if (open && testConfig.examType) {
+      fetchSubjectsAndQuestions(testConfig.examType);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [testConfig.examType]);
+
+
   const fetchSubjectsAndQuestions = async (examType?: string) => {
     try {
       setLoading(true);
