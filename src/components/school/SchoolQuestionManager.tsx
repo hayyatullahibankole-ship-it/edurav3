@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   Plus, Upload, BookOpen, Trash2, Edit, FileText, CheckCircle2, AlertCircle
 } from 'lucide-react';
+import QuestionMediaUploader from '@/components/admin/QuestionMediaUploader';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -45,6 +46,7 @@ export default function SchoolQuestionManager({ schoolId }: SchoolQuestionManage
     points: 1,
     time_limit_seconds: 90,
     tags: [] as string[],
+    media_urls: [] as any[],
   });
 
   const [stats, setStats] = useState({
@@ -160,6 +162,7 @@ export default function SchoolQuestionManager({ schoolId }: SchoolQuestionManage
           points: newQuestion.points,
           time_limit_seconds: newQuestion.time_limit_seconds,
           tags: newQuestion.tags.length > 0 ? newQuestion.tags : null,
+          media_urls: newQuestion.media_urls || [],
           created_by: userData.id,
           is_active: true,
         });
@@ -196,6 +199,7 @@ export default function SchoolQuestionManager({ schoolId }: SchoolQuestionManage
       points: 1,
       time_limit_seconds: 90,
       tags: [],
+      media_urls: [],
     });
   };
 
@@ -314,6 +318,11 @@ export default function SchoolQuestionManager({ schoolId }: SchoolQuestionManage
                   Supports LaTeX notation: Use \(...\) for inline math and \[...\] for display math
                 </p>
               </div>
+
+              <QuestionMediaUploader
+                value={newQuestion.media_urls}
+                onChange={(items) => setNewQuestion({ ...newQuestion, media_urls: items })}
+              />
 
               {/* Options for MCQ */}
               {(newQuestion.type === 'MCQ_SINGLE' || newQuestion.type === 'MCQ_MULTI') && (

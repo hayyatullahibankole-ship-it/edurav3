@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { normalizeOptionMedia } from '@/lib/questionMedia';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -9,6 +10,8 @@ import { CleanCBTInterface } from '@/components/CleanCBTInterface';
 interface Question {
   id: string;
   question_text: string;
+  media_urls?: any;
+  option_media?: any;
   options: any;
   type: string;
 }
@@ -129,6 +132,8 @@ export default function ChallengeDetail() {
           question_text: q.question_text,
           options: q.options,
           type: q.type,
+          media_urls: q.media_urls,
+          option_media: q.option_media,
         }));
         if (allQuestions.length === 0) {
           toast.error('No questions available for this challenge');
@@ -236,7 +241,9 @@ export default function ChallengeDetail() {
           type: q.type,
           originalIndexMap: [idx],
           subject: '',
-          displayIndex: idx
+          displayIndex: idx,
+          media: q.media_urls,
+          optionMedia: normalizeOptionMedia(q.option_media)
         }))}
         answers={answers}
         onAnswerSelect={handleAnswerSelect}

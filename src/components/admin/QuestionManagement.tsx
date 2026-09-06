@@ -32,6 +32,8 @@ import {
   Download,
   Database
 } from 'lucide-react';
+import QuestionMediaUploader from '@/components/admin/QuestionMediaUploader';
+import { normalizeQuestionMedia, normalizeOptionMedia } from '@/lib/questionMedia';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import SimpleBulkUpload from './SimpleBulkUpload';
@@ -95,7 +97,9 @@ export default function QuestionManagement() {
     difficulty_level: 1,
     tags: [] as string[],
     subject_id: '',
-    points: 1
+    points: 1,
+    media_urls: [] as any[],
+    option_media: [] as any[]
   });
 
   // Debounce search
@@ -219,6 +223,8 @@ export default function QuestionManagement() {
         tags: Array.isArray(newQuestion.tags) ? newQuestion.tags : [],
         subject_id: newQuestion.subject_id,
         points: newQuestion.points,
+        media_urls: newQuestion.media_urls || [],
+        option_media: newQuestion.option_media || [],
         is_active: true
       };
 
@@ -264,7 +270,9 @@ export default function QuestionManagement() {
       difficulty_level: 1,
       tags: [],
       subject_id: '',
-      points: 1
+      points: 1,
+      media_urls: [],
+      option_media: []
     });
   };
 
@@ -311,7 +319,9 @@ export default function QuestionManagement() {
       difficulty_level: question.difficulty_level,
       tags: question.tags || [],
       subject_id: question.subject_id,
-      points: question.points
+      points: question.points,
+      media_urls: normalizeQuestionMedia((question as any).media_urls),
+      option_media: normalizeOptionMedia((question as any).option_media)
     });
     setIsEditModalOpen(true);
   };
@@ -341,7 +351,9 @@ export default function QuestionManagement() {
         difficulty_level: newQuestion.difficulty_level,
         tags: Array.isArray(newQuestion.tags) ? newQuestion.tags : [],
         subject_id: newQuestion.subject_id,
-        points: newQuestion.points
+        points: newQuestion.points,
+        media_urls: newQuestion.media_urls || [],
+        option_media: newQuestion.option_media || []
       };
 
       const { error } = await supabase
@@ -650,11 +662,17 @@ export default function QuestionManagement() {
                       />
                     </div>
 
+                    <QuestionMediaUploader
+                      value={newQuestion.media_urls}
+                      onChange={(items) => setNewQuestion({ ...newQuestion, media_urls: items })}
+                    />
+
                     {newQuestion.type === 'MCQ_SINGLE' && (
                       <div className="space-y-3">
                         <Label>Options</Label>
                         {['A', 'B', 'C', 'D'].map((letter, index) => (
-                          <div key={letter} className="flex items-center space-x-2">
+                          <div key={letter} className="space-y-2 rounded-lg border p-2">
+                            <div className="flex items-center space-x-2">
                             <Label className="w-8">{letter}.</Label>
                             <Input
                               value={newQuestion.options[index]}
@@ -670,6 +688,18 @@ export default function QuestionManagement() {
                               name="correct"
                               checked={newQuestion.correct_answer === index}
                               onChange={() => setNewQuestion({...newQuestion, correct_answer: index})}
+                            />
+                            </div>
+                            <QuestionMediaUploader
+                              label={`Option ${letter} image (optional)`}
+                              multiple={false}
+                              compact
+                              value={newQuestion.option_media?.[index] ? [newQuestion.option_media[index]] : []}
+                              onChange={(items) => {
+                                const media = [...(newQuestion.option_media || [])];
+                                media[index] = items[0] || null;
+                                setNewQuestion({ ...newQuestion, option_media: media });
+                              }}
                             />
                           </div>
                         ))}
@@ -1101,6 +1131,11 @@ export default function QuestionManagement() {
                     rows={4}
                   />
                 </div>
+
+                <QuestionMediaUploader
+                  value={newQuestion.media_urls}
+                  onChange={(items) => setNewQuestion({ ...newQuestion, media_urls: items })}
+                />
 
                 {(newQuestion.type === 'MCQ_SINGLE' || newQuestion.type === 'MCQ_MULTI') && (
                   <div>
