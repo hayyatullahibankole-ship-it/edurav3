@@ -1,7 +1,7 @@
 import { assertEquals } from 'https://deno.land/std@0.224.0/assert/mod.ts';
 import { sdashapiAdapter } from './providers/sdashapi.ts';
 import { alocAdapter } from './providers/aloc.ts';
-import type { SyncRequest } from '../types.ts';
+import type { SyncRequest } from './types.ts';
 
 const config = { apiKey: 'test-key', baseUrl: 'http://localhost:9999' };
 
