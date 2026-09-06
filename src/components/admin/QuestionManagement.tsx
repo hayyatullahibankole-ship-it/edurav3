@@ -36,6 +36,7 @@ import { useToast } from '@/hooks/use-toast';
 import SimpleBulkUpload from './SimpleBulkUpload';
 import LatexConverter from '@/components/admin/LatexConverter';
 import QuestionCleanup from '@/components/admin/QuestionCleanup';
+import ExternalQuestionImport from './ExternalQuestionImport';
 
 interface Question {
   id: string;
@@ -860,6 +861,9 @@ export default function QuestionManagement() {
             <TabsTrigger value="cleanup">
               Question Cleanup
             </TabsTrigger>
+            <TabsTrigger value="import">
+              API Import
+            </TabsTrigger>
           </TabsList>
           </div>
 
@@ -915,6 +919,10 @@ export default function QuestionManagement() {
 
           <TabsContent value="cleanup">
             <QuestionCleanup />
+          </TabsContent>
+
+          <TabsContent value="import">
+            <ExternalQuestionImport />
           </TabsContent>
         </Tabs>
 
