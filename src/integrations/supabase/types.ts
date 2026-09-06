@@ -2745,13 +2745,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "external_sync_logs_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "external_sync_logs_subject_id_fkey"
             columns: ["subject_id"]
             isOneToOne: false
