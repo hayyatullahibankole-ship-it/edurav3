@@ -6199,21 +6199,13 @@ export type Database = {
         Returns: boolean
       }
       expire_subscriptions: { Args: never; Returns: undefined }
-      find_incomplete_questions:
-        | {
-            Args: never
-            Returns: {
-              id: string
-              reason: string
-            }[]
-          }
-        | {
-            Args: { target_subject?: string }
-            Returns: {
-              id: string
-              reason: string
-            }[]
-          }
+      find_incomplete_questions: {
+        Args: never
+        Returns: {
+          id: string
+          reason: string
+        }[]
+      }
       fix_latex_questions: {
         Args: { target_subject?: string }
         Returns: {
@@ -6320,74 +6312,42 @@ export type Database = {
           explanation: string
         }[]
       }
-      get_random_questions_for_exam:
-        | {
-            Args: { target_exam_id: string }
-            Returns: {
-              difficulty_level: number
-              id: string
-              media_urls: Json
-              options: Json
-              points: number
-              question_text: string
-              subject_id: string
-              tags: Json
-              time_limit_seconds: number
-              type: Database["public"]["Enums"]["question_type"]
-            }[]
-          }
-        | {
-            Args: { target_exam_body?: string; target_exam_id: string }
-            Returns: {
-              difficulty_level: number
-              id: string
-              media_urls: Json
-              option_media: Json
-              options: Json
-              points: number
-              question_text: string
-              subject_id: string
-              tags: Json
-              time_limit_seconds: number
-              type: Database["public"]["Enums"]["question_type"]
-            }[]
-          }
-      get_random_questions_for_subjects:
-        | {
-            Args: { per_subject_count?: number; subject_ids: string[] }
-            Returns: {
-              difficulty_level: number
-              id: string
-              media_urls: Json
-              options: Json
-              points: number
-              question_text: string
-              subject_id: string
-              tags: Json
-              time_limit_seconds: number
-              type: Database["public"]["Enums"]["question_type"]
-            }[]
-          }
-        | {
-            Args: {
-              per_subject_count?: number
-              subject_ids: string[]
-              target_exam_body?: string
-            }
-            Returns: {
-              difficulty_level: number
-              id: string
-              media_urls: Json
-              option_media: Json
-              options: Json
-              points: number
-              question_text: string
-              subject_id: string
-              tags: Json
-              time_limit_seconds: number
-              type: Database["public"]["Enums"]["question_type"]
-            }[]
-          }
+      get_random_questions_for_exam: {
+        Args: { target_exam_body?: string; target_exam_id: string }
+        Returns: {
+          difficulty_level: number
+          id: string
+          media_urls: Json
+          option_media: Json
+          options: Json
+          points: number
+          question_text: string
+          subject_id: string
+          tags: Json
+          time_limit_seconds: number
+          type: Database["public"]["Enums"]["question_type"]
+        }[]
+      }
+      get_random_questions_for_subjects: {
+        Args: {
+          per_subject_count?: number
+          subject_ids: string[]
+          target_exam_body?: string
+        }
+        Returns: {
+          difficulty_level: number
+          id: string
+          media_urls: Json
+          option_media: Json
+          options: Json
+          points: number
+          question_text: string
+          subject_id: string
+          tags: Json
+          time_limit_seconds: number
+          type: Database["public"]["Enums"]["question_type"]
+        }[]
+      }
       get_registration_for_admit: {
         Args: { p_registration_number: string }
         Returns: Json
@@ -6745,12 +6705,10 @@ export type Database = {
         }
         Returns: undefined
       }
-      redeem_ebook_code:
-        | { Args: { _code: string }; Returns: Json }
-        | {
-            Args: { _code: string; _device: string; _name: string }
-            Returns: Json
-          }
+      redeem_ebook_code: {
+        Args: { _code: string; _device: string; _name: string }
+        Returns: Json
+      }
       redeem_promo_coupon: { Args: { coupon_code: string }; Returns: Json }
       reset_ebook_device: { Args: { _access_id: string }; Returns: Json }
       send_immediate_result_notification: {
