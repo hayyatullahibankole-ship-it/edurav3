@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { normalizeExamBody } from '@/lib/examBody';
 
 // Deterministic shuffle utilities to keep option order stable per attempt
 const strHash = (s: string) => {
