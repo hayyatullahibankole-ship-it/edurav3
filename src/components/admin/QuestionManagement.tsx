@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { EXAM_BODIES, EXAM_BODY_LABELS, type ExamBody } from '@/lib/examBody';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MathRenderer } from '@/components/ui/math-renderer';
@@ -51,6 +52,8 @@ interface Question {
   is_active: boolean;
   points: number;
   created_at: string;
+  exam_body?: string | null;
+  exam_year?: number | null;
 }
 
 interface Subject {
@@ -71,6 +74,8 @@ export default function QuestionManagement() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
+  const [selectedExamBody, setSelectedExamBody] = useState('all');
+  const [bulkTagging, setBulkTagging] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const PAGE_SIZE = 50;
   
@@ -105,7 +110,7 @@ export default function QuestionManagement() {
   // Fetch when filters or page change
   useEffect(() => {
     fetchData();
-  }, [currentPage, debouncedSearch, selectedSubject, selectedDifficulty]);
+  }, [currentPage, debouncedSearch, selectedSubject, selectedDifficulty, selectedExamBody]);
 
   const fetchData = async () => {
     try {
@@ -136,6 +141,7 @@ export default function QuestionManagement() {
       };
       if (selectedSubject !== 'all') body.subject_id = selectedSubject;
       if (selectedDifficulty !== 'all') body.difficulty = selectedDifficulty;
+      if (selectedExamBody !== 'all') body.exam_body = selectedExamBody;
       if (debouncedSearch.trim()) body.search = debouncedSearch.trim();
 
       const { data: fnData, error: fnError } = await supabase.functions.invoke('admin-get-questions', { body });
@@ -153,6 +159,25 @@ export default function QuestionManagement() {
       setQuestions([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleBulkSetExamBody = async (examBody: ExamBody) => {
+    const ids = questions.map(q => q.id);
+    if (ids.length === 0) return;
+    try {
+      setBulkTagging(true);
+      const { error } = await supabase
+        .from('questions')
+        .update({ exam_body: examBody } as any)
+        .in('id', ids);
+      if (error) throw error;
+      toast({ title: 'Questions tagged', description: `${ids.length} question(s) now marked as ${EXAM_BODY_LABELS[examBody]}.` });
+      fetchData();
+    } catch (error) {
+      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Could not tag questions', variant: 'destructive' });
+    } finally {
+      setBulkTagging(false);
     }
   };
 
@@ -801,6 +826,34 @@ export default function QuestionManagement() {
                     <SelectItem value="3">Hard</SelectItem>
                   </SelectContent>
                 </Select>
+                <Select value={selectedExamBody} onValueChange={(v) => { setSelectedExamBody(v); setCurrentPage(0); }}>
+                  <SelectTrigger className="flex-1 sm:w-36">
+                    <SelectValue placeholder="All Exams" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Exams</SelectItem>
+                    {EXAM_BODIES.map(b => (
+                      <SelectItem key={b} value={b}>{EXAM_BODY_LABELS[b]}</SelectItem>
+                    ))}
+                    <SelectItem value="untagged">Untagged</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="text-xs text-muted-foreground">
+                  Tag the {questions.length} question(s) on this page as:
+                </span>
+                {EXAM_BODIES.map(b => (
+                  <Button
+                    key={b}
+                    size="sm"
+                    variant="outline"
+                    disabled={bulkTagging || loading || questions.length === 0}
+                    onClick={() => handleBulkSetExamBody(b)}
+                  >
+                    {EXAM_BODY_LABELS[b]}
+                  </Button>
+                ))}
               </div>
             </div>
           </CardContent>
