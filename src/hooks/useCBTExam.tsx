@@ -107,10 +107,11 @@ export const useCBTExam = (attemptId: string | null) => {
           }
           questionsData = specificQs || [];
         } else if (attemptData.exam_id) {
-          // Standard exam - use exam blueprint
+          // Standard exam - use exam blueprint (restricted to the exam body)
           const { data: examQs, error: examError } = await supabase
             .rpc('get_random_questions_for_exam', { 
-              target_exam_id: attemptData.exam_id 
+              target_exam_id: attemptData.exam_id,
+              target_exam_body: normalizeExamBody(proctorData?.exam_type) ?? undefined,
             });
           
           if (examError) {
