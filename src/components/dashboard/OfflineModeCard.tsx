@@ -93,7 +93,7 @@ export const OfflineModeCard = () => {
         .rpc('get_random_questions_for_subjects', {
           subject_ids: subjectIds,
           per_subject_count: 10,
-          target_exam_body: normalizeExamBody(selectedExamType) ?? undefined,
+          target_exam_body: normalizeExamBody(selectedExamType) ?? null,
         });
 
       if (questionsError) throw questionsError;
