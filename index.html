@@ -3,6 +3,65 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Brand swap: on AKBOY domains, replace Edura head tags with AKBOY branding before render -->
+    <script>
+      (function () {
+        var host = window.location.hostname.toLowerCase();
+        var isAkboy = /(^|\.)akboy\.(space|com\.ng)$/.test(host) || host.indexOf('akboy.') === 0 || host === 'akboy.lovable.app';
+        var isCampusHub = host.indexOf('campushub.') === 0;
+        if (!isAkboy && !isCampusHub) return;
+
+        var TITLE = isCampusHub
+          ? 'Campus Hub by AKBOY — Campus News, Admissions & Opportunities'
+          : 'AKBOY Creative Hub — Education & Technology Solutions';
+        var DESC = isCampusHub
+          ? 'Campus Hub by AKBOY Creative Hub — the latest campus news, admission updates, scholarships and opportunities across Nigerian institutions.'
+          : 'AKBOY Creative Hub — campus news, exam preparation, ebooks, tutorials, events and technology services for Nigerian students.';
+        var ORIGIN = 'https://akboy.space';
+        var LOGO = ORIGIN + '/akboy-logo.png';
+
+        document.title = TITLE;
+
+        function setMeta(attr, key, content) {
+          var el = document.head.querySelector('meta[' + attr + '="' + key + '"]');
+          if (!el) {
+            el = document.createElement('meta');
+            el.setAttribute(attr, key);
+            document.head.appendChild(el);
+          }
+          el.setAttribute('content', content);
+        }
+        function setLink(rel, href, type) {
+          var el = document.head.querySelector('link[rel="' + rel + '"]');
+          if (!el) {
+            el = document.createElement('link');
+            el.setAttribute('rel', rel);
+            document.head.appendChild(el);
+          }
+          el.setAttribute('href', href);
+          if (type) el.setAttribute('type', type);
+        }
+
+        setMeta('name', 'description', DESC);
+        setMeta('name', 'author', 'AKBOY Creative Hub');
+        setMeta('name', 'theme-color', '#0D5C28');
+        setMeta('name', 'apple-mobile-web-app-title', 'AKBOY');
+        setMeta('property', 'og:type', 'website');
+        setMeta('property', 'og:site_name', 'AKBOY Creative Hub');
+        setMeta('property', 'og:title', TITLE);
+        setMeta('property', 'og:description', DESC);
+        setMeta('property', 'og:url', ORIGIN + window.location.pathname);
+        setMeta('property', 'og:image', LOGO);
+        setMeta('name', 'twitter:card', 'summary');
+        setMeta('name', 'twitter:title', TITLE);
+        setMeta('name', 'twitter:description', DESC);
+        setMeta('name', 'twitter:image', LOGO);
+        setLink('icon', '/akboy-logo.png', 'image/png');
+        setLink('apple-touch-icon', '/akboy-logo.png');
+      })();
+    </script>
+
     <title>Edura — CBT Practice & Student Services in Nigeria</title>
     <meta name="description" content="Practise JAMB, WAEC, NECO and Post-UTME CBT, buy result checker PINs instantly, process admissions and fund a wallet — all in one Edura account.">
     <meta name="keywords" content="CBT, JAMB, WAEC, NECO, Post-UTME, exam preparation, Nigeria, past questions, online testing, offline mode">
@@ -68,10 +127,6 @@
   
   
   
-  <meta property="og:title" content="Edura — CBT Practice & Student Services in Nigeria">
-  <meta name="twitter:title" content="Edura — CBT Practice & Student Services in Nigeria">
-  <meta property="og:description" content="Practise JAMB, WAEC, NECO and Post-UTME CBT, buy result checker PINs instantly, process admissions and fund a wallet — all in one Edura account.">
-  <meta name="twitter:description" content="Practise JAMB, WAEC, NECO and Post-UTME CBT, buy result checker PINs instantly, process admissions and fund a wallet — all in one Edura account.">
 </head>
 
   <body>
