@@ -480,6 +480,11 @@ export default function QuestionManagement() {
                   <Badge variant="secondary" className="text-[10px] max-w-[45vw] truncate sm:max-w-none">
                     {subjects.find(s => s.id === question.subject_id)?.name || 'Unknown'}
                   </Badge>
+                  <Badge variant={question.exam_body ? 'default' : 'outline'} className="text-[10px]">
+                    {question.exam_body
+                      ? (EXAM_BODY_LABELS[question.exam_body as ExamBody] || question.exam_body)
+                      : 'Untagged'}
+                  </Badge>
                   {!question.is_active && (
                     <Badge variant="destructive" className="text-[10px]">Inactive</Badge>
                   )}
