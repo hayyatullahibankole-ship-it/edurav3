@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Download, Eye, RefreshCw, Database, AlertTriangle, CheckCircle, PlugZap } from 'lucide-react';
+import { Loader2, Download, Eye, RefreshCw, Database, AlertTriangle, CheckCircle, PlugZap, Layers } from 'lucide-react';
 
 /** Reads the real error message returned by the edge function body. */
 async function readFunctionError(error: any, fallback: string): Promise<string> {
@@ -547,6 +547,160 @@ export default function ExternalQuestionImport() {
           )}
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Layers className="h-5 w-5" />
+            Bulk import
+          </CardTitle>
+          <CardDescription>
+            Import many subjects and years in one run. Each job pulls repeatedly (40 per provider call) until it
+            reaches your target.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="space-y-2">
+            <Label>Exam bodies</Label>
+            <div className="flex flex-wrap gap-2">
+              {EXAM_BODIES.map((b) => (
+                <Button
+                  key={b}
+                  type="button"
+                  size="sm"
+                  variant={bulkBodies.includes(b) ? 'default' : 'outline'}
+                  onClick={() => toggleBody(b)}
+                  disabled={bulkRunning}
+                >
+                  {b}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Subjects</Label>
+            <p className="text-xs text-muted-foreground">
+              {bulkSubjectIds.length === 0
+                ? 'All mapped subjects will be imported. Tap subjects to narrow the list.'
+                : `${bulkSubjectIds.length} selected.`}
+            </p>
+            <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
+              {subjects.map((s) => (
+                <Button
+                  key={s.id}
+                  type="button"
+                  size="sm"
+                  variant={bulkSubjectIds.includes(s.id) ? 'default' : 'outline'}
+                  onClick={() => toggleBulkSubject(s.id)}
+                  disabled={bulkRunning}
+                >
+                  {s.name}
+                </Button>
+              ))}
+            </div>
+            {bulkSubjectIds.length > 0 && (
+              <Button variant="ghost" size="sm" onClick={() => setBulkSubjectIds([])} disabled={bulkRunning}>
+                Clear selection
+              </Button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div className="flex items-center gap-2">
+              <Switch id="bulk-years" checked={bulkUseYears} onCheckedChange={setBulkUseYears} disabled={bulkRunning} />
+              <Label htmlFor="bulk-years" className="cursor-pointer">
+                Use year range
+              </Label>
+            </div>
+            <div className="space-y-2">
+              <Label>From year</Label>
+              <Input
+                type="number"
+                value={bulkYearFrom}
+                min={2001}
+                max={2030}
+                disabled={!bulkUseYears || bulkRunning}
+                onChange={(e) => setBulkYearFrom(Number(e.target.value))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>To year</Label>
+              <Input
+                type="number"
+                value={bulkYearTo}
+                min={2001}
+                max={2030}
+                disabled={!bulkUseYears || bulkRunning}
+                onChange={(e) => setBulkYearTo(Number(e.target.value))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Questions per job</Label>
+              <Input
+                type="number"
+                value={bulkTarget}
+                min={1}
+                max={500}
+                disabled={bulkRunning}
+                onChange={(e) => setBulkTarget(Math.min(500, Math.max(1, Number(e.target.value))))}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Button onClick={startBulk} disabled={bulkRunning || bulkBodies.length === 0}>
+              {bulkRunning ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
+              Start bulk import
+            </Button>
+            {bulkRunning && (
+              <Button variant="destructive" onClick={() => { stopRef.current = true; }}>
+                Stop
+              </Button>
+            )}
+          </div>
+
+          {bulkJobs.length > 0 && (
+            <div className="space-y-3">
+              <div className="text-sm text-muted-foreground">
+                {bulkDone} / {bulkJobs.length} jobs finished · imported {bulkTotals.imported} · skipped{' '}
+                {bulkTotals.skipped}
+              </div>
+              <div className="max-h-72 overflow-y-auto border rounded-lg divide-y">
+                {bulkJobs.map((j) => (
+                  <div key={j.key} className="flex items-start justify-between gap-3 p-2 text-sm">
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">
+                        {j.examBody} · {j.subjectName} {j.year ? `· ${j.year}` : ''}
+                      </p>
+                      {j.message && <p className="text-xs text-destructive break-words">{j.message}</p>}
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {(j.status === 'done' || j.status === 'failed') && (
+                        <span className="text-xs text-muted-foreground">
+                          +{j.imported} / {j.skipped} skipped
+                        </span>
+                      )}
+                      <Badge
+                        variant={
+                          j.status === 'done'
+                            ? 'default'
+                            : j.status === 'failed'
+                            ? 'destructive'
+                            : 'secondary'
+                        }
+                      >
+                        {j.status === 'running' ? 'running…' : j.status}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
 
       <Card>
         <CardHeader>
