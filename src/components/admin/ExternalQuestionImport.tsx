@@ -68,6 +68,19 @@ const PROVIDERS = [
   { value: 'sdashapi', label: 'SdashAPI' },
 ];
 
+interface BulkJob {
+  key: string;
+  examBody: string;
+  subjectId: string;
+  subjectName: string;
+  year: number | null;
+  status: 'queued' | 'running' | 'done' | 'failed' | 'stopped';
+  imported: number;
+  skipped: number;
+  message?: string;
+}
+
+
 export default function ExternalQuestionImport() {
   const { toast } = useToast();
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -87,11 +100,33 @@ export default function ExternalQuestionImport() {
   const [testing, setTesting] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
 
+  // --- Bulk import state ---
+  const [allMappings, setAllMappings] = useState<Mapping[]>([]);
+  const [bulkBodies, setBulkBodies] = useState<string[]>(['JAMB']);
+  const [bulkSubjectIds, setBulkSubjectIds] = useState<string[]>([]); // empty = all mapped
+  const [bulkUseYears, setBulkUseYears] = useState(true);
+  const [bulkYearFrom, setBulkYearFrom] = useState(2015);
+  const [bulkYearTo, setBulkYearTo] = useState(new Date().getFullYear() - 1);
+  const [bulkTarget, setBulkTarget] = useState(40);
+  const [bulkJobs, setBulkJobs] = useState<BulkJob[]>([]);
+  const [bulkRunning, setBulkRunning] = useState(false);
+  const stopRef = React.useRef(false);
+
   useEffect(() => {
     fetchSubjects();
     fetchLogs();
     fetchDailyCount();
   }, []);
+
+  useEffect(() => {
+    supabase
+      .from('external_question_mappings')
+      .select('*')
+      .eq('provider', provider)
+      .eq('is_active', true)
+      .then(({ data }) => setAllMappings((data as Mapping[]) || []));
+  }, [provider]);
+
 
   useEffect(() => {
     if (subjectId) {
