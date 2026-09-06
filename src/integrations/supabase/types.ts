@@ -6399,6 +6399,8 @@ export type Database = {
           explanation: string
           id: string
           is_correct: boolean
+          media_urls: Json
+          option_media: Json
           options: Json
           question_text: string
           subject_id: string
