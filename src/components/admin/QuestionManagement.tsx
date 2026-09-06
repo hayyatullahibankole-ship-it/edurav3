@@ -920,6 +920,10 @@ export default function QuestionManagement() {
           <TabsContent value="cleanup">
             <QuestionCleanup />
           </TabsContent>
+
+          <TabsContent value="import">
+            <ExternalQuestionImport />
+          </TabsContent>
         </Tabs>
 
         {/* View Question Modal */}
