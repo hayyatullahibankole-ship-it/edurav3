@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MathRenderer } from '@/components/ui/math-renderer';
 import { Clock, ChevronLeft, ChevronRight, Check, Calculator as CalculatorIcon, Camera, AlertTriangle, Eye } from 'lucide-react';
+import { QuestionMedia, OptionMedia } from "@/components/questions/QuestionMedia";
 import { cn } from '@/lib/utils';
 import { CBTQuestion, CBTAnswers } from '@/hooks/useCBTExam';
 import Calculator from '@/components/Calculator';
@@ -353,6 +354,7 @@ export const MockCBTInterface: React.FC<MockCBTInterfaceProps> = ({
                     content={currentQuestion.questionText}
                     className="text-sm sm:text-base font-medium leading-relaxed break-words"
                   />
+                  <QuestionMedia media={currentQuestion.media} className="mt-3" />
                 </div>
 
                 {/* Options */}
@@ -383,6 +385,7 @@ export const MockCBTInterface: React.FC<MockCBTInterfaceProps> = ({
                           </div>
                           <div className="flex-1 min-w-0 overflow-hidden">
                             <MathRenderer content={option} className="text-xs sm:text-sm break-words" />
+                            <OptionMedia media={currentQuestion.optionMedia?.[index]} />
                           </div>
                         </div>
                       </button>
