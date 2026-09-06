@@ -861,6 +861,9 @@ export default function QuestionManagement() {
             <TabsTrigger value="cleanup">
               Question Cleanup
             </TabsTrigger>
+            <TabsTrigger value="import">
+              API Import
+            </TabsTrigger>
           </TabsList>
           </div>
 
