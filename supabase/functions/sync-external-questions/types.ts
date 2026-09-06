@@ -2,9 +2,11 @@ export interface SyncRequest {
   provider: 'aloc' | 'sdashapi';
   exam_body: string; // JAMB, WAEC, NECO, POST_UTME
   subject_id?: string; // Edura subject UUID
+  provider_subject?: string; // provider-specific subject code, e.g. "english"
   year?: number;
   limit?: number;
   dry_run?: boolean;
+  action?: 'sync' | 'test_connection';
 }
 
 export interface NormalizedQuestion {
@@ -27,6 +29,7 @@ export interface ProviderConfig {
 
 export interface ProviderAdapter {
   name: 'aloc' | 'sdashapi';
+  buildUrl(params: SyncRequest, config: ProviderConfig): string;
   fetchQuestions(params: SyncRequest, config: ProviderConfig): Promise<NormalizedQuestion[]>;
 }
 
@@ -40,4 +43,17 @@ export interface SyncResult {
   error_count: number;
   errors: string[];
   status: 'completed' | 'failed';
+}
+
+/** Strips any secret from a URL before logging. */
+export function safeUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    for (const key of ['accesstoken', 'token', 'apikey', 'api_key', 'key']) {
+      if (u.searchParams.has(key)) u.searchParams.set(key, '***');
+    }
+    return u.toString();
+  } catch {
+    return url;
+  }
 }
