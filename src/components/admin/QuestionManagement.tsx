@@ -36,6 +36,7 @@ import { useToast } from '@/hooks/use-toast';
 import SimpleBulkUpload from './SimpleBulkUpload';
 import LatexConverter from '@/components/admin/LatexConverter';
 import QuestionCleanup from '@/components/admin/QuestionCleanup';
+import ExternalQuestionImport from './ExternalQuestionImport';
 
 interface Question {
   id: string;
