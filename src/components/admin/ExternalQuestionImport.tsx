@@ -62,6 +62,8 @@ interface SyncLog {
   completed_at: string | null;
 }
 
+const BULK_STORAGE_KEY = 'edura.admin.bulkImportQueue.v1';
+
 const EXAM_BODIES = ['JAMB', 'WAEC', 'NECO', 'POST_UTME'];
 const PROVIDERS = [
   { value: 'aloc', label: 'ALOC (recommended)' },
@@ -74,7 +76,7 @@ interface BulkJob {
   subjectId: string;
   subjectName: string;
   year: number | null;
-  status: 'queued' | 'running' | 'done' | 'failed' | 'stopped';
+  status: 'queued' | 'running' | 'done' | 'failed' | 'stopped' | 'paused';
   imported: number;
   skipped: number;
   message?: string;
@@ -110,13 +112,48 @@ export default function ExternalQuestionImport() {
   const [bulkTarget, setBulkTarget] = useState(40);
   const [bulkJobs, setBulkJobs] = useState<BulkJob[]>([]);
   const [bulkRunning, setBulkRunning] = useState(false);
-  const stopRef = React.useRef(false);
+  const [bulkPaused, setBulkPaused] = useState(false);
+  const [restored, setRestored] = useState(false);
+  const controlRef = React.useRef<'run' | 'pause' | 'stop'>('run');
 
   useEffect(() => {
     fetchSubjects();
     fetchLogs();
     fetchDailyCount();
   }, []);
+
+  // Restore an interrupted bulk run
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(BULK_STORAGE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (!Array.isArray(saved?.jobs) || saved.jobs.length === 0) return;
+      const jobs: BulkJob[] = saved.jobs.map((j: BulkJob) =>
+        j.status === 'running' ? { ...j, status: 'paused' } : j,
+      );
+      if (!jobs.some((j) => j.status === 'queued' || j.status === 'paused' || j.status === 'failed')) return;
+      setBulkJobs(jobs);
+      setBulkPaused(true);
+      setRestored(true);
+      if (saved.provider) setProvider(saved.provider);
+      if (saved.bulkTarget) setBulkTarget(Number(saved.bulkTarget) || 40);
+    } catch {
+      // ignore corrupted state
+    }
+  }, []);
+
+  useEffect(() => {
+    if (bulkJobs.length === 0) return;
+    try {
+      localStorage.setItem(
+        BULK_STORAGE_KEY,
+        JSON.stringify({ provider, bulkTarget, jobs: bulkJobs, savedAt: Date.now() }),
+      );
+    } catch {
+      // storage full / unavailable
+    }
+  }, [bulkJobs, provider, bulkTarget]);
 
   useEffect(() => {
     supabase
@@ -293,29 +330,27 @@ export default function ExternalQuestionImport() {
     return jobs;
   };
 
-  const startBulk = async () => {
-    const jobs = buildJobs();
-    if (jobs.length === 0) {
-      toast({
-        title: 'Nothing to import',
-        description: 'No mapped subjects match the selected exam bodies.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    stopRef.current = false;
+  const runQueue = async (queue: BulkJob[]) => {
+    controlRef.current = 'run';
+    setBulkPaused(false);
     setBulkRunning(true);
-    setBulkJobs(jobs);
+    setRestored(false);
 
     const update = (key: string, patch: Partial<BulkJob>) =>
       setBulkJobs((prev) => prev.map((j) => (j.key === key ? { ...j, ...patch } : j)));
 
-    for (const job of jobs) {
-      if (stopRef.current) {
-        update(job.key, { status: 'stopped' });
+    let halted: 'pause' | 'stop' | null = null;
+
+    for (const job of queue) {
+      if (job.status === 'done') continue;
+
+      const control = String(controlRef.current);
+      if (control !== 'run') {
+        halted = control === 'pause' ? 'pause' : 'stop';
+        update(job.key, { status: control === 'pause' ? 'paused' : 'stopped' });
         continue;
       }
+
       update(job.key, { status: 'running' });
 
       try {
@@ -334,6 +369,7 @@ export default function ExternalQuestionImport() {
 
         update(job.key, {
           status: 'done',
+          message: undefined,
           imported: Number((data as any)?.imported_count) || 0,
           skipped: Number((data as any)?.skipped_count) || 0,
         });
@@ -341,18 +377,72 @@ export default function ExternalQuestionImport() {
         const message = err instanceof Error ? err.message : 'Unknown error';
         update(job.key, { status: 'failed', message });
         if (/daily import cap/i.test(message)) {
-          stopRef.current = true;
+          controlRef.current = 'stop';
+          halted = 'stop';
           toast({ title: 'Daily cap reached', description: message, variant: 'destructive' });
         }
       }
 
+      fetchDailyCount();
       await new Promise((r) => setTimeout(r, 400));
     }
 
     setBulkRunning(false);
+    setBulkPaused(halted === 'pause');
     fetchLogs();
     fetchDailyCount();
-    toast({ title: stopRef.current ? 'Bulk import stopped' : 'Bulk import finished' });
+    toast({
+      title:
+        halted === 'pause'
+          ? 'Bulk import paused'
+          : halted === 'stop'
+          ? 'Bulk import stopped'
+          : 'Bulk import finished',
+      description:
+        halted === 'pause' ? 'Press Resume to continue from where it stopped.' : undefined,
+    });
+  };
+
+  const startBulk = async () => {
+    const jobs = buildJobs();
+    if (jobs.length === 0) {
+      toast({
+        title: 'Nothing to import',
+        description: 'No mapped subjects match the selected exam bodies.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setBulkJobs(jobs);
+    await runQueue(jobs);
+  };
+
+  const resumeBulk = async () => {
+    const remaining = bulkJobs.map((j) =>
+      j.status === 'paused' || j.status === 'stopped' ? { ...j, status: 'queued' as const } : j,
+    );
+    setBulkJobs(remaining);
+    await runQueue(remaining);
+  };
+
+  const retryFailed = async () => {
+    const retried = bulkJobs.map((j) =>
+      j.status === 'failed' ? { ...j, status: 'queued' as const, message: undefined } : j,
+    );
+    setBulkJobs(retried);
+    await runQueue(retried);
+  };
+
+  const resetQueue = () => {
+    controlRef.current = 'stop';
+    setBulkJobs([]);
+    setBulkPaused(false);
+    setRestored(false);
+    try {
+      localStorage.removeItem(BULK_STORAGE_KEY);
+    } catch {
+      // ignore
+    }
   };
 
   const toggleBody = (body: string) =>
@@ -365,7 +455,11 @@ export default function ExternalQuestionImport() {
     (acc, j) => ({ imported: acc.imported + j.imported, skipped: acc.skipped + j.skipped }),
     { imported: 0, skipped: 0 },
   );
-  const bulkDone = bulkJobs.filter((j) => j.status !== 'queued' && j.status !== 'running').length;
+  const bulkDone = bulkJobs.filter((j) => j.status === 'done' || j.status === 'failed').length;
+  const bulkPending = bulkJobs.filter(
+    (j) => j.status === 'queued' || j.status === 'paused' || j.status === 'stopped',
+  ).length;
+  const bulkFailed = bulkJobs.filter((j) => j.status === 'failed').length;
 
 
 
@@ -648,14 +742,46 @@ export default function ExternalQuestionImport() {
             </div>
           </div>
 
+          {restored && bulkPending > 0 && (
+            <Alert>
+              <AlertDescription className="flex flex-wrap items-center gap-3">
+                <span>
+                  A previous run was interrupted with {bulkPending} job{bulkPending === 1 ? '' : 's'} left.
+                </span>
+                <Button size="sm" onClick={resumeBulk}>Continue previous run</Button>
+                <Button size="sm" variant="outline" onClick={resetQueue}>Discard</Button>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="flex flex-wrap gap-3">
             <Button onClick={startBulk} disabled={bulkRunning || bulkBodies.length === 0}>
               {bulkRunning ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
               Start bulk import
             </Button>
             {bulkRunning && (
-              <Button variant="destructive" onClick={() => { stopRef.current = true; }}>
-                Stop
+              <>
+                <Button variant="secondary" onClick={() => { controlRef.current = 'pause'; }}>
+                  Pause
+                </Button>
+                <Button variant="destructive" onClick={() => { controlRef.current = 'stop'; }}>
+                  Stop
+                </Button>
+              </>
+            )}
+            {!bulkRunning && bulkPending > 0 && (
+              <Button variant="secondary" onClick={resumeBulk}>
+                Resume ({bulkPending} left)
+              </Button>
+            )}
+            {!bulkRunning && bulkFailed > 0 && (
+              <Button variant="outline" onClick={retryFailed}>
+                Retry failed ({bulkFailed})
+              </Button>
+            )}
+            {!bulkRunning && bulkJobs.length > 0 && (
+              <Button variant="ghost" onClick={resetQueue}>
+                Reset queue
               </Button>
             )}
           </div>
@@ -664,7 +790,8 @@ export default function ExternalQuestionImport() {
             <div className="space-y-3">
               <div className="text-sm text-muted-foreground">
                 {bulkDone} / {bulkJobs.length} jobs finished · imported {bulkTotals.imported} · skipped{' '}
-                {bulkTotals.skipped}
+                {bulkTotals.skipped} · {dailyCount.toLocaleString()} / 20,000 imported today
+                {bulkPaused ? ' · paused' : ''}
               </div>
               <div className="max-h-72 overflow-y-auto border rounded-lg divide-y">
                 {bulkJobs.map((j) => (
