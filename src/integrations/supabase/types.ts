@@ -3700,6 +3700,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           media_urls: Json | null
+          option_media: Json | null
           options: Json | null
           points: number | null
           question_text: string
@@ -3722,6 +3723,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           media_urls?: Json | null
+          option_media?: Json | null
           options?: Json | null
           points?: number | null
           question_text: string
@@ -3744,6 +3746,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           media_urls?: Json | null
+          option_media?: Json | null
           options?: Json | null
           points?: number | null
           question_text?: string
@@ -6339,6 +6342,7 @@ export type Database = {
               difficulty_level: number
               id: string
               media_urls: Json
+              option_media: Json
               options: Json
               points: number
               question_text: string
@@ -6374,6 +6378,7 @@ export type Database = {
               difficulty_level: number
               id: string
               media_urls: Json
+              option_media: Json
               options: Json
               points: number
               question_text: string
