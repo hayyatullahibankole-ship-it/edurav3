@@ -344,9 +344,9 @@ export default function ExternalQuestionImport() {
     for (const job of queue) {
       if (job.status === 'done') continue;
 
-      const control: 'run' | 'pause' | 'stop' = controlRef.current;
+      const control = String(controlRef.current);
       if (control !== 'run') {
-        halted = control;
+        halted = control === 'pause' ? 'pause' : 'stop';
         update(job.key, { status: control === 'pause' ? 'paused' : 'stopped' });
         continue;
       }
