@@ -149,14 +149,17 @@ export default function SimpleBulkUpload({ subjects, onUploadComplete }: SimpleB
         question_text: '',
         options: [],
         correct_answer: null,
-        explanation: ''
+        explanation: '',
+        image_url: ''
       };
       
       // Map CSV columns to question properties
       headers.forEach((header, index) => {
         const value = values[index] || '';
         
-        if (header.includes('question')) {
+        if (header.includes('image') || header.includes('diagram')) {
+          questionObj.image_url = value;
+        } else if (header.includes('question')) {
           questionObj.question_text = value;
         } else if (header.includes('option') || header.includes('choice')) {
           if (header.includes('a') || header.includes('1')) questionObj.options[0] = value;
@@ -292,6 +295,7 @@ export default function SimpleBulkUpload({ subjects, onUploadComplete }: SimpleB
                 options: questionData.options,
                 correct_answer: correctIndex.toString(),
                 explanation: questionData.explanation,
+                media_urls: questionData.image_url ? [{ url: questionData.image_url }] : [],
                 subject_id: selectedSubject,
                 difficulty_level: 1,
                 points: 1,
@@ -543,6 +547,7 @@ Explanation: Capitalism is an economic system characterized by private ownership
                         <li>• <strong>option_a, option_b, option_c, option_d</strong> (or choice_a, choice_b, etc.)</li>
                         <li>• <strong>correct_answer</strong> (A, B, C, D or 0, 1, 2, 3)</li>
                         <li>• <strong>explanation</strong> (optional)</li>
+                        <li>• <strong>image_url</strong> or <strong>diagram_url</strong> (optional link to a diagram image)</li>
                       </ul>
                       
                       <div className="mt-3 pt-3 border-t border-accent/20">

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { useDomainDetection } from "@/hooks/useDomainDetection";
+import { normalizeOptionMedia } from '@/lib/questionMedia';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -116,7 +117,7 @@ export default function AkboyMockExam() {
 
         const { data: directQuestions } = await supabase
           .from("questions")
-          .select("id, question_text, options, correct_answer, explanation, subject_id")
+          .select("id, question_text, options, correct_answer, explanation, subject_id, media_urls, option_media")
           .eq("subject_id", subject.id)
           .eq("is_active", true)
           .limit(questionCount);
@@ -149,6 +150,8 @@ export default function AkboyMockExam() {
           originalIndexMap,
           subject: q.subject_name || 'Unknown',
           displayIndex: index + 1,
+          media: q.media_urls ?? null,
+          optionMedia: normalizeOptionMedia(q.option_media),
         };
       });
 
