@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { normalizeOptionMedia } from '@/lib/questionMedia';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +40,8 @@ export interface CBTQuestion {
   originalIndexMap: number[]; // Maps displayed index to original DB index
   subject: string;
   displayIndex: number;
+  media?: any;
+  optionMedia?: (any | null)[];
 }
 
 export interface CBTAnswers {
@@ -222,7 +225,12 @@ export const useCBTExam = (attemptId: string | null) => {
             options: shuffledOptions,
             originalIndexMap: shuffleMap, // Store mapping: displayIdx -> originalIdx
             subject: subjectsData?.find(s => s.id === q.subject_id)?.name || 'Unknown',
-            displayIndex: idx
+            displayIndex: idx,
+            media: (q as any).media_urls ?? null,
+            optionMedia: (() => {
+              const om = normalizeOptionMedia((q as any).option_media);
+              return om.length ? shuffleMap.map(origIdx => om[origIdx] ?? null) : [];
+            })()
           };
         });
 
