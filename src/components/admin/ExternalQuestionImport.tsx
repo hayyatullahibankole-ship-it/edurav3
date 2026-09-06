@@ -257,6 +257,118 @@ export default function ExternalQuestionImport() {
     }
   };
 
+  // ---------------- Bulk import ----------------
+
+  const mappedSubjectIds = (body: string) =>
+    allMappings.filter((m) => m.exam_body === body).map((m) => m.edura_subject_id);
+
+  const buildJobs = (): BulkJob[] => {
+    const years: (number | null)[] = bulkUseYears
+      ? Array.from(
+          { length: Math.max(0, bulkYearTo - bulkYearFrom + 1) },
+          (_, i) => bulkYearFrom + i,
+        )
+      : [null];
+
+    const jobs: BulkJob[] = [];
+    for (const body of bulkBodies) {
+      const mapped = mappedSubjectIds(body);
+      const ids = bulkSubjectIds.length > 0 ? bulkSubjectIds.filter((id) => mapped.includes(id)) : mapped;
+      for (const id of ids) {
+        const name = subjects.find((s) => s.id === id)?.name || 'Subject';
+        for (const y of years) {
+          jobs.push({
+            key: `${body}-${id}-${y ?? 'any'}`,
+            examBody: body,
+            subjectId: id,
+            subjectName: name,
+            year: y,
+            status: 'queued',
+            imported: 0,
+            skipped: 0,
+          });
+        }
+      }
+    }
+    return jobs;
+  };
+
+  const startBulk = async () => {
+    const jobs = buildJobs();
+    if (jobs.length === 0) {
+      toast({
+        title: 'Nothing to import',
+        description: 'No mapped subjects match the selected exam bodies.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    stopRef.current = false;
+    setBulkRunning(true);
+    setBulkJobs(jobs);
+
+    const update = (key: string, patch: Partial<BulkJob>) =>
+      setBulkJobs((prev) => prev.map((j) => (j.key === key ? { ...j, ...patch } : j)));
+
+    for (const job of jobs) {
+      if (stopRef.current) {
+        update(job.key, { status: 'stopped' });
+        continue;
+      }
+      update(job.key, { status: 'running' });
+
+      try {
+        const { data, error } = await supabase.functions.invoke('sync-external-questions', {
+          body: {
+            provider,
+            exam_body: job.examBody,
+            subject_id: job.subjectId,
+            year: job.year ?? undefined,
+            limit: bulkTarget,
+          },
+        });
+
+        if (error) throw new Error(await readFunctionError(error, 'Import failed'));
+        if ((data as any)?.error) throw new Error(String((data as any).error));
+
+        update(job.key, {
+          status: 'done',
+          imported: Number((data as any)?.imported_count) || 0,
+          skipped: Number((data as any)?.skipped_count) || 0,
+        });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        update(job.key, { status: 'failed', message });
+        if (/daily import cap/i.test(message)) {
+          stopRef.current = true;
+          toast({ title: 'Daily cap reached', description: message, variant: 'destructive' });
+        }
+      }
+
+      await new Promise((r) => setTimeout(r, 400));
+    }
+
+    setBulkRunning(false);
+    fetchLogs();
+    fetchDailyCount();
+    toast({ title: stopRef.current ? 'Bulk import stopped' : 'Bulk import finished' });
+  };
+
+  const toggleBody = (body: string) =>
+    setBulkBodies((prev) => (prev.includes(body) ? prev.filter((b) => b !== body) : [...prev, body]));
+
+  const toggleBulkSubject = (id: string) =>
+    setBulkSubjectIds((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
+
+  const bulkTotals = bulkJobs.reduce(
+    (acc, j) => ({ imported: acc.imported + j.imported, skipped: acc.skipped + j.skipped }),
+    { imported: 0, skipped: 0 },
+  );
+  const bulkDone = bulkJobs.filter((j) => j.status !== 'queued' && j.status !== 'running').length;
+
+
+
   const currentSubject = subjects.find((s) => s.id === subjectId);
   const mapping = mappings[0];
   const dailyCap = 1000;
