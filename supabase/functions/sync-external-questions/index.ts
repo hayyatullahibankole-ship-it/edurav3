@@ -11,7 +11,7 @@ const adapters = {
   sdashapi: sdashapiAdapter,
 };
 
-const DEFAULT_DAILY_CAP = 1000;
+const DEFAULT_DAILY_CAP = 20000;
 
 function providerConfig(provider: 'aloc' | 'sdashapi'): { config?: ProviderConfig; error?: string } {
   const apiKeyName = provider === 'aloc' ? 'ALOC_API_KEY' : 'SDASHAPI_API_KEY';
