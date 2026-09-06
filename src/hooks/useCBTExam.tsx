@@ -124,6 +124,7 @@ export const useCBTExam = (attemptId: string | null) => {
           // Practice mode - use selected subjects
           const subjects = attemptData.selected_subjects as any;
           const examType = proctorData?.exam_type;
+          const examBody = normalizeExamBody(examType);
           console.log('Selected subjects raw:', subjects, 'exam type:', examType);
           
           if (!subjects || (Array.isArray(subjects) && subjects.length === 0)) {
@@ -159,7 +160,8 @@ export const useCBTExam = (attemptId: string | null) => {
                 const { data: subjectQs, error: subjectError } = await supabase
                   .rpc('get_random_questions_for_subjects', { 
                     subject_ids: [subjectId],
-                    per_subject_count: questionCount
+                    per_subject_count: questionCount,
+                    target_exam_body: examBody ?? undefined,
                   });
                 if (subjectError) {
                   console.error('Subject RPC error:', subjectError);
@@ -175,7 +177,8 @@ export const useCBTExam = (attemptId: string | null) => {
             const { data: practiceQs, error: practiceError } = await supabase
               .rpc('get_random_questions_for_subjects', { 
                 subject_ids: subjectIds,
-                per_subject_count: questionCount
+                per_subject_count: questionCount,
+                target_exam_body: examBody ?? undefined,
               });
             
             if (practiceError) {
