@@ -441,7 +441,12 @@ export default function AkboyMockExam() {
         examTitle="AKBOY JAMB Mock Examination"
         submitting={submitting}
         disableSubmit={!attemptId || loading}
+        attemptId={attemptId}
+        candidateName={registrationData?.full_name || registrationData?.name || null}
+        candidatePhotoUrl={registrationData?.passport_url || registrationData?.photo_url || null}
+        registrationNumber={regNumber}
       />
+
     </div>
   );
 }
