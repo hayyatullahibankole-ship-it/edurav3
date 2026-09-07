@@ -42,3 +42,19 @@ One shared exam console used by:
 - Candidate photo/name read from the existing auth profile; mock exam uses the registration record.
 - All colours via existing semantic tokens, no gradients; safe-area padding for the native app; keyboard shortcuts (A-D, arrow keys) on desktop.
 - Verify with typecheck, the existing smoke tests, and Playwright captures at phone and desktop widths checking no horizontal overflow.
+
+## Camera proctoring and anti-cheat
+
+Built into the same console, on by default for real exams (practice mode can run without it):
+- Permission step before the exam starts: the student sees a short screen asking for camera access, with a live preview and a "Start exam" button. Clear message if they deny it.
+- Small live camera thumbnail in the candidate panel with a red "Recording" dot, like the mock exam has today; a warning appears if the camera stops.
+- Periodic snapshots (start, then every few minutes and at submission) uploaded to a private storage bucket and attached to the attempt, so admins can review them with the result.
+- Anti-cheat events reuse the existing monitor: tab switching, copy/paste, right-click and fullscreen exit are blocked and counted; repeated tab switches show warnings and, past a limit, auto-submit.
+- Every event and snapshot is stored on the attempt's proctoring record and shown in the admin exam review.
+- Students are told up-front what is recorded, matching the privacy policy.
+
+Technical notes for this part:
+- Extract the mock exam's camera logic into `src/components/cbt/useProctoring.ts` (stream setup, health checks, snapshot capture via canvas) shared by all exam surfaces.
+- Snapshots go to a private `proctoring-snapshots` bucket with per-attempt paths and admin-only read access, referenced from the attempt's existing `proctoring_data`.
+- `antiCheat.ts` stays the event source; the console subscribes and persists a summary with the attempt.
+- Camera is optional on the native app if permission is denied for practice exams; required for mock and school exams.
