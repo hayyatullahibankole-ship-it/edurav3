@@ -324,7 +324,7 @@ export const ExamConsole: React.FC<ExamConsoleProps> = ({
         {/* ---------- Subject tabs ---------- */}
         {subjects.length > 1 && (
           <div className="border-t bg-muted/60">
-            <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-2 py-1.5 scrollbar-hide">
+            <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-2 py-1.5 no-scrollbar">
               {subjects.map(subject => {
                 const answeredInSubject = subject.indices.filter(i => answers[questions[i].id] !== undefined).length;
                 const isActive = subject.name === activeSubject;
@@ -441,7 +441,7 @@ export const ExamConsole: React.FC<ExamConsoleProps> = ({
         className="fixed inset-x-0 bottom-0 z-40 border-t bg-card lg:hidden"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        <div className="flex items-center gap-1.5 overflow-x-auto px-2 py-2 scrollbar-hide">
+        <div className="flex items-center gap-1.5 overflow-x-auto px-2 py-2 no-scrollbar">
           {activeIndices.map(idx => {
             const q = questions[idx];
             const answered = answers[q.id] !== undefined;
