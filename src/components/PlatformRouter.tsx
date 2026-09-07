@@ -278,7 +278,7 @@ const EduraRoutes = () => {
       
       <Route path="/practice" element={
         <ProtectedRoute>
-          <Layout showNavbar={false}><CBTExam /></Layout>
+          <Layout showNavbar={false} showMobileNav={false}><CBTExam /></Layout>
         </ProtectedRoute>
       } />
       <Route path="/results" element={
@@ -298,17 +298,17 @@ const EduraRoutes = () => {
       } />
       <Route path="/exam" element={
         <ProtectedRoute>
-          <Layout showNavbar={false}><CBTExam /></Layout>
+          <Layout showNavbar={false} showMobileNav={false}><CBTExam /></Layout>
         </ProtectedRoute>
       } />
       <Route path="/exam/:attemptId" element={
         <ProtectedRoute>
-          <Layout showNavbar={false}><CBTExam /></Layout>
+          <Layout showNavbar={false} showMobileNav={false}><CBTExam /></Layout>
         </ProtectedRoute>
       } />
       
       <Route path="/demo" element={<Layout><Demo /></Layout>} />
-      <Route path="/demo-test" element={<Layout showNavbar={false}><DemoTest /></Layout>} />
+      <Route path="/demo-test" element={<Layout showNavbar={false} showMobileNav={false}><DemoTest /></Layout>} />
       
       <Route path="/resources" element={
         <ProtectedRoute>
@@ -450,7 +450,7 @@ const EduraRoutes = () => {
       <Route path="/battle" element={<Navigate to="/challenge-arena" replace />} />
       <Route path="/challenge/:challengeId" element={
         <ProtectedRoute>
-          <DashboardLayout><ChallengeDetail /></DashboardLayout>
+          <ChallengeDetail />
         </ProtectedRoute>
       } />
       
