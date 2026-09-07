@@ -136,8 +136,10 @@ const CBTExam = () => {
       duration={examDuration}
       examTitle="CBT Practice Exam"
       submitting={submitting}
+      attemptId={attemptId}
     />
   );
+
 };
 
 export default CBTExam;
