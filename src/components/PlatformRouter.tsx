@@ -69,6 +69,7 @@ const CBTHome = lazy(() => import("@/pages/CBTHome"));
 const Leaderboard = lazy(() => import("@/pages/Leaderboard"));
 
 const Settings = lazy(() => import("@/pages/Settings"));
+const Support = lazy(() => import("@/pages/Support"));
 const ServicesHome = lazy(() => import("@/pages/ServicesHome"));
 const Wallet = lazy(() => import("@/pages/Wallet"));
 const CampusHome = lazy(() => import("@/pages/campus/CampusHome"));
@@ -499,6 +500,7 @@ const EduraRoutes = () => {
       
       <Route path="/terms" element={<Layout><Terms /></Layout>} />
       <Route path="/privacy" element={<Layout><Privacy /></Layout>} />
+      <Route path="/support" element={<Layout><Support /></Layout>} />
       <Route path="/delete-account" element={<Layout><DeleteAccount /></Layout>} />
       
       {/* AKBOY Routes accessible via /akboy path on Edura domain */}
@@ -512,6 +514,7 @@ const EduraRoutes = () => {
       <Route path="/ebooks" element={akboy(<EbookLibrary />)} />
       <Route path="/ebooks/:slug" element={akboy(<EbookReader />)} />
       <Route path="/akboy/contact" element={akboy(<AkboyContact />)} />
+      <Route path="/akboy/support" element={akboy(<Support />)} />
       <Route path="/akboy/blog" element={<Navigate to="/akboy/campus-hub" replace />} />
       <Route path="/akboy/campus-hub" element={akboy(<AkboyCampusHub />)} />
       <Route path="/akboy/blog/:slug" element={akboy(<AkboyBlogPost />)} />
