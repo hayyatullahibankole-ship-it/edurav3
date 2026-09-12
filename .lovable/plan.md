@@ -28,6 +28,12 @@ Play Console flagged four items on release 5 (1.0.2). All four are fixable in th
 
 - Android versionCode 5 -> 6, versionName 1.0.2 -> 1.0.3, with the package version kept in sync.
 
+## 6. Dedicated support page/button
+
+- Add a `/support` route and a simple page that lists WhatsApp support, email support@edura.com.ng, and the phone number 07050757085.
+- Add a visible support entry in the mobile app profile/settings area and in the website footer.
+- Use the existing WhatsApp helper so the button opens a chat with the configured number.
+
 ## Technical notes
 
 - `android/app/src/main/AndroidManifest.xml`: drop `android:screenOrientation="portrait"`.
