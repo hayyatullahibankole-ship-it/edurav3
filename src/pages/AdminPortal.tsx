@@ -34,6 +34,10 @@ import { AkboyInquiriesManager } from '@/components/admin/AkboyInquiriesManager'
 import { AkboyTutorialsManager } from '@/components/admin/AkboyTutorialsManager';
 import { AkboyRegistrationsManager } from '@/components/admin/AkboyRegistrationsManager';
 import { AkboyNewsletterSubscribersManager } from '@/components/admin/AkboyNewsletterSubscribersManager';
+import { AkboyProductsManager } from '@/components/admin/AkboyProductsManager';
+import { AkboyAmbassadorsManager } from '@/components/admin/AkboyAmbassadorsManager';
+import { AkboyPartnerSchoolsManager } from '@/components/admin/AkboyPartnerSchoolsManager';
+import { AkboyHomepageManager } from '@/components/admin/AkboyHomepageManager';
 import ServiceCatalogManager from '@/components/admin/ServiceCatalogManager';
 import InstitutionsManager from '@/components/admin/InstitutionsManager';
 import CampusManager from '@/components/admin/CampusManager';
@@ -87,7 +91,11 @@ const NAV: NavSection[] = [
   {
     label: 'Akboy',
     items: [
+      { key: 'akboy-homepage', label: 'Homepage', icon: Home },
       { key: 'akboy-services', label: 'Services', icon: Palette },
+      { key: 'akboy-products', label: 'Products', icon: Briefcase },
+      { key: 'akboy-ambassadors', label: 'Ambassadors', icon: Users },
+      { key: 'akboy-partner-schools', label: 'Partner Schools', icon: School },
       { key: 'akboy-portfolio', label: 'Portfolio', icon: Briefcase },
       { key: 'akboy-events', label: 'Events', icon: CalendarDays },
       { key: 'akboy-ebooks', label: 'Ebooks', icon: BookOpen },
@@ -217,7 +225,11 @@ export default function AdminPortal() {
       case 'beta-testing': return <BetaTestingManager />;
       case 'settings': return <SystemConfig />;
 
+      case 'akboy-homepage': return <AkboyHomepageManager />;
       case 'akboy-services': return <AkboyServicesManager />;
+      case 'akboy-products': return <AkboyProductsManager />;
+      case 'akboy-ambassadors': return <AkboyAmbassadorsManager />;
+      case 'akboy-partner-schools': return <AkboyPartnerSchoolsManager />;
       case 'akboy-portfolio': return <AkboyPortfolioManager />;
       case 'akboy-events': return <AkboyEventsManager />;
       case 'institution-logos': return <InstitutionLogosManager />;
