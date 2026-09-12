@@ -28,6 +28,16 @@ export function AkboyNavbar() {
       cta: { name: "Request a Service", path: `${basePath}/contact` },
     },
     {
+      name: "Products",
+      path: `${basePath}/products`,
+      children: [
+        { name: "All Products", path: `${basePath}/products` },
+        { name: "Edura", path: `${basePath}/products/edura` },
+        { name: "School OS", path: `${basePath}/products/school-os` },
+      ],
+      cta: { name: "Explore Products", path: `${basePath}/products` },
+    },
+    {
       name: "Learn",
       children: [
         { name: "Akboy Exam Prep Academy", path: `${basePath}/register` },
@@ -48,6 +58,17 @@ export function AkboyNavbar() {
         { name: "School Updates", path: `${basePath}/campus-hub?category=School Updates` },
       ],
       cta: { name: "Explore Campus Hub", path: `${basePath}/campus-hub` },
+    },
+    {
+      name: "Community",
+      path: `${basePath}/community`,
+      children: [
+        { name: "Community Overview", path: `${basePath}/community` },
+        { name: "Student Ambassadors", path: `${basePath}/community/ambassadors` },
+        { name: "Partner Schools", path: `${basePath}/community/partners` },
+        { name: "Events & Workshops", path: `${basePath}/learn/events` },
+      ],
+      cta: { name: "Join the Community", path: `${basePath}/community` },
     },
     {
       name: "About",
