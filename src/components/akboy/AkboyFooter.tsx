@@ -73,10 +73,28 @@ export function AkboyFooter() {
               <li><Link to={`${basePath}/register`} className="text-white/60 hover:text-gray-50 transition-colors">Exam Prep Academy</Link></li>
               <li><Link to={`${basePath}/mock`} className="text-white/60 hover:text-gray-50 transition-colors">Mock Exams</Link></li>
               <li><Link to={`${basePath}/register`} className="text-white/60 hover:text-gray-50 transition-colors">Online Classes</Link></li>
+              <li><Link to={`${basePath}/learn/events`} className="text-white/60 hover:text-gray-50 transition-colors">Events & Workshops</Link></li>
+              <li><Link to={`${basePath}/ebooks`} className="text-white/60 hover:text-gray-50 transition-colors">Ebook Library</Link></li>
             </ul>
           </div>
 
-          {/* Campus Hub & Services */}
+          {/* Products & Community */}
+          <div>
+            <h4 className="text-gray-50 font-semibold text-base mb-5">Products</h4>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link to={`${basePath}/products`} className="text-white/60 hover:text-gray-50 transition-colors">All Products</Link></li>
+              <li><Link to={`${basePath}/products/edura`} className="text-white/60 hover:text-gray-50 transition-colors">Edura</Link></li>
+              <li><Link to={`${basePath}/products/school-os`} className="text-white/60 hover:text-gray-50 transition-colors">School OS</Link></li>
+            </ul>
+            <h4 className="text-gray-50 font-semibold text-base mb-5 mt-8">Community</h4>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link to={`${basePath}/community`} className="text-white/60 hover:text-gray-50 transition-colors">Community</Link></li>
+              <li><Link to={`${basePath}/community/ambassadors`} className="text-white/60 hover:text-gray-50 transition-colors">Student Ambassadors</Link></li>
+              <li><Link to={`${basePath}/community/partners`} className="text-white/60 hover:text-gray-50 transition-colors">Partner Schools</Link></li>
+            </ul>
+          </div>
+
+          {/* Explore */}
           <div>
             <h4 className="text-gray-50 font-semibold text-base mb-5">Explore</h4>
             <ul className="space-y-2.5 text-sm">
@@ -84,7 +102,6 @@ export function AkboyFooter() {
               <li><Link to={`${basePath}/services`} className="text-white/60 hover:text-gray-50 transition-colors">Services</Link></li>
               <li><Link to={`${basePath}/portfolio`} className="text-white/60 hover:text-gray-50 transition-colors">Portfolio</Link></li>
               <li><Link to={`${basePath}/about`} className="text-white/60 hover:text-gray-50 transition-colors">About</Link></li>
-              <li><Link to="/blog" className="text-white/60 hover:text-gray-50 transition-colors">Blog</Link></li>
             </ul>
           </div>
 
