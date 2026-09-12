@@ -115,6 +115,131 @@ export type Database = {
         }
         Relationships: []
       }
+      akboy_ambassadors: {
+        Row: {
+          bio: string | null
+          cohort: string | null
+          created_at: string
+          display_order: number
+          full_name: string
+          id: string
+          is_active: boolean
+          is_featured: boolean
+          is_published: boolean
+          photo_url: string | null
+          role_title: string | null
+          school: string | null
+          social_links: Json
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          cohort?: string | null
+          created_at?: string
+          display_order?: number
+          full_name: string
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          is_published?: boolean
+          photo_url?: string | null
+          role_title?: string | null
+          school?: string | null
+          social_links?: Json
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          cohort?: string | null
+          created_at?: string
+          display_order?: number
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          is_published?: boolean
+          photo_url?: string | null
+          role_title?: string | null
+          school?: string | null
+          social_links?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      akboy_event_ambassadors: {
+        Row: {
+          ambassador_id: string
+          created_at: string
+          event_id: string
+          id: string
+        }
+        Insert: {
+          ambassador_id: string
+          created_at?: string
+          event_id: string
+          id?: string
+        }
+        Update: {
+          ambassador_id?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "akboy_event_ambassadors_ambassador_id_fkey"
+            columns: ["ambassador_id"]
+            isOneToOne: false
+            referencedRelation: "akboy_ambassadors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "akboy_event_ambassadors_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "akboy_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      akboy_event_media: {
+        Row: {
+          caption: string | null
+          created_at: string
+          display_order: number
+          event_id: string
+          id: string
+          media_type: string
+          url: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          event_id: string
+          id?: string
+          media_type?: string
+          url: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          event_id?: string
+          id?: string
+          media_type?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "akboy_event_media_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "akboy_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       akboy_event_registrations: {
         Row: {
           created_at: string
@@ -159,60 +284,182 @@ export type Database = {
           },
         ]
       }
+      akboy_event_schools: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          school_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          school_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          school_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "akboy_event_schools_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "akboy_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "akboy_event_schools_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "akboy_partner_schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      akboy_event_speakers: {
+        Row: {
+          bio: string | null
+          created_at: string
+          display_order: number
+          event_id: string
+          full_name: string
+          id: string
+          organization: string | null
+          photo_url: string | null
+          position_title: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          display_order?: number
+          event_id: string
+          full_name: string
+          id?: string
+          organization?: string | null
+          photo_url?: string | null
+          position_title?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          display_order?: number
+          event_id?: string
+          full_name?: string
+          id?: string
+          organization?: string | null
+          photo_url?: string | null
+          position_title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "akboy_event_speakers_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "akboy_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       akboy_events: {
         Row: {
+          attendance_count: number | null
           created_at: string | null
           current_participants: number | null
           description: string | null
           end_date: string | null
+          end_time: string | null
           event_date: string | null
           event_type: string | null
           form_fields: Json
+          highlights: Json
           id: string
           image_url: string | null
           is_active: boolean | null
+          is_featured: boolean
+          is_published: boolean
           location: string | null
           max_participants: number | null
+          outcomes: string | null
           price: number | null
           registration_url: string | null
+          schedule: Json
+          slug: string | null
+          start_time: string | null
+          status: string
+          theme: string | null
           title: string
           updated_at: string | null
+          venue: string | null
+          who_its_for: string | null
+          why_we_do_this: string | null
         }
         Insert: {
+          attendance_count?: number | null
           created_at?: string | null
           current_participants?: number | null
           description?: string | null
           end_date?: string | null
+          end_time?: string | null
           event_date?: string | null
           event_type?: string | null
           form_fields?: Json
+          highlights?: Json
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          is_featured?: boolean
+          is_published?: boolean
           location?: string | null
           max_participants?: number | null
+          outcomes?: string | null
           price?: number | null
           registration_url?: string | null
+          schedule?: Json
+          slug?: string | null
+          start_time?: string | null
+          status?: string
+          theme?: string | null
           title: string
           updated_at?: string | null
+          venue?: string | null
+          who_its_for?: string | null
+          why_we_do_this?: string | null
         }
         Update: {
+          attendance_count?: number | null
           created_at?: string | null
           current_participants?: number | null
           description?: string | null
           end_date?: string | null
+          end_time?: string | null
           event_date?: string | null
           event_type?: string | null
           form_fields?: Json
+          highlights?: Json
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          is_featured?: boolean
+          is_published?: boolean
           location?: string | null
           max_participants?: number | null
+          outcomes?: string | null
           price?: number | null
           registration_url?: string | null
+          schedule?: Json
+          slug?: string | null
+          start_time?: string | null
+          status?: string
+          theme?: string | null
           title?: string
           updated_at?: string | null
+          venue?: string | null
+          who_its_for?: string | null
+          why_we_do_this?: string | null
         }
         Relationships: []
       }
@@ -248,6 +495,53 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      akboy_homepage_settings: {
+        Row: {
+          created_at: string
+          featured_event_id: string | null
+          id: string
+          impact_stats: Json
+          show_community: boolean
+          show_featured_event: boolean
+          show_impact: boolean
+          show_partner_strip: boolean
+          show_products: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          featured_event_id?: string | null
+          id?: string
+          impact_stats?: Json
+          show_community?: boolean
+          show_featured_event?: boolean
+          show_impact?: boolean
+          show_partner_strip?: boolean
+          show_products?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          featured_event_id?: string | null
+          id?: string
+          impact_stats?: Json
+          show_community?: boolean
+          show_featured_event?: boolean
+          show_impact?: boolean
+          show_partner_strip?: boolean
+          show_products?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "akboy_homepage_settings_featured_event_id_fkey"
+            columns: ["featured_event_id"]
+            isOneToOne: false
+            referencedRelation: "akboy_events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       akboy_inquiries: {
         Row: {
@@ -299,6 +593,57 @@ export type Database = {
           },
         ]
       }
+      akboy_partner_schools: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          is_active: boolean
+          is_featured: boolean
+          is_published: boolean
+          location: string | null
+          logo_url: string | null
+          name: string
+          partnership_start_date: string | null
+          partnership_type: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          is_published?: boolean
+          location?: string | null
+          logo_url?: string | null
+          name: string
+          partnership_start_date?: string | null
+          partnership_type?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          is_published?: boolean
+          location?: string | null
+          logo_url?: string | null
+          name?: string
+          partnership_start_date?: string | null
+          partnership_type?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       akboy_portfolio: {
         Row: {
           category: string
@@ -347,6 +692,172 @@ export type Database = {
           tags?: Json | null
           title?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      akboy_product_features: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          icon: string | null
+          id: string
+          product_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          icon?: string | null
+          id?: string
+          product_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          icon?: string | null
+          id?: string
+          product_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "akboy_product_features_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "akboy_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      akboy_product_media: {
+        Row: {
+          caption: string | null
+          created_at: string
+          display_order: number
+          id: string
+          media_type: string
+          product_id: string
+          url: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          media_type?: string
+          product_id: string
+          url: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          media_type?: string
+          product_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "akboy_product_media_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "akboy_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      akboy_products: {
+        Row: {
+          audience: string | null
+          category: string | null
+          cover_image_url: string | null
+          created_at: string
+          cta_text: string | null
+          cta_url: string | null
+          display_order: number
+          faqs: Json
+          full_description: string | null
+          how_it_works: Json
+          id: string
+          is_featured: boolean
+          is_published: boolean
+          logo_url: string | null
+          name: string
+          problem: string | null
+          seo_description: string | null
+          seo_image_url: string | null
+          seo_title: string | null
+          short_description: string | null
+          slug: string
+          solution: string | null
+          status: string
+          tagline: string | null
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          audience?: string | null
+          category?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          cta_text?: string | null
+          cta_url?: string | null
+          display_order?: number
+          faqs?: Json
+          full_description?: string | null
+          how_it_works?: Json
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          logo_url?: string | null
+          name: string
+          problem?: string | null
+          seo_description?: string | null
+          seo_image_url?: string | null
+          seo_title?: string | null
+          short_description?: string | null
+          slug: string
+          solution?: string | null
+          status?: string
+          tagline?: string | null
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          audience?: string | null
+          category?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          cta_text?: string | null
+          cta_url?: string | null
+          display_order?: number
+          faqs?: Json
+          full_description?: string | null
+          how_it_works?: Json
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          logo_url?: string | null
+          name?: string
+          problem?: string | null
+          seo_description?: string | null
+          seo_image_url?: string | null
+          seo_title?: string | null
+          short_description?: string | null
+          slug?: string
+          solution?: string | null
+          status?: string
+          tagline?: string | null
+          updated_at?: string
+          video_url?: string | null
         }
         Relationships: []
       }
