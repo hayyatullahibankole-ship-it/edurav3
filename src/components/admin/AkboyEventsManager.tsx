@@ -13,6 +13,12 @@ import { ImageUpload } from "@/components/admin/ImageUpload";
 import { EventFormBuilder } from "@/components/admin/EventFormBuilder";
 import { EventRegistrationsDialog } from "@/components/admin/EventRegistrationsDialog";
 import { EventFormField, parseFormFields } from "@/lib/eventForm";
+import { AkboyEventContentDialog } from "@/components/admin/AkboyEventContentDialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+
+const slugify = (s: string) =>
+  s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 
 interface Event {
@@ -30,6 +36,20 @@ interface Event {
   price: number;
   is_active: boolean;
   form_fields?: any;
+  slug?: string;
+  theme?: string;
+  start_time?: string;
+  end_time?: string;
+  venue?: string;
+  status?: string;
+  is_featured?: boolean;
+  is_published?: boolean;
+  why_we_do_this?: string;
+  who_its_for?: string;
+  outcomes?: string;
+  attendance_count?: number;
+  highlights?: any;
+  schedule?: any;
 }
 
 export function AkboyEventsManager() {
@@ -38,6 +58,7 @@ export function AkboyEventsManager() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [regEvent, setRegEvent] = useState<Event | null>(null);
+  const [contentEvent, setContentEvent] = useState<Event | null>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -53,6 +74,20 @@ export function AkboyEventsManager() {
     price: 0,
     is_active: true,
     form_fields: [] as EventFormField[],
+    slug: "",
+    theme: "",
+    start_time: "",
+    end_time: "",
+    venue: "",
+    status: "upcoming",
+    is_featured: false,
+    is_published: true,
+    why_we_do_this: "",
+    who_its_for: "",
+    outcomes: "",
+    attendance_count: 0,
+    highlights: [] as { title: string; description: string }[],
+    schedule: [] as { time: string; title: string; description: string }[],
   });
 
   useEffect(() => {
@@ -82,11 +117,19 @@ export function AkboyEventsManager() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const payload = {
+      ...formData,
+      slug: formData.slug ? slugify(formData.slug) : slugify(formData.title),
+      end_date: formData.end_date || null,
+      highlights: formData.highlights.filter((h) => (h.title || "").trim()),
+      schedule: formData.schedule.filter((s) => (s.title || "").trim()),
+    };
+
     try {
       if (editingEvent) {
         const { error } = await supabase
           .from("akboy_events")
-          .update(formData as any)
+          .update(payload as any)
           .eq("id", editingEvent.id);
 
         if (error) throw error;
@@ -94,7 +137,7 @@ export function AkboyEventsManager() {
       } else {
         const { error } = await supabase
           .from("akboy_events")
-          .insert([formData as any]);
+          .insert([payload as any]);
 
         if (error) throw error;
         toast({ title: "Event created successfully" });
@@ -127,6 +170,20 @@ export function AkboyEventsManager() {
       price: event.price || 0,
       is_active: event.is_active,
       form_fields: parseFormFields(event.form_fields),
+      slug: event.slug || "",
+      theme: event.theme || "",
+      start_time: event.start_time || "",
+      end_time: event.end_time || "",
+      venue: event.venue || "",
+      status: event.status || "upcoming",
+      is_featured: !!event.is_featured,
+      is_published: event.is_published !== false,
+      why_we_do_this: event.why_we_do_this || "",
+      who_its_for: event.who_its_for || "",
+      outcomes: event.outcomes || "",
+      attendance_count: event.attendance_count || 0,
+      highlights: Array.isArray(event.highlights) ? event.highlights : [],
+      schedule: Array.isArray(event.schedule) ? event.schedule : [],
     });
     setDialogOpen(true);
   };
@@ -166,6 +223,20 @@ export function AkboyEventsManager() {
       price: 0,
       is_active: true,
       form_fields: [],
+      slug: "",
+      theme: "",
+      start_time: "",
+      end_time: "",
+      venue: "",
+      status: "upcoming",
+      is_featured: false,
+      is_published: true,
+      why_we_do_this: "",
+      who_its_for: "",
+      outcomes: "",
+      attendance_count: 0,
+      highlights: [],
+      schedule: [],
     });
     setEditingEvent(null);
   };
@@ -242,6 +313,202 @@ export function AkboyEventsManager() {
                   placeholder="e.g., Workshop, Webinar, Training, Seminar"
                 />
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Page address (slug)</Label>
+                  <Input
+                    value={formData.slug}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    placeholder="auto-generated from title"
+                  />
+                </div>
+                <div>
+                  <Label>Status</Label>
+                  <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="upcoming">Upcoming</SelectItem>
+                      <SelectItem value="ongoing">Ongoing</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div>
+                <Label>Theme / subtitle</Label>
+                <Input
+                  value={formData.theme}
+                  onChange={(e) => setFormData({ ...formData, theme: e.target.value })}
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label>Start time</Label>
+                  <Input
+                    value={formData.start_time}
+                    onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                    placeholder="10:00 AM"
+                  />
+                </div>
+                <div>
+                  <Label>End time</Label>
+                  <Input
+                    value={formData.end_time}
+                    onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
+                    placeholder="2:00 PM"
+                  />
+                </div>
+                <div>
+                  <Label>Venue</Label>
+                  <Input
+                    value={formData.venue}
+                    onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div>
+                <Label>Why we are doing this</Label>
+                <Textarea
+                  rows={3}
+                  value={formData.why_we_do_this}
+                  onChange={(e) => setFormData({ ...formData, why_we_do_this: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>Who it is for</Label>
+                <Textarea
+                  rows={3}
+                  value={formData.who_its_for}
+                  onChange={(e) => setFormData({ ...formData, who_its_for: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-3 rounded-lg border p-4">
+                <div className="flex items-center justify-between">
+                  <Label>Programme highlights</Label>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      setFormData({ ...formData, highlights: [...formData.highlights, { title: "", description: "" }] })
+                    }
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-1" /> Add highlight
+                  </Button>
+                </div>
+                {formData.highlights.map((h, i) => (
+                  <div key={i} className="space-y-2 rounded-md border p-3">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Highlight title"
+                        value={h.title}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            highlights: formData.highlights.map((x, xi) => (xi === i ? { ...x, title: e.target.value } : x)),
+                          })
+                        }
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() =>
+                          setFormData({ ...formData, highlights: formData.highlights.filter((_, x) => x !== i) })
+                        }
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <Textarea
+                      rows={2}
+                      placeholder="Description"
+                      value={h.description}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          highlights: formData.highlights.map((x, xi) =>
+                            xi === i ? { ...x, description: e.target.value } : x
+                          ),
+                        })
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-3 rounded-lg border p-4">
+                <div className="flex items-center justify-between">
+                  <Label>Schedule</Label>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        schedule: [...formData.schedule, { time: "", title: "", description: "" }],
+                      })
+                    }
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-1" /> Add item
+                  </Button>
+                </div>
+                {formData.schedule.map((sItem, i) => (
+                  <div key={i} className="space-y-2 rounded-md border p-3">
+                    <div className="flex gap-2">
+                      <Input
+                        className="w-32"
+                        placeholder="10:00 AM"
+                        value={sItem.time}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            schedule: formData.schedule.map((x, xi) => (xi === i ? { ...x, time: e.target.value } : x)),
+                          })
+                        }
+                      />
+                      <Input
+                        placeholder="Session title"
+                        value={sItem.title}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            schedule: formData.schedule.map((x, xi) => (xi === i ? { ...x, title: e.target.value } : x)),
+                          })
+                        }
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() =>
+                          setFormData({ ...formData, schedule: formData.schedule.filter((_, x) => x !== i) })
+                        }
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <Textarea
+                      rows={2}
+                      placeholder="Description"
+                      value={sItem.description}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          schedule: formData.schedule.map((x, xi) =>
+                            xi === i ? { ...x, description: e.target.value } : x
+                          ),
+                        })
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+
               <div>
                 <Label>Event Image</Label>
                 <ImageUpload
@@ -283,6 +550,46 @@ export function AkboyEventsManager() {
                 onChange={(fields) => setFormData({ ...formData, form_fields: fields })}
               />
 
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Attendance (after the event)</Label>
+                  <Input
+                    type="number"
+                    value={formData.attendance_count}
+                    onChange={(e) => setFormData({ ...formData, attendance_count: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+                <div>
+                  <Label>Outcomes / impact summary</Label>
+                  <Textarea
+                    rows={2}
+                    value={formData.outcomes}
+                    onChange={(e) => setFormData({ ...formData, outcomes: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_published}
+                    onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
+                    className="w-4 h-4"
+                  />
+                  <Label>Published on website</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_featured}
+                    onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
+                    className="w-4 h-4"
+                  />
+                  <Label>Featured</Label>
+                </div>
+              </div>
+
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -315,7 +622,13 @@ export function AkboyEventsManager() {
               <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-lg font-semibold">{event.title}</h3>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-lg font-semibold">{event.title}</h3>
+                      <Badge variant={event.is_published === false ? "secondary" : "default"}>
+                        {event.is_published === false ? "Draft" : "Published"}
+                      </Badge>
+                      {event.status && <Badge variant="outline">{event.status}</Badge>}
+                    </div>
                     <p className="text-sm text-muted-foreground">{event.description}</p>
                     <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
@@ -327,7 +640,10 @@ export function AkboyEventsManager() {
                       {event.price > 0 && <span>₦{event.price.toLocaleString()}</span>}
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
+                    <Button size="sm" variant="outline" onClick={() => setContentEvent(event)}>
+                      Content
+                    </Button>
                     <Button size="sm" variant="outline" onClick={() => setRegEvent(event)}>
                       <Users className="w-4 h-4" />
                     </Button>
@@ -344,6 +660,13 @@ export function AkboyEventsManager() {
           </Card>
         ))}
       </div>
+
+      <AkboyEventContentDialog
+        open={!!contentEvent}
+        onOpenChange={(o) => !o && setContentEvent(null)}
+        eventId={contentEvent?.id || null}
+        eventTitle={contentEvent?.title}
+      />
 
       <EventRegistrationsDialog
         open={!!regEvent}
