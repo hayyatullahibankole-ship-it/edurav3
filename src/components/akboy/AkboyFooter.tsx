@@ -111,6 +111,7 @@ export function AkboyFooter() {
         <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-white/50 text-sm">© {currentYear} AKBOY Creative Hub. All rights reserved.</p>
           <div className="flex gap-6 text-sm">
+            <Link to="/support" className="text-white/50 hover:text-gray-50 transition-colors">Support</Link>
             <Link to="/privacy" className="text-white/50 hover:text-gray-50 transition-colors">Privacy Policy</Link>
             <Link to="/terms" className="text-white/50 hover:text-gray-50 transition-colors">Terms of Service</Link>
           </div>

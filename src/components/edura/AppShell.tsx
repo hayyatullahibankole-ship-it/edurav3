@@ -12,7 +12,7 @@ import {
   Calculator,
   Sparkles,
   MoreHorizontal,
-
+  Headphones,
   Settings as SettingsIcon,
   LogOut,
   type LucideIcon,
@@ -296,6 +296,9 @@ export const AppShell = ({ side, title, subtitle, meta, action, nav, children }:
         <DropdownMenuItem onClick={() => navigate("/settings#security")}>
           <SettingsIcon className="h-4 w-4 mr-2" /> Settings
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate("/support")}>
+          <Headphones className="h-4 w-4 mr-2" /> Support
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={handleLogout}
@@ -324,6 +327,14 @@ export const AppShell = ({ side, title, subtitle, meta, action, nav, children }:
             onClick={() => navigate("/settings")}
           >
             <SettingsIcon className="h-4 w-4" /> Settings
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-2.5 text-muted-foreground"
+            onClick={() => navigate("/support")}
+          >
+            <Headphones className="h-4 w-4" /> Support
           </Button>
           <Button
             variant="ghost"

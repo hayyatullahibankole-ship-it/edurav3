@@ -1,21 +1,33 @@
 # Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
+# You can control the set of applied configuration files using
 # proguardFiles setting in build.gradle.
 #
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Capacitor core and plugins
+-keep class com.getcapacitor.** { *; }
+-keep class com.capacitorjs.plugins.** { *; }
+-keepclassmembers class com.getcapacitor.Bridge {
+    public *;
+}
+-keepclassmembers class * {
+    @com.getcapacitor.annotation.CapacitorPlugin *;
+}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Keep JavaScript interfaces
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Keep the app package
+-keep class com.akboy.edura.** { *; }
+
+# Keep capacitor-cordova-android-plugins
+-keep class com.akboy.edura.plugin.** { *; }
+
+# Preserve line number information for debugging stack traces.
+# -keepattributes SourceFile,LineNumberTable
+
+# Hide the original source file name.
+# -renamesourcefileattribute SourceFile

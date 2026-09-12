@@ -20,7 +20,7 @@ const MobileSplash = () => {
       try {
         if (Capacitor.isNativePlatform()) {
           await StatusBar.setStyle({ style: Style.Light });
-          await StatusBar.setBackgroundColor({ color: '#12B76A' });
+          await StatusBar.setOverlaysWebView({ overlay: true });
           await SplashScreen.hide();
         }
       } catch {

@@ -21,10 +21,10 @@ export const NativeAppWrapper = ({ children }: NativeAppWrapperProps) => {
 
     const initNativeApp = async () => {
       try {
-        // Configure status bar
+        // Configure status bar for edge-to-edge (only set icon style)
         await StatusBar.setStyle({ style: Style.Light });
-        await StatusBar.setBackgroundColor({ color: '#12B76A' });
-        
+        await StatusBar.setOverlaysWebView({ overlay: true });
+
         // Hide splash screen after app loads
         await SplashScreen.hide();
       } catch (error) {
