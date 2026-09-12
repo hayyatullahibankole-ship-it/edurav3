@@ -10,6 +10,7 @@ import {
   Wallet,
   CreditCard,
   Gift,
+  Headphones,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ const ITEMS = [
   { label: "Wallet", description: "Fund and manage your balance", icon: Wallet, to: "/wallet" },
   { label: "Subscription", description: "Plan, upgrade and billing", icon: CreditCard, to: "/payment?scope=campus" },
   { label: "Referrals", description: "Invite friends and earn", icon: Gift, to: "/referral-program" },
+  { label: "Support", description: "Get help from our team", icon: Headphones, to: "/support" },
 ];
 
 export const CampusMoreSheet = ({

@@ -331,6 +331,14 @@ export const AppShell = ({ side, title, subtitle, meta, action, nav, children }:
           <Button
             variant="ghost"
             size="sm"
+            className="w-full justify-start gap-2.5 text-muted-foreground"
+            onClick={() => navigate("/support")}
+          >
+            <Headphones className="h-4 w-4" /> Support
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             className="w-full justify-start gap-2.5 text-destructive hover:bg-destructive/10 hover:text-destructive"
             onClick={handleLogout}
           >
