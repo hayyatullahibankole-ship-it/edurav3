@@ -6,7 +6,7 @@ import akboyLogo from "@/assets/akboy-logo.png";
 import { useDomainDetection } from "@/hooks/useDomainDetection";
 
 type NavChild = { name: string; path: string; external?: boolean };
-type NavGroup = { name: string; children: NavChild[]; cta?: NavChild };
+type NavGroup = { name: string; path?: string; children: NavChild[]; cta?: NavChild };
 
 export function AkboyNavbar() {
   const [isOpen, setIsOpen] = useState(false);
