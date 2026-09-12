@@ -27,6 +27,11 @@ export default function AkboyHome() {
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
   const [portfolio, setPortfolio] = useState<any[]>([]);
+  const [settings, setSettings] = useState<any | null>(null);
+  const [products, setProducts] = useState<any[]>([]);
+  const [featuredEvent, setFeaturedEvent] = useState<any | null>(null);
+  const [ambassadors, setAmbassadors] = useState<any[]>([]);
+  const [partnerSchools, setPartnerSchools] = useState<any[]>([]);
   const { isAkboy } = useDomainDetection();
 
   const basePath = isAkboy ? "" : "/akboy";
@@ -57,6 +62,43 @@ export default function AkboyHome() {
         setBlogPosts(posts.data || []);
         setEvents(evts.data || []);
         setPortfolio(folio.data || []);
+
+        const [cfg, prods, ambs, schools] = await Promise.all([
+          supabase.from("akboy_homepage_settings").select("*").limit(1).maybeSingle(),
+          supabase
+            .from("akboy_products")
+            .select("id,name,slug,tagline,short_description,status,logo_url,cover_image_url,category")
+            .eq("is_published", true)
+            .order("display_order", { ascending: true }),
+          supabase
+            .from("akboy_ambassadors")
+            .select("id,full_name,photo_url,school,role_title,cohort")
+            .eq("is_published", true)
+            .eq("is_active", true)
+            .order("display_order", { ascending: true })
+            .limit(4),
+          supabase
+            .from("akboy_partner_schools")
+            .select("id,name,logo_url")
+            .eq("is_published", true)
+            .eq("is_active", true)
+            .order("display_order", { ascending: true })
+            .limit(12),
+        ]);
+        setSettings(cfg.data || null);
+        setProducts(prods.data || []);
+        setAmbassadors(ambs.data || []);
+        setPartnerSchools(schools.data || []);
+
+        if (cfg.data?.featured_event_id) {
+          const { data: fe } = await supabase
+            .from("akboy_events")
+            .select("*")
+            .eq("id", cfg.data.featured_event_id)
+            .eq("is_published", true)
+            .maybeSingle();
+          setFeaturedEvent(fe || null);
+        }
       } catch (error) {
         console.error("Error loading homepage data:", error);
       }
@@ -334,6 +376,189 @@ export default function AkboyHome() {
           </div>
         </div>
       </section>
+
+
+      {/* ================= PRODUCTS ================= */}
+      {settings?.show_products !== false && products.length > 0 && (
+        <section className="bg-akboy-bone py-20 md:py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-wrap items-end justify-between gap-6">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-akboy-moss">What we build</p>
+                <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-akboy-forest md:text-4xl">
+                  Our products
+                </h2>
+              </div>
+              <Link
+                to={`${basePath}/products`}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-akboy-forest hover:text-akboy-moss"
+              >
+                All products <ArrowUpRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="mt-10 grid gap-6 md:grid-cols-2">
+              {products.slice(0, 4).map((p) => (
+                <Link
+                  key={p.id}
+                  to={`${basePath}/products/${p.slug}`}
+                  className="group flex flex-col rounded-2xl border border-akboy-line bg-white p-7 transition-colors hover:border-akboy-forest"
+                >
+                  <div className="flex items-center gap-4">
+                    {p.logo_url ? (
+                      <img src={p.logo_url} alt={`${p.name} logo`} loading="lazy" className="h-12 w-12 rounded-xl object-contain" />
+                    ) : (
+                      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-akboy-forest font-display text-lg font-bold text-akboy-butter">
+                        {p.name?.charAt(0)}
+                      </span>
+                    )}
+                    <div>
+                      <h3 className="font-display text-xl font-semibold text-akboy-forest">{p.name}</h3>
+                      {p.category && <p className="text-xs uppercase tracking-[0.14em] text-akboy-moss">{p.category}</p>}
+                    </div>
+                  </div>
+                  {(p.tagline || p.short_description) && (
+                    <p className="mt-5 text-sm leading-relaxed text-akboy-muted">{p.tagline || p.short_description}</p>
+                  )}
+                  <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-akboy-forest">
+                    Learn more <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ================= FEATURED EVENT ================= */}
+      {settings?.show_featured_event !== false && featuredEvent && (
+        <section className="bg-akboy-forest py-20 md:py-24">
+          <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-akboy-butter">Featured programme</p>
+              <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-white md:text-4xl">
+                {featuredEvent.title}
+              </h2>
+              {featuredEvent.theme && <p className="mt-3 text-base text-akboy-butter">{featuredEvent.theme}</p>}
+              {featuredEvent.description && (
+                <p className="mt-5 text-base leading-relaxed text-white/70">{featuredEvent.description}</p>
+              )}
+              <div className="mt-7 flex flex-wrap gap-x-8 gap-y-3 text-sm text-white/70">
+                {featuredEvent.event_date && (
+                  <span className="inline-flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-akboy-butter" />
+                    {new Date(featuredEvent.event_date).toLocaleDateString("en-NG", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </span>
+                )}
+                {(featuredEvent.venue || featuredEvent.location) && (
+                  <span className="inline-flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-akboy-butter" />
+                    {featuredEvent.venue || featuredEvent.location}
+                  </span>
+                )}
+              </div>
+              <Button asChild size="lg" className="mt-8 h-12 rounded-xl bg-akboy-butter px-7 text-sm font-semibold text-akboy-forest hover:bg-akboy-butter/90">
+                <Link to={`${basePath}/learn/events/${featuredEvent.slug || featuredEvent.id}`}>View programme</Link>
+              </Button>
+            </div>
+            {featuredEvent.image_url && (
+              <div className="overflow-hidden rounded-2xl">
+                <img
+                  src={featuredEvent.image_url}
+                  alt={featuredEvent.title}
+                  loading="lazy"
+                  className="h-72 w-full object-cover md:h-96"
+                />
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ================= COMMUNITY ================= */}
+      {settings?.show_community !== false && ambassadors.length > 0 && (
+        <section className="bg-white py-20 md:py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-wrap items-end justify-between gap-6">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-akboy-moss">Community</p>
+                <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-akboy-forest md:text-4xl">
+                  Students leading the work on their campuses
+                </h2>
+              </div>
+              <Link
+                to={`${basePath}/community`}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-akboy-forest hover:text-akboy-moss"
+              >
+                Explore community <ArrowUpRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {ambassadors.map((a) => (
+                <div key={a.id} className="rounded-2xl border border-akboy-line bg-akboy-paper p-6 text-center">
+                  {a.photo_url ? (
+                    <img src={a.photo_url} alt={a.full_name} loading="lazy" className="mx-auto h-20 w-20 rounded-full object-cover" />
+                  ) : (
+                    <span className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-akboy-forest font-display text-xl font-bold text-akboy-butter">
+                      {a.full_name?.charAt(0)}
+                    </span>
+                  )}
+                  <h3 className="mt-4 font-display text-base font-semibold text-akboy-forest">{a.full_name}</h3>
+                  {a.school && <p className="mt-1 text-xs text-akboy-muted">{a.school}</p>}
+                  {a.role_title && <p className="text-xs text-akboy-moss">{a.role_title}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ================= PARTNER SCHOOLS ================= */}
+      {settings?.show_partner_strip !== false && partnerSchools.length > 0 && (
+        <section className="border-y border-akboy-line bg-akboy-paper py-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <p className="text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-akboy-moss">
+              Schools we work with
+            </p>
+            <div className="mt-8 grid grid-cols-3 gap-5 sm:grid-cols-4 lg:grid-cols-6">
+              {partnerSchools.map((s) => (
+                <div key={s.id} className="flex h-20 items-center justify-center rounded-2xl border border-akboy-line bg-white p-3">
+                  {s.logo_url ? (
+                    <img src={s.logo_url} alt={`${s.name} logo`} loading="lazy" className="max-h-10 max-w-full object-contain" />
+                  ) : (
+                    <span className="text-center text-xs font-semibold text-akboy-forest">{s.name}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="mt-8 text-center">
+              <Link to={`${basePath}/community/partners`} className="text-sm font-semibold text-akboy-forest hover:text-akboy-moss">
+                See all partner schools
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ================= VERIFIED IMPACT ================= */}
+      {settings?.show_impact !== false && Array.isArray(settings?.impact_stats) && settings.impact_stats.length > 0 && (
+        <section className="bg-akboy-bone py-16">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-px overflow-hidden rounded-2xl border border-akboy-line bg-akboy-line sm:grid-cols-2 lg:grid-cols-4">
+              {settings.impact_stats.map((stat: any, i: number) => (
+                <div key={i} className="bg-white p-8 text-center">
+                  <p className="font-display text-3xl font-bold text-akboy-forest">{stat.value}</p>
+                  <p className="mt-2 text-sm text-akboy-muted">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ================= APPROACH ================= */}
       <section className="bg-white py-20 md:py-24">

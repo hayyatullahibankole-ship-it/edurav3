@@ -6,7 +6,7 @@ import akboyLogo from "@/assets/akboy-logo.png";
 import { useDomainDetection } from "@/hooks/useDomainDetection";
 
 type NavChild = { name: string; path: string; external?: boolean };
-type NavGroup = { name: string; children: NavChild[]; cta?: NavChild };
+type NavGroup = { name: string; path?: string; children: NavChild[]; cta?: NavChild };
 
 export function AkboyNavbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,6 +26,16 @@ export function AkboyNavbar() {
         { name: "Branding & Identity", path: `${basePath}/services#branding` },
       ],
       cta: { name: "Request a Service", path: `${basePath}/contact` },
+    },
+    {
+      name: "Products",
+      path: `${basePath}/products`,
+      children: [
+        { name: "All Products", path: `${basePath}/products` },
+        { name: "Edura", path: `${basePath}/products/edura` },
+        { name: "School OS", path: `${basePath}/products/school-os` },
+      ],
+      cta: { name: "Explore Products", path: `${basePath}/products` },
     },
     {
       name: "Learn",
@@ -48,6 +58,17 @@ export function AkboyNavbar() {
         { name: "School Updates", path: `${basePath}/campus-hub?category=School Updates` },
       ],
       cta: { name: "Explore Campus Hub", path: `${basePath}/campus-hub` },
+    },
+    {
+      name: "Community",
+      path: `${basePath}/community`,
+      children: [
+        { name: "Community Overview", path: `${basePath}/community` },
+        { name: "Student Ambassadors", path: `${basePath}/community/ambassadors` },
+        { name: "Partner Schools", path: `${basePath}/community/partners` },
+        { name: "Events & Workshops", path: `${basePath}/learn/events` },
+      ],
+      cta: { name: "Join the Community", path: `${basePath}/community` },
     },
     {
       name: "About",
