@@ -136,6 +136,12 @@ const AkboyAbout = lazy(() => import("@/pages/akboy/AkboyAbout"));
 const AkboyServices = lazy(() => import("@/pages/akboy/AkboyServices"));
 const AkboyPortfolio = lazy(() => import("@/pages/akboy/AkboyPortfolio"));
 const AkboyEvents = lazy(() => import("@/pages/akboy/AkboyEvents"));
+const AkboyEventDetail = lazy(() => import("@/pages/akboy/AkboyEventDetail"));
+const AkboyProducts = lazy(() => import("@/pages/akboy/AkboyProducts"));
+const AkboyProductDetail = lazy(() => import("@/pages/akboy/AkboyProductDetail"));
+const AkboyCommunity = lazy(() => import("@/pages/akboy/AkboyCommunity"));
+const AkboyAmbassadors = lazy(() => import("@/pages/akboy/AkboyAmbassadors"));
+const AkboyPartners = lazy(() => import("@/pages/akboy/AkboyPartners"));
 const EbookLibrary = lazy(() => import("@/pages/EbookLibrary"));
 const EbookReader = lazy(() => import("@/pages/EbookReader"));
 const AkboyTutorialRegistration = lazy(() => import("@/pages/akboy/AkboyTutorialRegistration"));
@@ -161,6 +167,14 @@ const AkboyRoutes = () => {
       <Route path="/services" element={<AkboyServices />} />
       <Route path="/portfolio" element={<AkboyPortfolio />} />
       <Route path="/events" element={<AkboyEvents />} />
+      <Route path="/learn/events" element={<AkboyEvents />} />
+      <Route path="/learn/events/:slug" element={<AkboyEventDetail />} />
+      <Route path="/events/:slug" element={<AkboyEventDetail />} />
+      <Route path="/products" element={<AkboyProducts />} />
+      <Route path="/products/:slug" element={<AkboyProductDetail />} />
+      <Route path="/community" element={<AkboyCommunity />} />
+      <Route path="/community/ambassadors" element={<AkboyAmbassadors />} />
+      <Route path="/community/partners" element={<AkboyPartners />} />
       <Route path="/ebooks" element={<EbookLibrary />} />
       <Route path="/ebooks/:slug" element={<EbookReader />} />
       <Route path="/auth" element={<Auth />} />
@@ -509,6 +523,14 @@ const EduraRoutes = () => {
       <Route path="/akboy/services" element={akboy(<AkboyServices />)} />
       <Route path="/akboy/portfolio" element={akboy(<AkboyPortfolio />)} />
       <Route path="/akboy/events" element={akboy(<AkboyEvents />)} />
+      <Route path="/akboy/learn/events" element={akboy(<AkboyEvents />)} />
+      <Route path="/akboy/learn/events/:slug" element={akboy(<AkboyEventDetail />)} />
+      <Route path="/akboy/events/:slug" element={akboy(<AkboyEventDetail />)} />
+      <Route path="/akboy/products" element={akboy(<AkboyProducts />)} />
+      <Route path="/akboy/products/:slug" element={akboy(<AkboyProductDetail />)} />
+      <Route path="/akboy/community" element={akboy(<AkboyCommunity />)} />
+      <Route path="/akboy/community/ambassadors" element={akboy(<AkboyAmbassadors />)} />
+      <Route path="/akboy/community/partners" element={akboy(<AkboyPartners />)} />
       <Route path="/akboy/ebooks" element={akboy(<EbookLibrary />)} />
       <Route path="/akboy/ebooks/:slug" element={akboy(<EbookReader />)} />
       <Route path="/ebooks" element={akboy(<EbookLibrary />)} />
