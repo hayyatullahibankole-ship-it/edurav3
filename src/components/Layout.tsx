@@ -25,11 +25,11 @@ const Layout = ({
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Configure status bar for native apps
+  // Configure status bar for native apps (edge-to-edge: only set icon style)
   useEffect(() => {
     if (isNative) {
       StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
-      StatusBar.setBackgroundColor({ color: "#12B76A" }).catch(() => {});
+      StatusBar.setOverlaysWebView({ overlay: true }).catch(() => {});
     }
   }, [isNative]);
 
