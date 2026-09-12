@@ -33,6 +33,7 @@ export default function AkboyEvents() {
         const days = start && end ? Math.max(1, Math.round((end.getTime() - start.getTime()) / 86400000)) : null;
         return {
           id: e.id,
+          slug: e.slug || e.id,
           title: e.title,
           type: e.event_type || "Event",
           description: e.description || "",
@@ -79,7 +80,7 @@ export default function AkboyEvents() {
                 Training Programs
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-emerald-50 leading-relaxed">
+            <p className="text-xl md:text-2xl text-akboy-bone leading-relaxed">
               Enhance your skills and connect with creative professionals
             </p>
           </div>
@@ -101,11 +102,11 @@ export default function AkboyEvents() {
           {loading ? (
             <p className="text-center text-muted-foreground">Loading events...</p>
           ) : upcomingEvents.length === 0 ? (
-            <Card className="p-12 text-center border-2 border-emerald-100 bg-white max-w-xl mx-auto">
-              <Calendar className="w-10 h-10 mx-auto text-emerald-600 mb-3" />
+            <Card className="p-12 text-center border-2 border-akboy-line bg-white max-w-xl mx-auto">
+              <Calendar className="w-10 h-10 mx-auto text-akboy-forest mb-3" />
               <h3 className="text-xl font-bold mb-2">No events scheduled right now</h3>
               <p className="text-muted-foreground mb-6">New workshops and programs are announced here regularly.</p>
-              <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+              <Button asChild className="bg-akboy-forest hover:bg-akboy-moss">
                 <Link to={`${basePath}/contact`}>Get notified</Link>
               </Button>
             </Card>
@@ -115,12 +116,12 @@ export default function AkboyEvents() {
               <Card
                 key={event.id}
                 className={`group overflow-hidden hover:shadow-2xl transition-all duration-500 border-2 ${
-                  event.featured ? 'border-yellow-400 ring-4 ring-yellow-100' : 'hover:border-emerald-300'
+                  event.featured ? 'border-akboy-butter ring-4 ring-yellow-100' : 'hover:border-emerald-300'
                 } bg-white`}
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 {event.featured && (
-                  <div className="bg-emerald-700 px-6 py-3 text-center">
+                  <div className="bg-akboy-moss px-6 py-3 text-center">
                     <span className="text-white font-bold text-sm">NEXT UP</span>
                   </div>
                 )}
@@ -130,11 +131,11 @@ export default function AkboyEvents() {
                 )}
 
                 <div className="p-8">
-                  <Badge className="bg-emerald-100 text-emerald-700 border-emerald-300 mb-4 font-semibold">
+                  <Badge className="bg-akboy-line text-akboy-moss border-emerald-300 mb-4 font-semibold">
                     {event.type}
                   </Badge>
 
-                  <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-emerald-600 transition-colors">
+                  <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-akboy-forest transition-colors">
                     {event.title}
                   </h3>
                   <p className="text-muted-foreground mb-6 leading-relaxed">
@@ -143,42 +144,47 @@ export default function AkboyEvents() {
 
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center gap-3 text-muted-foreground">
-                      <Calendar className="w-5 h-5 text-emerald-600" />
+                      <Calendar className="w-5 h-5 text-akboy-forest" />
                       <span className="text-sm font-medium">{event.date}</span>
                     </div>
 
                     <div className="flex items-center gap-3 text-muted-foreground">
-                      <Clock className="w-5 h-5 text-emerald-600" />
+                      <Clock className="w-5 h-5 text-akboy-forest" />
                       <span className="text-sm font-medium">{event.duration}</span>
                     </div>
 
                     <div className="flex items-center gap-3 text-muted-foreground">
-                      <MapPin className="w-5 h-5 text-emerald-600" />
+                      <MapPin className="w-5 h-5 text-akboy-forest" />
                       <span className="text-sm font-medium">{event.location}</span>
                     </div>
 
                     <div className="flex items-center gap-3 text-muted-foreground">
-                      <Users className="w-5 h-5 text-emerald-600" />
+                      <Users className="w-5 h-5 text-akboy-forest" />
                       <span className="text-sm font-medium">{event.participants}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-6 border-t-2 border-emerald-100">
-                    <div className="text-3xl font-extrabold text-emerald-600">
+                  <div className="flex items-center justify-between pt-6 border-t-2 border-akboy-line">
+                    <div className="text-3xl font-extrabold text-akboy-forest">
                       {event.price}
                     </div>
+                    <div className="flex items-center gap-3">
+                      <Button asChild variant="outline" className="border-akboy-forest text-akboy-forest hover:bg-akboy-bone">
+                        <Link to={`${basePath}/learn/events/${event.slug}`}>Details</Link>
+                      </Button>
                     {event.seatsLeft === 0 ? (
-                      <Button disabled className="bg-emerald-600 text-white">
+                      <Button disabled className="bg-akboy-forest text-white">
                         Fully booked
                       </Button>
                     ) : (
                       <Button
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        className="bg-akboy-forest hover:bg-akboy-moss text-white"
                         onClick={() => setRegisterEvent(event)}
                       >
                         Register <ArrowRight className="ml-2 w-4 h-4" />
                       </Button>
                     )}
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -216,7 +222,7 @@ export default function AkboyEvents() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-emerald-600 relative overflow-hidden">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-akboy-forest relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{
           backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
         }}></div>
@@ -225,13 +231,13 @@ export default function AkboyEvents() {
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Want to Host an Event With Us?
           </h2>
-          <p className="text-xl text-emerald-50 mb-10 leading-relaxed">
+          <p className="text-xl text-akboy-bone mb-10 leading-relaxed">
             We're open to partnerships and collaboration opportunities
           </p>
           <Button
             asChild
             size="lg"
-            className="bg-white text-emerald-900 hover:bg-emerald-50 text-lg px-10 py-6 h-auto font-bold shadow-2xl hover:scale-105 transition-all rounded-2xl"
+            className="bg-white text-emerald-900 hover:bg-akboy-bone text-lg px-10 py-6 h-auto font-bold shadow-2xl hover:scale-105 transition-all rounded-2xl"
           >
             <Link to={`${basePath}/contact`}>Partner With Us</Link>
           </Button>
