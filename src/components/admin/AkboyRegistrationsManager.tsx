@@ -508,18 +508,12 @@ export function AkboyRegistrationsManager() {
               {selectedRegistration.payment_proof_url && (
                 <div className="bg-slate-700 rounded-lg p-4">
                   <h4 className="font-semibold text-emerald-400 mb-3">Payment Proof</h4>
-                  <a 
-                    href={selectedRegistration.payment_proof_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="block"
-                  >
-                    <img 
-                      src={selectedRegistration.payment_proof_url} 
-                      alt="Payment Proof"
-                      className="max-w-full rounded-lg border border-slate-600"
-                    />
-                  </a>
+                  <PrivateFileImage
+                    bucket="tutorial-uploads"
+                    path={selectedRegistration.payment_proof_url}
+                    alt="Payment Proof"
+                    className="max-w-full rounded-lg border border-slate-600"
+                  />
                 </div>
               )}
 
