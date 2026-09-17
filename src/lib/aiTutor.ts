@@ -93,14 +93,12 @@ export async function streamTutorReply(
       signal,
     });
 
-  let response = await callFn(accessToken);
-  if (response.status === 401 && accessToken) {
-    response = await callFn(null);
-  }
+  const response = await callFn(accessToken);
 
   if (!response.ok) {
     let friendly = "The tutor is unavailable right now. Please try again.";
-    if (response.status === 429) friendly = "Too many requests — wait a moment and try again.";
+    if (response.status === 401) friendly = "Please sign in again to use the AI tutor.";
+    else if (response.status === 429) friendly = "Too many requests — wait a moment and try again.";
     else if (response.status === 402) friendly = "AI service is temporarily unavailable. Please contact support.";
     else {
       try {
