@@ -144,9 +144,9 @@ export function AkboyProductsManager() {
       const payload = {
         ...form,
         slug: form.slug ? slugify(form.slug) : slugify(form.name),
-        how_it_works: steps.filter((s) => s.title.trim()),
-        faqs: faqs.filter((f) => f.question.trim()),
-      };
+        how_it_works: steps.filter((s) => s.title.trim()) as unknown as any,
+        faqs: faqs.filter((f) => f.question.trim()) as unknown as any,
+      } as any;
 
       let productId = editingId;
       if (editingId) {
