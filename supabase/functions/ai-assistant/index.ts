@@ -12,11 +12,39 @@ serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get("Authorization");
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      {
+        global: {
+          headers: authHeader ? { Authorization: authHeader } : {},
+        },
+      }
+    );
+
+    // Authentication is required before any AI work happens.
+    let user: any = null;
+    try {
+      const { data, error: authError } = await supabaseClient.auth.getUser();
+      if (authError) console.error("Auth error:", authError.message);
+      user = data?.user ?? null;
+    } catch (e) {
+      console.error("Auth lookup failed:", e);
+    }
+
+    if (!user) {
+      return new Response(
+        JSON.stringify({ error: "Please sign in to use the AI tutor." }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { messages } = await req.json();
     console.log("Received messages:", messages?.length, "messages");
-    
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
+
     if (!LOVABLE_API_KEY) {
       console.error("LOVABLE_API_KEY is not configured");
       throw new Error("LOVABLE_API_KEY is not configured");
@@ -26,7 +54,6 @@ serve(async (req) => {
     const processedMessages = messages.map((msg: any) => {
       if (msg.images && Array.isArray(msg.images) && msg.images.length > 0) {
         console.log("Processing message with images:", msg.images.length);
-        // Validate and limit images
         const validImages = msg.images
           .filter((img: string) => typeof img === "string" && /^data:image\/(png|jpeg|jpg|webp|gif);base64,/.test(img))
           .slice(0, 5);
@@ -46,26 +73,6 @@ serve(async (req) => {
       return { role: msg.role, content: msg.content };
     });
 
-    const authHeader = req.headers.get("Authorization");
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      {
-        global: {
-          headers: authHeader ? { Authorization: authHeader } : {},
-        },
-      }
-    );
-
-    // Try to get authenticated user (optional — never block the chat on this)
-    let user: any = null;
-    try {
-      const { data, error: authError } = await supabaseClient.auth.getUser();
-      if (authError) console.error("Auth error:", authError.message);
-      user = data?.user ?? null;
-    } catch (e) {
-      console.error("Auth lookup failed, continuing anonymously:", e);
-    }
 
 
     // Build user context (supports unauthenticated users)

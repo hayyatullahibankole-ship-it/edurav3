@@ -198,8 +198,8 @@ export default function AkboyTutorialRegistration() {
     const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
     const { error } = await supabase.storage.from('tutorial-uploads').upload(fileName, file);
     if (error) { console.error('Upload error:', error); return null; }
-    const { data: { publicUrl } } = supabase.storage.from('tutorial-uploads').getPublicUrl(fileName);
-    return publicUrl;
+    // Bucket is private: store the path and sign it on demand for admins only.
+    return fileName;
   };
 
   const selectTutorial = (tutorialId: string) => {
