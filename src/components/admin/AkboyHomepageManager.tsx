@@ -63,7 +63,7 @@ export function AkboyHomepageManager() {
         show_partner_strip: settings.show_partner_strip,
         show_impact: settings.show_impact,
         featured_event_id: settings.featured_event_id || null,
-        impact_stats: stats.filter((s) => s.label.trim() && s.value.trim()),
+        impact_stats: stats.filter((s) => s.label.trim() && s.value.trim()) as unknown as any,
       })
       .eq("id", settings.id);
     setSaving(false);
