@@ -26,8 +26,6 @@ interface BeforeInstallPromptEvent extends Event {
 
 type Platform = "ios" | "android" | "desktop";
 
-const PLAY_STORE_URL =
-  "https://play.google.com/store/apps/details?id=com.akboy.edura&pcampaignid=web_share";
 
 const benefits = [
   { icon: Zap, title: "Built for speed", copy: "Open practice, lessons and results without waiting." },
