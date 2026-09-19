@@ -22,8 +22,8 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
-// TODO: replace with the live Play Store listing URL once shared
-const PLAY_STORE_URL = "";
+const PLAY_STORE_URL =
+  "https://play.google.com/store/apps/details?id=com.akboy.edura&pcampaignid=web_share";
 
 export default function InstallApp() {
   const navigate = useNavigate();
