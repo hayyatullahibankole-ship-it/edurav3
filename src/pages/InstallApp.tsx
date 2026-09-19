@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft,
   Bell,
   Check,
   CheckCircle2,
@@ -135,21 +134,6 @@ export default function InstallApp() {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate(-1)} aria-label="Go back">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <img src={eduraLogo} alt="Edura" className="h-8 w-auto" />
-          </div>
-          <span className="hidden items-center gap-2 text-sm font-medium text-muted-foreground sm:flex">
-            <ShieldCheck className="h-4 w-4 text-primary" />
-            Official Edura app
-          </span>
-        </div>
-      </header>
-
       <main>
         <section className="border-b bg-surface">
           <div className="mx-auto grid max-w-6xl items-center gap-8 px-5 py-10 sm:px-6 sm:py-14 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14 lg:py-16">
