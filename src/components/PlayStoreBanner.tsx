@@ -74,7 +74,10 @@ export const PlayStoreBanner = () => {
             className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold text-ink transition-colors hover:bg-primary-hover"
           >
             <Download className="h-3.5 w-3.5" />
-            {platform === "android" ? "Get it on Google Play" : "Get the app"}
+            <span className="sm:hidden">Get the app</span>
+            <span className="hidden sm:inline">
+              {platform === "android" ? "Get it on Google Play" : "Get the app"}
+            </span>
           </button>
 
           <button
