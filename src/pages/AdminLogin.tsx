@@ -10,7 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { z } from 'zod';
-import AddAdminModal from '@/components/AddAdminModal';
 
 const adminLoginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -29,7 +28,6 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showAddAdminModal, setShowAddAdminModal] = useState(false);
 
   // Redirect if already logged in as admin
   useEffect(() => {
@@ -251,15 +249,7 @@ export default function AdminLogin() {
             </Button>
           </form>
 
-          <div className="text-center space-y-3">
-            <Button 
-              variant="outline" 
-              onClick={() => setShowAddAdminModal(true)}
-              className="w-full text-sm"
-            >
-              + Add Admin Account
-            </Button>
-            
+          <div className="text-center">
             <Button 
               variant="ghost" 
               onClick={() => navigate('/')}
@@ -270,11 +260,6 @@ export default function AdminLogin() {
           </div>
         </CardContent>
       </Card>
-
-      <AddAdminModal 
-        isOpen={showAddAdminModal}
-        onClose={() => setShowAddAdminModal(false)}
-      />
     </div>
   );
 }

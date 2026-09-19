@@ -22,6 +22,9 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+// TODO: replace with the live Play Store listing URL once shared
+const PLAY_STORE_URL = "";
+
 export default function InstallApp() {
   const navigate = useNavigate();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
@@ -130,25 +133,55 @@ export default function InstallApp() {
               </p>
             </div>
           </div>
+        ) : platform === "android" && PLAY_STORE_URL ? (
+          <div className="space-y-3">
+            <Button
+              size="lg"
+              asChild
+              className="w-full font-bold text-base py-6 rounded-xl gap-2"
+            >
+              <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer">
+                <Download className="h-5 w-5" />
+                Get it on Google Play
+              </a>
+            </Button>
+            <button
+              onClick={handleInstall}
+              disabled={!deferredPrompt}
+              className="w-full text-center text-xs text-muted-foreground underline underline-offset-2 disabled:no-underline"
+            >
+              Or install instantly from your browser — no app store needed
+            </button>
+          </div>
         ) : (
           <div className="space-y-3">
             <Button
               size="lg"
-              onClick={handleInstall}
-              disabled={!deferredPrompt}
+              onClick={() =>
+                platform === "ios"
+                  ? document.getElementById("install-steps")?.scrollIntoView({ behavior: "smooth" })
+                  : handleInstall()
+              }
+              disabled={platform !== "ios" && !deferredPrompt}
               className="w-full font-bold text-base py-6 rounded-xl gap-2"
             >
               <Download className="h-5 w-5" />
-              {deferredPrompt ? "Install app" : platform === "ios" ? "Add to Home Screen" : "Install from your browser menu"}
+              {platform === "ios"
+                ? "Add to Home Screen"
+                : deferredPrompt
+                  ? "Install app"
+                  : "Install from your browser menu"}
             </Button>
             <p className="text-center text-xs text-muted-foreground">
-              Installs the latest version instantly — no app store, no APK file, and it updates itself.
+              {platform === "ios"
+                ? "The full Edura app — same features, same experience. It just installs through Safari instead of the App Store."
+                : "Installs the latest version instantly — no app store, no APK file, and it updates itself."}
             </p>
           </div>
         )}
 
         {/* How to install */}
-        <div className="space-y-4">
+        <div className="space-y-4" id="install-steps">
           <h3 className="font-semibold text-foreground">
             {platform === "ios" ? "How to install on iPhone" : "How to install"}
           </h3>
@@ -177,16 +210,31 @@ export default function InstallApp() {
           </div>
         </div>
 
-        {/* Play Store note */}
+        {/* Store note */}
         <div className="p-4 rounded-xl bg-muted/50 border">
           <div className="flex items-start gap-3">
             <Smartphone className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
             <div>
-              <p className="text-sm font-medium text-foreground mb-1">Google Play listing coming soon</p>
-              <p className="text-xs text-muted-foreground">
-                The Play Store version is going through review. Until it’s live, install from your browser — it’s the
-                same app and updates automatically.
+              <p className="text-sm font-medium text-foreground mb-1">
+                {platform === "ios" ? "Using an iPhone?" : "Also on Google Play"}
               </p>
+              <p className="text-xs text-muted-foreground">
+                {platform === "ios"
+                  ? "The App Store version is on the way. Until then, Add to Home Screen gives you the complete app — own icon, full screen, offline practice — and it always stays updated."
+                  : PLAY_STORE_URL
+                    ? "Prefer the store? Get Edura on Google Play — same app, automatic updates."
+                    : "Edura is live on Google Play for Android. The browser install is the same app and updates itself."}
+              </p>
+              {platform !== "ios" && PLAY_STORE_URL && (
+                <a
+                  href={PLAY_STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-2 text-xs font-semibold text-primary underline underline-offset-2"
+                >
+                  Open Google Play →
+                </a>
+              )}
             </div>
           </div>
         </div>
