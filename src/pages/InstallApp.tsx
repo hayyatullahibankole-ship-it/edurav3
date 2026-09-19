@@ -157,7 +157,11 @@ export default function InstallApp() {
           <div className="space-y-3">
             <Button
               size="lg"
-              onClick={handleInstall}
+              onClick={() =>
+                platform === "ios"
+                  ? document.getElementById("install-steps")?.scrollIntoView({ behavior: "smooth" })
+                  : handleInstall()
+              }
               disabled={platform !== "ios" && !deferredPrompt}
               className="w-full font-bold text-base py-6 rounded-xl gap-2"
             >
@@ -177,7 +181,7 @@ export default function InstallApp() {
         )}
 
         {/* How to install */}
-        <div className="space-y-4">
+        <div className="space-y-4" id="install-steps">
           <h3 className="font-semibold text-foreground">
             {platform === "ios" ? "How to install on iPhone" : "How to install"}
           </h3>
