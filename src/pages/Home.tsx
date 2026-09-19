@@ -503,16 +503,27 @@ const Home = () => {
                 Practise offline, right from your phone
               </h2>
               <p className="mt-2 text-ink-foreground/60">
-                Install Edura in one tap — full CBT engine, downloadable papers, streaks and your wallet, all working
-                without data. No app store account needed.
+                Edura is now on Google Play. Install it in one tap — full CBT engine, downloadable
+                papers, streaks and your wallet, all working offline on your phone.
               </p>
             </div>
-            <Link to="/install-app" className="shrink-0">
-              <Button size="lg" className="h-12 w-full md:w-auto px-8 text-base font-bold text-ink">
-                Install the app
+            {isAndroid ? (
+              <Button
+                size="lg"
+                className="h-12 w-full md:w-auto shrink-0 px-8 text-base font-bold text-ink"
+                onClick={() => window.location.assign(PLAY_STORE_URL)}
+              >
+                Get it on Google Play
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-            </Link>
+            ) : (
+              <Link to="/install-app" className="shrink-0">
+                <Button size="lg" className="h-12 w-full md:w-auto px-8 text-base font-bold text-ink">
+                  Install the app
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </section>
