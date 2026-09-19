@@ -27,9 +27,14 @@ import {
 import { Link } from "react-router-dom";
 
 import Footer from "@/components/Footer";
+import PlayStoreBanner from "@/components/PlayStoreBanner";
+import { PLAY_STORE_URL } from "@/lib/playStore";
 import { useAuth } from "@/hooks/useAuth";
 import { useInstalledApp } from "@/hooks/useInstalledApp";
 import { useIsMobile } from "@/hooks/use-mobile";
+
+const isAndroid =
+  typeof navigator !== "undefined" && /Android/i.test(navigator.userAgent);
 
 const Home = () => {
   const { user } = useAuth();
@@ -96,6 +101,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-background font-sans">
+      <PlayStoreBanner />
       {/* ============ HERO — Deep Ink command center ============ */}
       <section className="relative overflow-hidden bg-ink text-ink-foreground">
         <div className="pointer-events-none absolute -top-40 right-0 h-[38rem] w-[38rem] rounded-full bg-primary/10 blur-[140px]" />
