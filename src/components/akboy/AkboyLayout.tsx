@@ -33,6 +33,27 @@ export function AkboyLayout({ children, title, description, path = "/" }: AkboyL
     "AKBOY Creative Hub — campus news, exam preparation, ebooks, tutorials, events and technology services for Nigerian students.";
   const pageUrl = `${AKBOY_ORIGIN}${path}`;
 
+  // Guarantee the Akboy icon is the ONLY favicon while this layout is mounted.
+  // The static Edura icon in index.html would otherwise compete with Helmet's links.
+  useEffect(() => {
+    const swap = (rel: string, href: string, type?: string) => {
+      document
+        .querySelectorAll(`link[rel="${rel}"]`)
+        .forEach((el) => el.parentNode?.removeChild(el));
+      const link = document.createElement("link");
+      link.setAttribute("rel", rel);
+      link.setAttribute("href", href);
+      if (type) link.setAttribute("type", type);
+      document.head.appendChild(link);
+    };
+    swap("icon", "/akboy-logo.png", "image/png");
+    swap("apple-touch-icon", "/akboy-logo.png");
+    return () => {
+      swap("icon", "/favicon.png", "image/png");
+      swap("apple-touch-icon", "/apple-touch-icon.png");
+    };
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans">
       <Helmet>
