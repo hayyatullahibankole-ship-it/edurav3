@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Download, Smartphone, X } from "lucide-react";
 import { useInstalledApp } from "@/hooks/useInstalledApp";
 import { PLAY_STORE_URL } from "@/lib/playStore";
@@ -57,7 +57,7 @@ export const PlayStoreBanner = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3 py-2.5 sm:py-3">
           <span className="hidden sm:flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15">
-            <Smartphone className="h-4.5 w-4.5 text-primary" />
+            <Smartphone className="h-4 w-4 text-primary" />
           </span>
 
           <div className="min-w-0 flex-1">
@@ -91,9 +91,3 @@ export const PlayStoreBanner = () => {
 };
 
 export default PlayStoreBanner;
-
-// Re-exported so other surfaces (e.g. the homepage app section) share one source of truth.
-export { PLAY_STORE_URL };
-
-// Keep Link import used for tree-shaking clarity in future edits (banner may link internally).
-void Link;
