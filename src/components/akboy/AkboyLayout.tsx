@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { AkboyNavbar } from "./AkboyNavbar";
 import { AkboyFooter } from "./AkboyFooter";
