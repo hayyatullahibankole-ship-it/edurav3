@@ -1,0 +1,13 @@
+{
+  "name": "AKBOY Creative Hub",
+  "short_name": "AKBOY",
+  "description": "Education, technology, campus news, events and opportunities from AKBOY Creative Hub.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0D5C28",
+  "icons": [
+    { "src": "/akboy-app-icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
