@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import eduraLogo from "@/assets/edura-logo.png";
 import dashboardPreview from "@/assets/edura-dashboard-mockup.png";
+import { PLAY_STORE_URL } from "@/lib/playStore";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
