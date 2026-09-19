@@ -22,6 +22,9 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+// TODO: replace with the live Play Store listing URL once shared
+const PLAY_STORE_URL = "";
+
 export default function InstallApp() {
   const navigate = useNavigate();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
