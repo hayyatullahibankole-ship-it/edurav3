@@ -60,8 +60,6 @@ export function AkboyLayout({ children, title, description, path = "/" }: AkboyL
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
         <meta name="author" content="AKBOY Creative Hub" />
-        <link rel="icon" href="/akboy-logo.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/akboy-logo.png" />
         <link rel="canonical" href={pageUrl} />
 
         {/* Open Graph */}
