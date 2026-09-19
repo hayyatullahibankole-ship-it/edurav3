@@ -46,7 +46,7 @@ export function AkboyLayout({ children, title, description, path = "/" }: AkboyL
       if (type) link.setAttribute("type", type);
       document.head.appendChild(link);
     };
-    swap("icon", "/akboy-logo.png", "image/png");
+    swap("icon", "/akboy-favicon.png", "image/png");
     swap("apple-touch-icon", "/akboy-logo.png");
     return () => {
       swap("icon", "/favicon.png", "image/png");
