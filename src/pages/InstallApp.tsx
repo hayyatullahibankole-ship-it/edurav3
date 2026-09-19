@@ -1,69 +1,100 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft,
-  Download,
-  Smartphone,
-  Zap,
-  Wifi,
   Bell,
-  Shield,
-  Clock,
-  Star,
-  CheckCircle,
-  Share,
+  Check,
+  CheckCircle2,
+  ChevronRight,
+  Download,
+  ExternalLink,
+  Play,
   PlusSquare,
+  Share,
+  ShieldCheck,
+  Smartphone,
+  WifiOff,
+  Zap,
 } from "lucide-react";
 import eduraLogo from "@/assets/edura-logo.png";
+import dashboardPreview from "@/assets/edura-dashboard-mockup.png";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+type Platform = "ios" | "android" | "desktop";
+
 const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.akboy.edura&pcampaignid=web_share";
 
+const benefits = [
+  { icon: Zap, title: "Built for speed", copy: "Open practice, lessons and results without waiting." },
+  { icon: WifiOff, title: "Offline-ready", copy: "Keep studying when your connection is unreliable." },
+  { icon: Bell, title: "Stay on track", copy: "Receive useful reminders for exams and study plans." },
+  { icon: ShieldCheck, title: "Safe and current", copy: "Secure sign-in with automatic app updates." },
+];
+
+const iphoneSteps = [
+  { icon: Share, title: "Tap Share", copy: "In Safari, tap the Share icon at the bottom of your screen." },
+  { icon: PlusSquare, title: "Add to Home Screen", copy: "Scroll through the menu and choose Add to Home Screen." },
+  { icon: CheckCircle2, title: "Tap Add", copy: "Edura will appear on your Home Screen like your other apps." },
+];
+
 export default function InstallApp() {
   const navigate = useNavigate();
+  const iphoneSectionRef = useRef<HTMLElement>(null);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
 
-  const platform = useMemo(() => {
-    if (typeof navigator === "undefined") return "other";
-    const ua = navigator.userAgent;
-    if (/iPad|iPhone|iPod/.test(ua)) return "ios";
-    if (/Android/i.test(ua)) return "android";
-    return "desktop";
+  const device = useMemo(() => {
+    if (typeof navigator === "undefined") {
+      return { platform: "desktop" as Platform, isSafari: false };
+    }
+
+    const userAgent = navigator.userAgent;
+    const isIPadOS = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+    const platform: Platform = /iPad|iPhone|iPod/.test(userAgent) || isIPadOS
+      ? "ios"
+      : /Android/i.test(userAgent)
+        ? "android"
+        : "desktop";
+    const isSafari = /Safari/i.test(userAgent) && !/CriOS|FxiOS|EdgiOS|OPiOS/i.test(userAgent);
+
+    return { platform, isSafari };
   }, []);
 
   useEffect(() => {
-    const isStandalone =
+    const standalone =
       window.matchMedia("(display-mode: standalone)").matches ||
-      (window.navigator as any).standalone === true;
-    setInstalled(isStandalone);
+      (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+    setInstalled(standalone);
 
-    const handler = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    const handlePrompt = (event: Event) => {
+      event.preventDefault();
+      setDeferredPrompt(event as BeforeInstallPromptEvent);
     };
-    const installedHandler = () => {
+    const handleInstalled = () => {
       setInstalled(true);
       setDeferredPrompt(null);
     };
 
-    window.addEventListener("beforeinstallprompt", handler);
-    window.addEventListener("appinstalled", installedHandler);
+    window.addEventListener("beforeinstallprompt", handlePrompt);
+    window.addEventListener("appinstalled", handleInstalled);
     return () => {
-      window.removeEventListener("beforeinstallprompt", handler);
-      window.removeEventListener("appinstalled", installedHandler);
+      window.removeEventListener("beforeinstallprompt", handlePrompt);
+      window.removeEventListener("appinstalled", handleInstalled);
     };
   }, []);
 
-  const handleInstall = async () => {
+  const showIphoneGuide = () => {
+    iphoneSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const promptBrowserInstall = async () => {
     if (!deferredPrompt) return;
-    deferredPrompt.prompt();
+    await deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === "accepted") {
       setInstalled(true);
@@ -71,180 +102,182 @@ export default function InstallApp() {
     }
   };
 
-  const iosSteps = [
-    { icon: Share, text: "Tap the Share button in Safari" },
-    { icon: PlusSquare, text: 'Choose "Add to Home Screen"' },
-    { icon: CheckCircle, text: "Tap Add — Edura appears on your home screen" },
-  ];
+  const primaryAction = () => {
+    if (installed) {
+      navigate("/dashboard");
+      return;
+    }
+    if (device.platform === "android") {
+      window.location.assign(PLAY_STORE_URL);
+      return;
+    }
+    if (device.platform === "ios") {
+      showIphoneGuide();
+      return;
+    }
+    if (deferredPrompt) {
+      void promptBrowserInstall();
+      return;
+    }
+    window.open(PLAY_STORE_URL, "_blank", "noopener,noreferrer");
+  };
 
-  const androidSteps = [
-    { icon: Download, text: "Tap Install app below (or browser menu → Install app)" },
-    { icon: CheckCircle, text: "Confirm the install prompt" },
-    { icon: Zap, text: "Open Edura from your home screen and start practising" },
-  ];
-
-  const steps = platform === "ios" ? iosSteps : androidSteps;
-
-  const features = [
-    { icon: Zap, text: "Lightning fast performance" },
-    { icon: Wifi, text: "Practice offline anytime" },
-    { icon: Bell, text: "Get exam reminders" },
-    { icon: Shield, text: "Secure & private" },
-    { icon: Clock, text: "Accurate exam timing" },
-    { icon: Star, text: "Full CBT experience" },
-  ];
+  const primaryLabel = installed
+    ? "Open Edura"
+    : device.platform === "android"
+      ? "Get it on Google Play"
+      : device.platform === "ios"
+        ? "Install on this iPhone"
+        : deferredPrompt
+          ? "Install Edura"
+          : "Get it on Google Play";
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b px-4 py-3 flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="shrink-0">
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <h1 className="font-semibold text-lg">Get the App</h1>
-      </div>
-
-      <div className="max-w-lg mx-auto px-5 py-8 space-y-8">
-        {/* App Card */}
-        <div className="flex items-center gap-4 p-5 rounded-2xl bg-primary/10 border">
-          <div className="w-16 h-16 rounded-2xl bg-white shadow-md flex items-center justify-center p-2 shrink-0">
-            <img src={eduraLogo} alt="Edura" className="w-full h-full object-contain" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="font-bold text-xl">Edura CBT</h2>
-            <p className="text-muted-foreground text-sm">Your Gateway to Exam Success</p>
-            <div className="flex items-center gap-3 mt-1">
-              <span className="text-xs text-muted-foreground">Free to start</span>
-              <span className="text-xs font-semibold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">
-                NIGERIA ED-TECH
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Primary install */}
-        {installed ? (
-          <div className="p-5 rounded-2xl border bg-emerald-50 text-emerald-900 flex items-start gap-3">
-            <CheckCircle className="h-5 w-5 mt-0.5 shrink-0 text-emerald-600" />
-            <div>
-              <p className="font-semibold text-sm">You already have the app installed</p>
-              <p className="text-xs mt-1 text-emerald-800">
-                Launch Edura from your home screen — it always stays on the latest version.
+    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
+      <main>
+        <section className="border-b bg-surface">
+          <div className="mx-auto grid max-w-6xl items-center gap-8 px-5 py-10 sm:px-6 sm:py-14 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14 lg:py-16">
+            <div className="max-w-xl">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1.5 text-xs font-semibold text-primary">
+                <span className="h-2 w-2 rounded-full bg-primary" />
+                NOW LIVE ON GOOGLE PLAY
+              </div>
+              <h1 className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
+                Take Edura wherever you study.
+              </h1>
+              <p className="mt-5 max-w-lg text-base leading-7 text-muted-foreground sm:text-lg">
+                Practise CBT exams, study your materials and track your progress in one focused student app.
               </p>
+
+              <div className="mt-7 max-w-md space-y-3">
+                <Button size="lg" onClick={primaryAction} className="h-14 w-full justify-center gap-3 text-base font-bold sm:w-auto sm:min-w-72">
+                  {installed ? <CheckCircle2 className="h-5 w-5" /> : device.platform === "android" || device.platform === "desktop" ? <Play className="h-5 w-5 fill-current" /> : <Download className="h-5 w-5" />}
+                  {primaryLabel}
+                </Button>
+                <p className="text-sm text-muted-foreground">
+                  {installed
+                    ? "Edura is installed and ready on this device."
+                    : device.platform === "android"
+                      ? "We recognised your Android device. This opens our official Play Store listing."
+                      : device.platform === "ios"
+                        ? "We recognised your Apple device. We’ll show you the quick Safari installation steps."
+                        : "On Android? This opens our official Google Play listing."}
+                </p>
+              </div>
+
+              <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium">
+                {["Free to install", "Automatic updates", "No APK download"].map((item) => (
+                  <span key={item} className="flex items-center gap-1.5">
+                    <Check className="h-4 w-4 text-primary" />
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative mx-auto w-full max-w-xl overflow-hidden rounded-md border bg-card">
+              <img
+                src={dashboardPreview}
+                alt="Edura app shown on a mobile phone"
+                className="aspect-[16/10] w-full object-cover"
+              />
+              <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3 rounded-md border bg-background/95 p-3 shadow-card backdrop-blur">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border bg-card p-1.5">
+                  <img src={eduraLogo} alt="" className="h-full w-full object-contain" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold">Edura: Learn & Practise</p>
+                  <p className="truncate text-xs text-muted-foreground">CBT • Campus • Study tools</p>
+                </div>
+                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">FREE</span>
+              </div>
             </div>
           </div>
-        ) : platform === "android" && PLAY_STORE_URL ? (
-          <div className="space-y-3">
-            <Button
-              size="lg"
-              asChild
-              className="w-full font-bold text-base py-6 rounded-xl gap-2"
-            >
-              <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer">
-                <Download className="h-5 w-5" />
-                Get it on Google Play
-              </a>
-            </Button>
-            <button
-              onClick={handleInstall}
-              disabled={!deferredPrompt}
-              className="w-full text-center text-xs text-muted-foreground underline underline-offset-2 disabled:no-underline"
-            >
-              Or install instantly from your browser — no app store needed
-            </button>
+        </section>
+
+        <section className="border-b bg-background py-12 sm:py-16">
+          <div className="mx-auto max-w-6xl px-5 sm:px-6">
+            <div className="mb-8 max-w-2xl">
+              <p className="text-sm font-bold text-primary">THE FULL STUDENT EXPERIENCE</p>
+              <h2 className="mt-2 text-2xl font-bold sm:text-3xl">Everything important stays within reach.</h2>
+            </div>
+            <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2 lg:grid-cols-4">
+              {benefits.map(({ icon: Icon, title, copy }) => (
+                <article key={title} className="bg-card p-5 sm:p-6">
+                  <Icon className="h-6 w-6 text-primary" />
+                  <h3 className="mt-4 font-semibold">{title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{copy}</p>
+                </article>
+              ))}
+            </div>
           </div>
-        ) : (
-          <div className="space-y-3">
-            <Button
-              size="lg"
-              onClick={() =>
-                platform === "ios"
-                  ? document.getElementById("install-steps")?.scrollIntoView({ behavior: "smooth" })
-                  : handleInstall()
-              }
-              disabled={platform !== "ios" && !deferredPrompt}
-              className="w-full font-bold text-base py-6 rounded-xl gap-2"
-            >
-              <Download className="h-5 w-5" />
-              {platform === "ios"
-                ? "Add to Home Screen"
-                : deferredPrompt
-                  ? "Install app"
-                  : "Install from your browser menu"}
-            </Button>
-            <p className="text-center text-xs text-muted-foreground">
-              {platform === "ios"
-                ? "The full Edura app — same features, same experience. It just installs through Safari instead of the App Store."
-                : "Installs the latest version instantly — no app store, no APK file, and it updates itself."}
+        </section>
+
+        <section ref={iphoneSectionRef} id="iphone-install" className="scroll-mt-20 bg-ink py-12 text-ink-foreground sm:py-16">
+          <div className="mx-auto max-w-6xl px-5 sm:px-6">
+            <div className="grid gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
+              <div>
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                  <Smartphone className="h-6 w-6" />
+                </div>
+                <p className="text-sm font-bold text-primary-glow">FOR IPHONE & IPAD</p>
+                <h2 className="mt-2 text-3xl font-bold">Install Edura from Safari.</h2>
+                <p className="mt-4 leading-7 text-ink-foreground/70">
+                  Our App Store release is coming. For now, add the full Edura web app to your Home Screen—complete with its own icon, full-screen view and automatic updates.
+                </p>
+                {device.platform === "ios" && !device.isSafari && (
+                  <div className="mt-5 rounded-md border border-warning/40 bg-warning/10 p-4 text-sm leading-6">
+                    You’re using another browser. Open this page in Safari first, then follow the steps.
+                  </div>
+                )}
+              </div>
+
+              <ol className="grid gap-3 sm:grid-cols-3">
+                {iphoneSteps.map(({ icon: Icon, title, copy }, index) => (
+                  <li key={title} className="relative rounded-md border border-ink-foreground/15 bg-ink-soft p-5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-primary-glow">STEP {index + 1}</span>
+                      <Icon className="h-5 w-5 text-primary-glow" />
+                    </div>
+                    <h3 className="mt-6 font-semibold">{title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-ink-foreground/65">{copy}</p>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <p className="mt-7 border-t border-ink-foreground/15 pt-5 text-sm text-ink-foreground/60">
+              Apple does not let websites open the Home Screen confirmation automatically. These three Safari taps are the secure installation process.
             </p>
           </div>
-        )}
+        </section>
 
-        {/* How to install */}
-        <div className="space-y-4" id="install-steps">
-          <h3 className="font-semibold text-foreground">
-            {platform === "ios" ? "How to install on iPhone" : "How to install"}
-          </h3>
-          <div className="space-y-3">
-            {steps.map((step, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <step.icon className="h-4 w-4" />
-                </div>
-                <p className="text-sm text-muted-foreground">{step.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Features */}
-        <div className="space-y-4">
-          <h3 className="font-semibold text-foreground">Why use the app?</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {features.map((feature, i) => (
-              <div key={i} className="flex items-center gap-2.5 p-3 rounded-xl bg-muted/50">
-                <feature.icon className="h-4 w-4 text-primary shrink-0" />
-                <span className="text-sm text-foreground">{feature.text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Store note */}
-        <div className="p-4 rounded-xl bg-muted/50 border">
-          <div className="flex items-start gap-3">
-            <Smartphone className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-foreground mb-1">
-                {platform === "ios" ? "Using an iPhone?" : "Also on Google Play"}
+        <section className="bg-background py-12 sm:py-16">
+          <div className="mx-auto flex max-w-6xl flex-col gap-6 px-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-sm font-bold text-primary">ANDROID</p>
+              <h2 className="mt-2 text-2xl font-bold sm:text-3xl">Download the official Play Store app.</h2>
+              <p className="mt-3 leading-7 text-muted-foreground">
+                Get verified installation, automatic updates and the Edura experience optimised for your Android phone.
               </p>
-              <p className="text-xs text-muted-foreground">
-                {platform === "ios"
-                  ? "The App Store version is on the way. Until then, Add to Home Screen gives you the complete app — own icon, full screen, offline practice — and it always stays updated."
-                  : PLAY_STORE_URL
-                    ? "Prefer the store? Get Edura on Google Play — same app, automatic updates."
-                    : "Edura is live on Google Play for Android. The browser install is the same app and updates itself."}
-              </p>
-              {platform !== "ios" && PLAY_STORE_URL && (
-                <a
-                  href={PLAY_STORE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-2 text-xs font-semibold text-primary underline underline-offset-2"
-                >
-                  Open Google Play →
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button size="lg" asChild className="h-14 gap-3 font-bold">
+                <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer">
+                  <Play className="h-5 w-5 fill-current" />
+                  Get it on Google Play
+                  <ExternalLink className="h-4 w-4" />
                 </a>
+              </Button>
+              {deferredPrompt && !installed && (
+                <Button size="lg" variant="outline" onClick={() => void promptBrowserInstall()} className="h-14 gap-2 font-semibold">
+                  Install from browser
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
               )}
             </div>
           </div>
-        </div>
-
-        {/* Trust badge */}
-        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground pb-4">
-          <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />
-          <span>Safe & Secure • Always the latest version</span>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }
