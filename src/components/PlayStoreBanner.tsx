@@ -62,7 +62,8 @@ export const PlayStoreBanner = () => {
 
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold leading-tight">
-              Edura is now on Google Play
+              <span className="sm:hidden">Now on Google Play</span>
+              <span className="hidden sm:inline">Edura is now on Google Play</span>
             </p>
             <p className="hidden sm:block truncate text-xs text-ink-foreground/60">
               Offline CBT, instant result PINs and your wallet — now in your pocket.
