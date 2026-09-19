@@ -8,7 +8,8 @@
     <script>
       (function () {
         var host = window.location.hostname.toLowerCase();
-        var isAkboy = /(^|\.)akboy\.(space|com\.ng)$/.test(host) || host.indexOf('akboy.') === 0 || host === 'akboy.lovable.app';
+        var isAkboy = /(^|\.)akboy\.(space|com\.ng)$/.test(host) || host.indexOf('akboy.') === 0 || host === 'akboy.lovable.app'
+          || window.location.pathname.indexOf('/akboy') === 0;
         var isCampusHub = host.indexOf('campushub.') === 0;
         if (!isAkboy && !isCampusHub) return;
 
@@ -57,7 +58,7 @@
         setMeta('name', 'twitter:title', TITLE);
         setMeta('name', 'twitter:description', DESC);
         setMeta('name', 'twitter:image', LOGO);
-        setLink('icon', '/akboy-logo.png', 'image/png');
+        setLink('icon', '/akboy-favicon.png', 'image/png');
         setLink('apple-touch-icon', '/akboy-logo.png');
       })();
     </script>

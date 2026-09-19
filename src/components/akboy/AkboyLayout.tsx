@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { AkboyNavbar } from "./AkboyNavbar";
 import { AkboyFooter } from "./AkboyFooter";
@@ -33,14 +33,33 @@ export function AkboyLayout({ children, title, description, path = "/" }: AkboyL
     "AKBOY Creative Hub — campus news, exam preparation, ebooks, tutorials, events and technology services for Nigerian students.";
   const pageUrl = `${AKBOY_ORIGIN}${path}`;
 
+  // Guarantee the Akboy icon is the ONLY favicon while this layout is mounted.
+  // The static Edura icon in index.html would otherwise compete with Helmet's links.
+  useEffect(() => {
+    const swap = (rel: string, href: string, type?: string) => {
+      document
+        .querySelectorAll(`link[rel="${rel}"]`)
+        .forEach((el) => el.parentNode?.removeChild(el));
+      const link = document.createElement("link");
+      link.setAttribute("rel", rel);
+      link.setAttribute("href", href);
+      if (type) link.setAttribute("type", type);
+      document.head.appendChild(link);
+    };
+    swap("icon", "/akboy-favicon.png", "image/png");
+    swap("apple-touch-icon", "/akboy-logo.png");
+    return () => {
+      swap("icon", "/favicon.png", "image/png");
+      swap("apple-touch-icon", "/apple-touch-icon.png");
+    };
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans">
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
         <meta name="author" content="AKBOY Creative Hub" />
-        <link rel="icon" href="/akboy-logo.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/akboy-logo.png" />
         <link rel="canonical" href={pageUrl} />
 
         {/* Open Graph */}
