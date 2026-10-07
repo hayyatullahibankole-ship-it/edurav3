@@ -55,6 +55,12 @@ export function AkboyLayout({ children, title, description, path = "/" }: AkboyL
       ["manifest", "/akboy-manifest.webmanifest"],
     ]);
     return () => {
+      // On Akboy domains (or /akboy paths) the Akboy icon must stay, even on non-layout pages.
+      const keepAkboy = (window as unknown as { __applyAkboyIcons?: () => void }).__applyAkboyIcons;
+      if (keepAkboy) {
+        keepAkboy();
+        return;
+      }
       setIcons([
         ["icon", "/favicon.png", "image/png"],
         ["apple-touch-icon", "/apple-touch-icon.png"],
