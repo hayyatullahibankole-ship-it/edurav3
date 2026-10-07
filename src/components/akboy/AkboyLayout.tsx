@@ -36,21 +36,30 @@ export function AkboyLayout({ children, title, description, path = "/" }: AkboyL
   // Guarantee the Akboy icon is the ONLY favicon while this layout is mounted.
   // The static Edura icon in index.html would otherwise compete with Helmet's links.
   useEffect(() => {
-    const swap = (rel: string, href: string, type?: string) => {
-      document
-        .querySelectorAll(`link[rel="${rel}"]`)
-        .forEach((el) => el.parentNode?.removeChild(el));
-      const link = document.createElement("link");
-      link.setAttribute("rel", rel);
-      link.setAttribute("href", href);
-      if (type) link.setAttribute("type", type);
-      document.head.appendChild(link);
+    const SELECTOR =
+      'link[rel="icon"], link[rel="shortcut icon"], link[rel="apple-touch-icon"], link[rel="manifest"]';
+    const setIcons = (defs: Array<[string, string, string?]>) => {
+      document.querySelectorAll(SELECTOR).forEach((el) => el.parentNode?.removeChild(el));
+      defs.forEach(([rel, href, type]) => {
+        const link = document.createElement("link");
+        link.setAttribute("rel", rel);
+        link.setAttribute("href", href);
+        if (type) link.setAttribute("type", type);
+        document.head.appendChild(link);
+      });
     };
-    swap("icon", "/akboy-favicon.png", "image/png");
-    swap("apple-touch-icon", "/akboy-logo.png");
+    setIcons([
+      ["icon", "/akboy-favicon-v2.png?v=3", "image/png"],
+      ["shortcut icon", "/akboy-favicon-v2.png?v=3", "image/png"],
+      ["apple-touch-icon", "/akboy-app-icon.png?v=3"],
+      ["manifest", "/akboy-manifest.webmanifest"],
+    ]);
     return () => {
-      swap("icon", "/favicon.png", "image/png");
-      swap("apple-touch-icon", "/apple-touch-icon.png");
+      setIcons([
+        ["icon", "/favicon.png", "image/png"],
+        ["apple-touch-icon", "/apple-touch-icon.png"],
+        ["manifest", "/manifest.json"],
+      ]);
     };
   }, []);
 

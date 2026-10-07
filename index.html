@@ -58,8 +58,27 @@
         setMeta('name', 'twitter:title', TITLE);
         setMeta('name', 'twitter:description', DESC);
         setMeta('name', 'twitter:image', LOGO);
-        setLink('icon', '/akboy-favicon.png', 'image/png');
-        setLink('apple-touch-icon', '/akboy-logo.png');
+        function applyAkboyIcons() {
+          var olds = document.head.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"], link[rel="apple-touch-icon"], link[rel="manifest"]');
+          for (var i = 0; i < olds.length; i++) olds[i].parentNode.removeChild(olds[i]);
+          var defs = [
+            ['icon', '/akboy-favicon-v2.png?v=3', 'image/png'],
+            ['shortcut icon', '/akboy-favicon-v2.png?v=3', 'image/png'],
+            ['apple-touch-icon', '/akboy-app-icon.png?v=3'],
+            ['manifest', '/akboy-manifest.webmanifest']
+          ];
+          for (var j = 0; j < defs.length; j++) {
+            var l = document.createElement('link');
+            l.setAttribute('rel', defs[j][0]);
+            l.setAttribute('href', defs[j][1]);
+            if (defs[j][2]) l.setAttribute('type', defs[j][2]);
+            document.head.appendChild(l);
+          }
+        }
+        window.__applyAkboyIcons = applyAkboyIcons;
+        applyAkboyIcons();
+        // Static Edura icons / build-injected manifest appear later in <head>; re-apply once parsed.
+        document.addEventListener('DOMContentLoaded', applyAkboyIcons);
       })();
     </script>
 
