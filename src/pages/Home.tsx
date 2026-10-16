@@ -1,3 +1,4 @@
+import { useState } from "react";
 import jambLogo from "@/assets/exam-jamb.png";
 import waecLogo from "@/assets/exam-waec.png";
 import necoLogo from "@/assets/exam-neco.png";
@@ -38,6 +39,7 @@ const isAndroid =
 
 const Home = () => {
   const { user } = useAuth();
+  const [sampleAnswer, setSampleAnswer] = useState<string | null>(null);
   const { isInstalledApp } = useInstalledApp();
   const isMobile = useIsMobile();
   const isMobileWeb = isMobile && !isInstalledApp;
@@ -102,208 +104,145 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-background font-sans">
       <PlayStoreBanner />
-      {/* ============ HERO — Deep Ink command center ============ */}
-      <section className="relative overflow-hidden bg-ink text-ink-foreground">
-        <div className="pointer-events-none absolute -top-40 right-0 h-[38rem] w-[38rem] rounded-full bg-primary/10 blur-[140px]" />
+      {/* Homepage hero: product-led, interactive and focused on learning progress. */}
+      <section className="relative isolate overflow-hidden bg-ink text-ink-foreground">
+        <div aria-hidden="true" className="pointer-events-none absolute right-[-8rem] top-[-8rem] h-[26rem] w-[26rem] rounded-full border border-primary/15 sm:right-[-4rem] sm:top-[-6rem] sm:h-[38rem] sm:w-[38rem]" />
+        <div aria-hidden="true" className="pointer-events-none absolute bottom-[-10rem] left-[28%] h-[22rem] w-[22rem] rounded-full bg-primary/10 blur-3xl" />
 
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 md:pt-24 md:pb-28">
-          <div className="grid lg:grid-cols-2 gap-14 lg:gap-16 items-center">
-            {/* Copy */}
-            <div className="space-y-7">
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-ink-soft px-3 py-1.5">
-                <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-                  The complete student ecosystem
-                </span>
-              </div>
+        <div className="relative container mx-auto grid items-center gap-12 px-4 pb-16 pt-14 sm:px-6 sm:pb-20 sm:pt-20 lg:grid-cols-[1.02fr_0.98fr] lg:gap-16 lg:px-8 lg:pb-24 lg:pt-24">
+          <div className="max-w-2xl">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-2 text-xs font-bold text-primary">
+              <Sparkles className="h-4 w-4" aria-hidden="true" />
+              PRACTISE WITH PURPOSE
+            </div>
 
-              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold leading-[1.05] tracking-tight">
-                Master your exams.
-                <br />
-                <span className="text-primary">Manage your future.</span>
-              </h1>
+            <h1 className="font-display text-[2.65rem] font-extrabold leading-[0.98] tracking-[-0.045em] sm:text-6xl lg:text-7xl">
+              Don't just practise.
+              <span className="mt-2 block text-primary">Know what to fix next.</span>
+            </h1>
 
-              <p className="max-w-xl text-base md:text-lg leading-relaxed text-ink-foreground/70">
-                Nigeria's most advanced platform for students. Take realistic CBT simulations for JAMB, WAEC, NECO and
-                Post-UTME, then handle every result PIN, admission form and payment through a wallet with your own
-                dedicated bank account.
-              </p>
+            <p className="mt-6 max-w-xl text-base leading-7 text-ink-foreground/75 sm:text-lg sm:leading-8">
+              Prepare for JAMB, WAEC, NECO and Post-UTME with CBT practice, explanations and tools that help you turn each attempt into your next step.
+            </p>
 
-              <div className="flex flex-wrap gap-3">
-                <Link to={primaryHref}>
-                  <Button size="lg" className="h-12 px-8 text-base font-bold text-ink hover:bg-primary-hover">
-                    Get started free
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-                <Link to="/demo-test">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="h-12 px-8 text-base font-bold border-white/15 bg-ink-soft text-ink-foreground hover:bg-ink-soft/70 hover:text-ink-foreground"
-                  >
-                    Try a free demo test
-                  </Button>
-                </Link>
-              </div>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link to={primaryHref} className="inline-flex">
+                <Button size="lg" className="h-13 w-full rounded-xl px-7 text-base font-extrabold text-ink shadow-lg shadow-primary/10 transition-transform duration-200 hover:-translate-y-0.5 hover:bg-primary-hover sm:w-auto">
+                  Start learning free <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Link to="/demo-test" className="inline-flex">
+                <Button size="lg" variant="outline" className="h-13 w-full rounded-xl border-white/20 bg-white/5 px-7 text-base font-bold text-ink-foreground transition-colors hover:bg-white/10 hover:text-ink-foreground sm:w-auto">
+                  Take a demo test
+                </Button>
+              </Link>
+            </div>
 
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <span className="text-xs uppercase tracking-wide text-ink-foreground/50">Built for</span>
-                {[jambLogo, waecLogo, necoLogo, postUtmeLogo, nabtebLogo].map((src, i) => (
-                  <span
-                    key={src}
-                    className="flex h-11 w-11 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm"
-                  >
-                    <img
-                      src={src}
-                      alt={["JAMB", "WAEC", "NECO", "Post-UTME", "NABTEB"][i] + " logo"}
-                      loading="lazy"
-                      className="h-full w-full object-contain"
-                    />
+            <div className="mt-8 flex flex-wrap gap-x-5 gap-y-3 border-t border-white/10 pt-6 text-sm text-ink-foreground/70">
+              <span className="inline-flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-primary" /> Exam-focused practice</span>
+              <span className="inline-flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-primary" /> Learn from mistakes</span>
+              <span className="inline-flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-primary" /> Track your progress</span>
+            </div>
+
+            <div className="mt-8 flex items-center gap-3">
+              <div className="flex -space-x-2">
+                {[jambLogo, waecLogo, necoLogo, postUtmeLogo].map((src, i) => (
+                  <span key={src} className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-ink bg-white p-1.5">
+                    <img src={src} alt={["JAMB", "WAEC", "NECO", "Post-UTME"][i]} loading="lazy" className="h-full w-full object-contain" />
                   </span>
                 ))}
               </div>
-
-
-
-              <div className="flex flex-wrap items-center gap-6 sm:gap-8 pt-6 border-t border-white/10">
-                {[
-                  { v: "120,000+", l: "Practice questions" },
-                  { v: "50,000+", l: "Students" },
-                  { v: "Instant", l: "PIN delivery" },
-                ].map((s, i) => (
-                  <div key={s.l} className="flex items-center gap-6 sm:gap-8">
-                    {i > 0 && <div className="hidden sm:block h-8 w-px bg-white/10" />}
-                    <div>
-                      <div className="font-display text-2xl font-bold">{s.v}</div>
-                      <div className="text-xs text-ink-foreground/50">{s.l}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Product surfaces */}
-            <div className="relative">
-              <div className="pointer-events-none absolute -inset-16 rounded-full bg-primary/5 blur-[120px]" />
-
-              <div className="relative grid grid-cols-12 gap-4 pb-8 lg:pb-0">
-                {/* CBT engine */}
-                <div className="col-span-12 sm:col-span-10 lg:col-span-9 rounded-2xl border border-white/10 bg-ink-soft shadow-2xl overflow-hidden lg:-rotate-2">
-                  <div className="flex items-center justify-between border-b border-white/5 bg-ink px-4 py-2.5">
-                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-ink-foreground/40">
-                      Edura CBT engine
-                    </span>
-                    <div className="flex gap-1.5">
-                      <span className="h-2 w-2 rounded-full bg-destructive/50" />
-                      <span className="h-2 w-2 rounded-full bg-warning/50" />
-                      <span className="h-2 w-2 rounded-full bg-primary/60" />
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 p-5 sm:p-6">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-display text-sm font-bold text-primary">JAMB — Use of English</h4>
-                      <span className="rounded border border-destructive/30 bg-destructive/15 px-2 py-1 text-[10px] font-semibold text-destructive tabular-nums">
-                        01:42:05
-                      </span>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <p className="text-sm font-medium">
-                        Choose the option most nearly opposite in meaning to the underlined word.
-                      </p>
-                      <p className="text-xs italic text-ink-foreground/60">
-                        The principal was <u>adamant</u> about the new school rules.
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="rounded-lg border border-white/10 bg-white/5 p-3 text-xs">A. Flexible</div>
-                      <div className="rounded-lg border border-primary bg-primary/10 p-3 text-xs font-medium">
-                        B. Unyielding
-                      </div>
-                      <div className="rounded-lg border border-white/10 bg-white/5 p-3 text-xs">C. Indifferent</div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-1">
-                      <div className="flex gap-1.5">
-                        <span className="flex h-6 w-6 items-center justify-center rounded bg-primary text-[10px] font-bold text-ink">1</span>
-                        <span className="flex h-6 w-6 items-center justify-center rounded bg-white/10 text-[10px]">2</span>
-                        <span className="flex h-6 w-6 items-center justify-center rounded bg-white/10 text-[10px]">3</span>
-                      </div>
-                      <span className="rounded bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wide">
-                        Next question
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Wallet & services */}
-                <div className="col-span-12 sm:col-span-8 sm:col-start-5 lg:col-span-7 lg:col-start-6 lg:-mt-24 rounded-2xl border border-white/60 bg-card text-card-foreground shadow-2xl overflow-hidden lg:rotate-3">
-                  <div className="space-y-4 p-5">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                          Available balance
-                        </p>
-                        <h3 className="font-display text-2xl font-bold tabular-nums">₦24,850.00</h3>
-                      </div>
-                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                        <Plus className="h-4 w-4 text-primary-foreground" />
-                      </span>
-                    </div>
-
-                    <div className="rounded-xl bg-surface p-3">
-                      <p className="text-[9px] font-bold uppercase text-muted-foreground">Dedicated account</p>
-                      <div className="mt-1 flex items-center justify-between">
-                        <span className="font-mono text-xs font-bold tracking-wider tabular-nums">8234991022</span>
-                        <span className="rounded border border-border bg-card px-1.5 py-0.5 text-[9px]">Wema Bank</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <p className="text-[10px] font-bold uppercase text-muted-foreground">Quick services</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {["WAEC PIN", "JAMB e-PIN"].map((s) => (
-                          <div key={s} className="flex flex-col items-center gap-1 rounded-lg bg-surface p-2">
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-card shadow-sm">
-                              <Ticket className="h-3 w-3 text-primary" />
-                            </span>
-                            <span className="text-[9px] font-bold">{s}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between border-t border-border pt-2.5">
-                      <div className="flex items-center gap-2">
-                        <span className="flex h-6 w-6 items-center justify-center rounded bg-primary/15">
-                          <Check className="h-3 w-3 text-primary" />
-                        </span>
-                        <div>
-                          <p className="text-[10px] font-bold">WAEC checker PIN</p>
-                          <p className="text-[9px] text-muted-foreground">Delivered • 2m ago</p>
-                        </div>
-                      </div>
-                      <span className="text-[10px] font-bold text-destructive tabular-nums">-₦3,500</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <p className="text-xs leading-5 text-ink-foreground/55">One place for your exam preparation journey.</p>
             </div>
           </div>
 
-          {/* Three pillars */}
-          <div className="mt-20 grid gap-10 border-t border-white/10 pt-12 md:grid-cols-3 md:gap-12">
-            {pillars.map((p) => (
-              <div key={p.no}>
-                <h3 className="font-display text-xl md:text-2xl font-bold text-primary mb-3">
-                  {p.no}. {p.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-ink-foreground/60">{p.body}</p>
+          <div className="relative mx-auto w-full max-w-xl lg:ml-auto">
+            <div aria-hidden="true" className="absolute -inset-3 rotate-2 rounded-[2rem] bg-primary/15 sm:-inset-5" />
+            <div className="relative overflow-hidden rounded-[1.6rem] border border-white/15 bg-background text-foreground shadow-2xl shadow-black/25 transition-transform duration-300 hover:-translate-y-1">
+              <div className="flex items-center justify-between border-b border-border px-5 py-4 sm:px-6">
+                <div>
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-primary">Try it now</p>
+                  <h2 className="mt-1 font-display text-lg font-extrabold">One question. One useful lesson.</h2>
+                </div>
+                <span className="rounded-full bg-muted px-3 py-1 text-xs font-bold text-muted-foreground">Sample</span>
               </div>
-            ))}
+
+              <div className="p-5 sm:p-6">
+                <div className="mb-5 flex items-center justify-between gap-3">
+                  <span className="text-xs font-bold text-muted-foreground">USE OF ENGLISH</span>
+                  <span className="rounded-lg bg-primary/10 px-2.5 py-1.5 text-xs font-bold text-primary">Vocabulary</span>
+                </div>
+                <p className="text-base font-semibold leading-7 sm:text-lg">
+                  Choose the option <span className="underline decoration-primary decoration-2 underline-offset-4">opposite</span> in meaning to the word below.
+                </p>
+                <p className="mt-3 rounded-xl bg-muted/70 px-4 py-3 text-sm leading-6">
+                  The principal remained <strong>adamant</strong> despite the students' complaints.
+                </p>
+                <div className="mt-4 space-y-2.5">
+                  {[
+                    { key: "A", label: "Flexible" },
+                    { key: "B", label: "Unyielding" },
+                    { key: "C", label: "Indifferent" },
+                    { key: "D", label: "Decisive" },
+                  ].map((option) => {
+                    const isCorrect = option.key === "A";
+                    const isSelected = sampleAnswer === option.key;
+                    const revealed = sampleAnswer !== null;
+                    return (
+                      <button
+                        key={option.key}
+                        type="button"
+                        aria-pressed={isSelected}
+                        onClick={() => setSampleAnswer(option.key)}
+                        className={cn(
+                          "group flex min-h-12 w-full items-center gap-3 rounded-xl border px-3.5 py-3 text-left text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                          isSelected && isCorrect && "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+                          isSelected && !isCorrect && "border-destructive bg-destructive/5 text-destructive",
+                          !isSelected && revealed && isCorrect && "border-emerald-500/60 bg-emerald-500/5",
+                          !isSelected && !(revealed && isCorrect) && "border-border bg-card hover:border-primary/50 hover:bg-primary/5"
+                        )}
+                      >
+                        <span className={cn(
+                          "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border text-xs font-extrabold transition-colors",
+                          isSelected && isCorrect && "border-emerald-500 bg-emerald-500 text-white",
+                          isSelected && !isCorrect && "border-destructive bg-destructive text-white",
+                          !isSelected && revealed && isCorrect && "border-emerald-500 bg-emerald-500 text-white",
+                          !isSelected && !(revealed && isCorrect) && "border-border bg-muted group-hover:border-primary/50"
+                        )}>
+                          {revealed && isCorrect ? <Check className="h-4 w-4" /> : option.key}
+                        </span>
+                        <span className="flex-1">{option.label}</span>
+                        {isSelected && <span className="text-xs font-bold">{isCorrect ? "Correct" : "Your answer"}</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {sampleAnswer !== null && (
+                  <div aria-live="polite" className={cn(
+                    "mt-4 rounded-xl border p-4 text-sm leading-6 animate-fade-in",
+                    sampleAnswer === "A" ? "border-emerald-500/30 bg-emerald-500/5" : "border-border bg-muted/60"
+                  )}>
+                    <p className="font-extrabold">{sampleAnswer === "A" ? "Exactly right." : "Not quite — use this to learn."}</p>
+                    <p className="mt-1 text-muted-foreground">
+                      <strong>Adamant</strong> means refusing to change one's mind. <strong>Flexible</strong> means willing to change, so it is the opposite. “Unyielding” is a synonym, not an antonym.
+                    </p>
+                    <button type="button" onClick={() => setSampleAnswer(null)} className="mt-3 text-xs font-bold text-primary underline underline-offset-4">
+                      Try another answer
+                    </button>
+                  </div>
+                )}
+
+                <div className="mt-5 flex items-center justify-between border-t border-border pt-4 text-xs text-muted-foreground">
+                  <span className="inline-flex items-center gap-1.5"><BookOpen className="h-4 w-4" /> Explanation included</span>
+                  <span>Interactive sample · not a live exam</span>
+                </div>
+              </div>
+            </div>
+            <div className="relative mt-4 flex items-center justify-between gap-3 px-1 text-xs text-ink-foreground/60">
+              <span>Learn from the answer, not just the score.</span>
+              <span className="hidden rounded-full border border-white/15 px-3 py-1.5 sm:inline-flex">Edura CBT</span>
+            </div>
           </div>
         </div>
       </section>
