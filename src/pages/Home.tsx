@@ -26,6 +26,7 @@ import {
   Newspaper,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 import Footer from "@/components/Footer";
 import PlayStoreBanner from "@/components/PlayStoreBanner";
