@@ -128,12 +128,12 @@ const Home = () => {
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link to={primaryHref} className="inline-flex">
-                <Button size="lg" className="h-13 w-full rounded-xl px-7 text-base font-extrabold text-ink shadow-lg shadow-primary/10 transition-transform duration-200 hover:-translate-y-0.5 hover:bg-primary-hover sm:w-auto">
+                <Button size="lg" className="h-12 w-full rounded-xl px-7 text-base font-extrabold text-ink shadow-lg shadow-primary/10 transition-transform duration-200 hover:-translate-y-0.5 hover:bg-primary-hover sm:w-auto">
                   Start learning free <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/demo-test" className="inline-flex">
-                <Button size="lg" variant="outline" className="h-13 w-full rounded-xl border-white/20 bg-white/5 px-7 text-base font-bold text-ink-foreground transition-colors hover:bg-white/10 hover:text-ink-foreground sm:w-auto">
+                <Button size="lg" variant="outline" className="h-12 w-full rounded-xl border-white/20 bg-white/5 px-7 text-base font-bold text-ink-foreground transition-colors hover:bg-white/10 hover:text-ink-foreground sm:w-auto">
                   Take a demo test
                 </Button>
               </Link>
