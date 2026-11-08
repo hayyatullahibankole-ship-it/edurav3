@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -53,6 +53,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import {
+  countUsersJoinedWithinHours,
+  countUsersLoggedInWithinDays,
+  filterAdminUsers,
+  mergeAuthActivity,
+} from '@/lib/adminUserActivity';
 
 type NavItem = { key: string; label: string; icon: any };
 type NavSection = { label: string; items: NavItem[] };
@@ -155,32 +161,68 @@ export default function AdminPortal() {
   });
   const [users, setUsers] = useState<any[]>([]);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
+  const knownUserIds = useRef<Set<string> | null>(null);
 
-  useEffect(() => {
-    if (isAdmin) fetchAdminData();
-  }, [isAdmin]);
+  const refreshUserDirectory = useCallback(async (announceNewUsers = false) => {
+    const { data: profiles, error: profilesError } = await supabase.rpc('get_users_masked');
+    if (profilesError) throw profilesError;
 
-  const fetchAdminData = async () => {
+    const { data: activityData, error: activityError } = await supabase.functions.invoke('admin-user-activity');
+    if (activityError) console.error('Could not load sign-in activity', activityError);
+
+    const enrichedUsers = activityError
+      ? profiles || []
+      : mergeAuthActivity(profiles || [], activityData?.users || []);
+
+    if (announceNewUsers && knownUserIds.current) {
+      const newEnrollments = enrichedUsers.filter((person: any) =>
+        !knownUserIds.current?.has(person.id) &&
+        countUsersJoinedWithinHours([person], 24) > 0,
+      );
+      if (newEnrollments.length > 0) {
+        toast({
+          title: newEnrollments.length === 1 ? 'New student enrolled' : 'New students enrolled',
+          description: newEnrollments.length === 1
+            ? `${newEnrollments[0].first_name || 'A student'} just joined Edura.`
+            : `${newEnrollments.length} new students joined Edura.`,
+        });
+      }
+    }
+
+    knownUserIds.current = new Set(enrichedUsers.map((person: any) => person.id));
+    setUsers(enrichedUsers);
+    return enrichedUsers;
+  }, [toast]);
+
+  const fetchAdminData = useCallback(async () => {
     try {
-      const [usersResp, examsResp, attemptsResp] = await Promise.all([
-        supabase.rpc('get_users_masked'),
+      const [directory, examsResp, attemptsResp] = await Promise.all([
+        refreshUserDirectory(),
         supabase.from('exams').select('*'),
         supabase.from('attempts').select(`*, users(first_name, last_name, email), exams(title)`)
           .order('created_at', { ascending: false }).limit(8),
       ]);
       setStats({
-        totalUsers: usersResp.data?.length || 0,
+        totalUsers: directory.length,
         activeExams: examsResp.data?.filter((e: any) => e.is_published).length || 0,
         totalAttempts: attemptsResp.data?.length || 0,
         suspiciousActivities: attemptsResp.data?.filter((a: any) => a.suspicious_activity_count > 0).length || 0,
       });
-      setUsers(usersResp.data || []);
       setRecentActivities(attemptsResp.data || []);
     } catch (error) {
       console.error('Error fetching admin data:', error);
       toast({ title: 'Error', description: 'Failed to load admin data', variant: 'destructive' });
     }
-  };
+  }, [refreshUserDirectory, toast]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    fetchAdminData();
+    const interval = window.setInterval(() => {
+      refreshUserDirectory(true).catch((error) => console.error('Could not refresh user directory', error));
+    }, 60_000);
+    return () => window.clearInterval(interval);
+  }, [isAdmin, fetchAdminData, refreshUserDirectory]);
 
   const handleSignOut = async () => {
     try { await signOut(); navigate('/admin/login'); } catch (e) { console.error(e); }
@@ -203,7 +245,14 @@ export default function AdminPortal() {
 
   const renderContent = () => {
     switch (activeKey) {
-      case 'dashboard': return <DashboardOverview stats={stats} activities={recentActivities} />;
+      case 'dashboard': return (
+        <DashboardOverview
+          stats={stats}
+          activities={recentActivities}
+          users={users}
+          onOpenUsers={() => setActiveKey('users')}
+        />
+      );
       case 'users': return <UserManagement users={users} onRefresh={fetchAdminData} />;
       case 'exams': return <ExamControl />;
       case 'questions': return <QuestionManagement />;
@@ -385,9 +434,23 @@ export default function AdminPortal() {
 }
 
 /* ====================== Dashboard Overview (flat, no gradients) ====================== */
-function DashboardOverview({ stats, activities }: { stats: any; activities: any[] }) {
+function DashboardOverview({
+  stats,
+  activities,
+  users,
+  onOpenUsers,
+}: {
+  stats: any;
+  activities: any[];
+  users: any[];
+  onOpenUsers: () => void;
+}) {
+  const newEnrollments = filterAdminUsers(users, { enrollment: '24h', sort: 'newest' });
+  const loginsThisWeek = countUsersLoggedInWithinDays(users, 7);
   const metrics = [
     { label: 'Total Users', value: stats.totalUsers, icon: Users },
+    { label: 'New Enrollments · 24h', value: countUsersJoinedWithinHours(users, 24), icon: UserPlus },
+    { label: 'Logged In · 7d', value: loginsThisWeek, icon: Clock },
     { label: 'Active Exams', value: stats.activeExams, icon: BookOpen },
     { label: 'Recent Attempts', value: stats.totalAttempts, icon: Activity },
     { label: 'Security Alerts', value: stats.suspiciousActivities, icon: AlertTriangle, alert: true },
@@ -400,7 +463,7 @@ function DashboardOverview({ stats, activities }: { stats: any; activities: any[
         <p className="mt-1 text-sm text-slate-500">A quick look at your platform health.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
         {metrics.map((m) => {
           const Icon = m.icon;
           return (
@@ -419,6 +482,35 @@ function DashboardOverview({ stats, activities }: { stats: any; activities: any[
           );
         })}
       </div>
+
+      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white" aria-labelledby="new-enrollments-title">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3.5 sm:px-5">
+          <div>
+            <h3 id="new-enrollments-title" className="text-sm font-semibold text-slate-900">New student enrollments</h3>
+            <p className="text-xs text-slate-500">Joined in the last 24 hours · {newEnrollments.length} total</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={onOpenUsers}>View all users</Button>
+        </div>
+        {newEnrollments.length === 0 ? (
+          <div className="px-5 py-7 text-center text-sm text-slate-500">No new enrollments in the last 24 hours</div>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {newEnrollments.slice(0, 5).map((person: any) => (
+              <div key={person.id} className="flex min-w-0 items-center justify-between gap-3 px-4 py-3 sm:px-5">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-slate-900">
+                    {[person.first_name, person.last_name].filter(Boolean).join(' ') || 'New student'}
+                  </p>
+                  <p className="truncate text-xs text-slate-500">{person.email || 'Email unavailable'}</p>
+                </div>
+                <time className="shrink-0 text-xs text-slate-500" dateTime={person.auth_created_at || person.created_at}>
+                  {new Date(person.auth_created_at || person.created_at).toLocaleString()}
+                </time>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
         <div className="border-b border-slate-200 px-4 py-3.5 sm:px-5">
