@@ -8,7 +8,7 @@ import {
   Shield, Users, BookOpen, Settings, BarChart3, LogOut, FileText, DollarSign,
   Gift, Newspaper, MessageCircle, GraduationCap, Sword, Palette, Briefcase,
   CalendarDays, Mail, ClipboardList, CheckCircle, Lock, Upload, Search, Menu,
-  Home, ChevronRight, Activity, AlertTriangle, School,
+  Home, ChevronRight, Activity, AlertTriangle, School, Clock, UserPlus,
 } from 'lucide-react';
 import UserManagement from '@/components/admin/UserManagement';
 import ExamControl from '@/components/admin/ExamControl';
@@ -191,6 +191,7 @@ export default function AdminPortal() {
 
     knownUserIds.current = new Set(enrichedUsers.map((person: any) => person.id));
     setUsers(enrichedUsers);
+    setStats((current) => ({ ...current, totalUsers: enrichedUsers.length }));
     return enrichedUsers;
   }, [toast]);
 

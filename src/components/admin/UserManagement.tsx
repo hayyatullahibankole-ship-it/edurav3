@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,11 +19,23 @@ import {
   Shield,
   AlertTriangle,
   CheckCircle,
-  Mail
+  Mail,
+  Clock,
+  Filter,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { emailSchema, passwordSchema, nameSchema, adminUserSchema } from '@/utils/inputValidation';
+import {
+  countUsersJoinedWithinHours,
+  countUsersLoggedInWithinDays,
+  filterAdminUsers,
+  type AccountFilter,
+  type EnrollmentWindow,
+  type LoginWindow,
+  type UserSort,
+  type VerificationFilter,
+} from '@/lib/adminUserActivity';
 
 interface UserManagementProps {
   users: any[];
@@ -33,6 +45,11 @@ interface UserManagementProps {
 export default function UserManagement({ users: initialUsers, onRefresh }: UserManagementProps) {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [enrollmentFilter, setEnrollmentFilter] = useState<EnrollmentWindow>('all');
+  const [loginFilter, setLoginFilter] = useState<LoginWindow>('all');
+  const [accountFilter, setAccountFilter] = useState<AccountFilter>('all');
+  const [verificationFilter, setVerificationFilter] = useState<VerificationFilter>('all');
+  const [sortBy, setSortBy] = useState<UserSort>('newest');
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -55,19 +72,20 @@ export default function UserManagement({ users: initialUsers, onRefresh }: UserM
   const exportUsers = async () => {
     try {
       // Create CSV content
-      const headers = ['Email', 'First Name', 'Last Name', 'Phone', 'Country', 'Created At', 'Last Login', 'Is Suspended'];
+      const headers = ['Email', 'First Name', 'Last Name', 'Phone', 'Country', 'Created At', 'Last Login', 'Is Suspended', 'Is Verified'];
       const csvContent = [
         headers.join(','),
-        ...localUsers.map(user => [
+        ...filteredUsers.map(user => [
           user.email || '',
           user.first_name || '',
           user.last_name || '',
           user.phone || '',
           user.country || '',
-          new Date(user.created_at).toLocaleDateString(),
+          user.auth_created_at || user.created_at || '',
           user.last_login_at ? new Date(user.last_login_at).toLocaleDateString() : 'Never',
-          user.is_suspended ? 'Yes' : 'No'
-        ].map(field => `"${field}"`).join(','))
+          user.is_suspended ? 'Yes' : 'No',
+          user.is_verified ? 'Yes' : 'No',
+        ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(','))
       ].join('\n');
 
       // Create and download file
@@ -83,7 +101,7 @@ export default function UserManagement({ users: initialUsers, onRefresh }: UserM
       
       toast({
         title: "Success",
-        description: "Users exported successfully"
+        description: `${filteredUsers.length} filtered users exported successfully`
       });
     } catch (error) {
       toast({
@@ -94,10 +112,14 @@ export default function UserManagement({ users: initialUsers, onRefresh }: UserM
     }
   };
 
-  const filteredUsers = localUsers.filter(user => 
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = useMemo(() => filterAdminUsers(localUsers, {
+    search: searchTerm,
+    enrollment: enrollmentFilter,
+    login: loginFilter,
+    account: accountFilter,
+    verification: verificationFilter,
+    sort: sortBy,
+  }), [localUsers, searchTerm, enrollmentFilter, loginFilter, accountFilter, verificationFilter, sortBy]);
 
   const handleAddUser = async () => {
     try {
@@ -438,9 +460,24 @@ export default function UserManagement({ users: initialUsers, onRefresh }: UserM
         </div>
       </div>
 
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="flex items-center gap-3 rounded-lg border border-slate-700 bg-slate-800 p-4">
+          <UserPlus className="h-4 w-4 shrink-0 text-emerald-400" />
+          <div><p className="text-xs text-slate-400">Joined in 24 hours</p><p className="text-lg font-semibold text-white">{countUsersJoinedWithinHours(localUsers, 24)}</p></div>
+        </div>
+        <div className="flex items-center gap-3 rounded-lg border border-slate-700 bg-slate-800 p-4">
+          <Clock className="h-4 w-4 shrink-0 text-emerald-400" />
+          <div><p className="text-xs text-slate-400">Logged in within 7 days</p><p className="text-lg font-semibold text-white">{countUsersLoggedInWithinDays(localUsers, 7)}</p></div>
+        </div>
+        <div className="flex items-center gap-3 rounded-lg border border-slate-700 bg-slate-800 p-4">
+          <Users className="h-4 w-4 shrink-0 text-slate-300" />
+          <div><p className="text-xs text-slate-400">Never logged in</p><p className="text-lg font-semibold text-white">{localUsers.filter((user) => !user.last_login_at).length}</p></div>
+        </div>
+      </div>
+
       {/* Search and Filters */}
       <Card className="bg-slate-800 border-slate-700">
-        <CardContent className="p-4">
+        <CardContent className="space-y-4 p-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="relative flex-1 w-full">
               <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
@@ -454,6 +491,36 @@ export default function UserManagement({ users: initialUsers, onRefresh }: UserM
             <Badge className="bg-slate-700 text-slate-300 whitespace-nowrap">
               {filteredUsers.length} users
             </Badge>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-400">
+            <Filter className="h-3.5 w-3.5" />
+            Filter and sort
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            <Select value={enrollmentFilter} onValueChange={(value) => setEnrollmentFilter(value as EnrollmentWindow)}>
+              <SelectTrigger aria-label="Filter by enrollment date" className="bg-slate-700 border-slate-600 text-white"><SelectValue placeholder="Enrollment date" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Any enrollment date</SelectItem><SelectItem value="24h">Joined in 24 hours</SelectItem><SelectItem value="7d">Joined in 7 days</SelectItem><SelectItem value="30d">Joined in 30 days</SelectItem><SelectItem value="90d">Joined in 90 days</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={loginFilter} onValueChange={(value) => setLoginFilter(value as LoginWindow)}>
+              <SelectTrigger aria-label="Filter by recent login" className="bg-slate-700 border-slate-600 text-white"><SelectValue placeholder="Login activity" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Any login activity</SelectItem><SelectItem value="7d">Logged in within 7 days</SelectItem><SelectItem value="30d">Logged in within 30 days</SelectItem><SelectItem value="90d">Logged in within 90 days</SelectItem><SelectItem value="never">Never logged in</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={accountFilter} onValueChange={(value) => setAccountFilter(value as AccountFilter)}>
+              <SelectTrigger aria-label="Filter by suspension status" className="bg-slate-700 border-slate-600 text-white"><SelectValue placeholder="Suspension status" /></SelectTrigger>
+              <SelectContent><SelectItem value="all">All suspension statuses</SelectItem><SelectItem value="active">Not suspended</SelectItem><SelectItem value="suspended">Suspended</SelectItem></SelectContent>
+            </Select>
+            <Select value={verificationFilter} onValueChange={(value) => setVerificationFilter(value as VerificationFilter)}>
+              <SelectTrigger aria-label="Filter by verification status" className="bg-slate-700 border-slate-600 text-white"><SelectValue placeholder="Verification" /></SelectTrigger>
+              <SelectContent><SelectItem value="all">All verification statuses</SelectItem><SelectItem value="verified">Verified</SelectItem><SelectItem value="unverified">Unverified</SelectItem></SelectContent>
+            </Select>
+            <Select value={sortBy} onValueChange={(value) => setSortBy(value as UserSort)}>
+              <SelectTrigger aria-label="Sort users" className="bg-slate-700 border-slate-600 text-white"><SelectValue placeholder="Sort users" /></SelectTrigger>
+              <SelectContent><SelectItem value="newest">Newest enrollment</SelectItem><SelectItem value="recent-login">Most recent login</SelectItem><SelectItem value="name">Name A–Z</SelectItem></SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
@@ -484,13 +551,11 @@ export default function UserManagement({ users: initialUsers, onRefresh }: UserM
                     <p className="text-sm text-slate-400 truncate">{user.email}</p>
                     <div className="flex items-center space-x-2 mt-1">
                       <Badge variant="secondary" className="text-xs">
-                        {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}
+                        Joined {user.auth_created_at || user.created_at ? new Date(user.auth_created_at || user.created_at).toLocaleDateString() : 'Unknown'}
                       </Badge>
-                      {user.last_login_at && (
-                        <Badge variant="outline" className="text-xs">
-                          Last active: {new Date(user.last_login_at).toLocaleDateString()}
-                        </Badge>
-                      )}
+                      <Badge variant="outline" className="text-xs">
+                        {user.last_login_at ? `Last login: ${new Date(user.last_login_at).toLocaleDateString()}` : 'Never logged in'}
+                      </Badge>
                     </div>
                   </div>
                 </div>
@@ -677,7 +742,7 @@ export default function UserManagement({ users: initialUsers, onRefresh }: UserM
                 <div>
                   <h4 className="font-medium mb-3">Account Information</h4>
                   <div className="space-y-2 text-sm">
-                    <div><span className="text-muted-foreground">Created:</span> {new Date(selectedUser.created_at).toLocaleDateString()}</div>
+                    <div><span className="text-muted-foreground">Enrolled:</span> {selectedUser.auth_created_at || selectedUser.created_at ? new Date(selectedUser.auth_created_at || selectedUser.created_at).toLocaleDateString() : 'Unknown'}</div>
                     <div><span className="text-muted-foreground">Last Login:</span> {selectedUser.last_login_at ? new Date(selectedUser.last_login_at).toLocaleDateString() : 'Never'}</div>
                     <div><span className="text-muted-foreground">2FA Enabled:</span> {selectedUser.two_fa_enabled ? 'Yes' : 'No'}</div>
                     <div><span className="text-muted-foreground">Account Status:</span> {selectedUser.is_suspended ? 'Suspended' : 'Active'}</div>
