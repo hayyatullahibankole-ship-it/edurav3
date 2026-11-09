@@ -59,6 +59,7 @@ import {
   filterAdminUsers,
   mergeAuthActivity,
 } from '@/lib/adminUserActivity';
+import { Clock, UserPlus } from 'lucide-react';
 
 type NavItem = { key: string; label: string; icon: any };
 type NavSection = { label: string; items: NavItem[] };

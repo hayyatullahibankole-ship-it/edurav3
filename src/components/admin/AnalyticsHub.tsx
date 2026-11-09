@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Cell, Pie, LineChart, Line } from 'recharts';
+import { countUsersLoggedInWithinDays } from '@/lib/adminUserActivity';
 
 const COLORS = ['#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#8b5cf6', '#06b6d4'];
 
@@ -27,6 +28,7 @@ export default function AnalyticsHub() {
     totalAttempts: 0,
     avgScore: 0,
     recentUsers: 0,
+    loggedInUsers7d: 0,
     recentExams: 0,
     activeSessions: 0,
     subjectPerformance: [] as any[],
@@ -65,7 +67,8 @@ export default function AnalyticsHub() {
         resultsResp,
         subscriptionsResp,
         transactionsResp,
-        subjectsResp
+        subjectsResp,
+        authActivityResp,
       ] = await Promise.all([
         supabase.from('users').select('id, created_at, country').order('created_at', { ascending: false }),
         supabase.from('exams').select('id, title, type, created_at, is_published'),
@@ -73,8 +76,10 @@ export default function AnalyticsHub() {
         supabase.from('results').select('*').order('created_at', { ascending: false }),
         supabase.from('subscriptions').select('*, subscription_plans(name, price, currency)').eq('status', 'ACTIVE'),
         supabase.from('transactions').select('*').eq('status', 'SUCCESS').order('created_at', { ascending: false }),
-        supabase.from('subjects').select('id, name')
+        supabase.from('subjects').select('id, name'),
+        supabase.functions.invoke('admin-user-activity')
       ]);
+      if (authActivityResp.error) console.error('Could not load sign-in activity', authActivityResp.error);
 
       // Process user growth data
       const userGrowthData = [];
@@ -213,6 +218,7 @@ export default function AnalyticsHub() {
         totalAttempts: completedAttempts,
         avgScore,
         recentUsers,
+        loggedInUsers7d: countUsersLoggedInWithinDays(authActivityResp.data?.users || [], 7),
         recentExams,
         activeSessions: attemptsResp.data?.filter(a => a.status === 'IN_PROGRESS').length || 0,
         subjectPerformance: subjectPerformance.slice(0, 10),
@@ -266,7 +272,7 @@ export default function AnalyticsHub() {
                   <p className="text-3xl font-bold text-blue-100">{analytics.totalUsers.toLocaleString()}</p>
                   <div className="flex items-center mt-2">
                     <TrendingUp className="w-4 h-4 text-green-400 mr-1" />
-                    <span className="text-xs text-green-400">+{analytics.recentUsers} today</span>
+                    <span className="text-xs text-green-400">+{analytics.recentUsers} registrations today</span>
                   </div>
                 </div>
                 <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
@@ -320,7 +326,7 @@ export default function AnalyticsHub() {
                   <p className="text-3xl font-bold text-orange-100">{analytics.activeSessions}</p>
                   <div className="flex items-center mt-2">
                     <Activity className="w-4 h-4 text-green-400 mr-1" />
-                    <span className="text-xs text-green-400">Live now</span>
+                    <span className="text-xs text-green-400">In progress now</span>
                   </div>
                 </div>
                 <div className="w-12 h-12 bg-orange-500/20 rounded-full flex items-center justify-center">
@@ -428,15 +434,19 @@ export default function AnalyticsHub() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-300">Active Users Today</span>
+                    <span className="text-slate-300">New Registrations Today</span>
                     <Badge className="bg-green-600">{analytics.recentUsers}</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-300">Logged In Within 7 Days</span>
+                    <Badge className="bg-emerald-700">{analytics.loggedInUsers7d}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-slate-300">Total Registered</span>
                     <Badge className="bg-blue-600">{analytics.totalUsers}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-300">Active Sessions</span>
+                    <span className="text-slate-300">Exams In Progress</span>
                     <Badge className="bg-orange-600">{analytics.activeSessions}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
