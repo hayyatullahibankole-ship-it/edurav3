@@ -3,7 +3,6 @@ import {
   countUsersJoinedWithinHours,
   countUsersLoggedInWithinDays,
   filterAdminUsers,
-  getEnrollmentTimestamp,
   mergeAuthActivity,
 } from '@/lib/adminUserActivity';
 
@@ -42,7 +41,7 @@ describe('admin user activity', () => {
     const merged = mergeAuthActivity(users, [
       { auth_user_id: 'a1', auth_created_at: daysAgo(1), last_login_at: hoursAgo(1) },
     ]);
-    expect(getEnrollmentTimestamp(merged[0])).toBe(daysAgo(1));
+    expect(new Date(merged[0].auth_created_at || '').toISOString()).toBe(daysAgo(1));
     expect(merged[0].last_login_at).toBe(hoursAgo(1));
     expect(merged[2]).toEqual(users[2]);
   });

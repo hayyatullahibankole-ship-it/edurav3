@@ -49,11 +49,6 @@ const loginTime = (user: AdminUserRecord): number | null => {
 const withinHours = (timestamp: number | null, hours: number, now: number) =>
   timestamp !== null && timestamp <= now && timestamp >= now - hours * 60 * 60 * 1000;
 
-export const getEnrollmentTimestamp = (user: AdminUserRecord): string | null => {
-  const timestamp = enrollmentTime(user);
-  return timestamp === null ? null : new Date(timestamp).toISOString();
-};
-
 export const mergeAuthActivity = <T extends AdminUserRecord>(
   profiles: T[],
   activities: AdminUserActivity[],
