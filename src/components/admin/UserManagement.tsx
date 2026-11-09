@@ -84,8 +84,8 @@ export default function UserManagement({ users: initialUsers, onRefresh }: UserM
           user.country || '',
           user.auth_created_at || user.created_at || '',
           user.last_login_at ? new Date(user.last_login_at).toLocaleDateString() : 'Never',
-          user.is_suspended ? 'Yes' : 'No'
-          , user.is_verified ? 'Yes' : 'No'
+          user.is_suspended ? 'Yes' : 'No',
+          user.is_verified ? 'Yes' : 'No',
         ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(','))
       ].join('\n');
 

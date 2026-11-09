@@ -8,7 +8,7 @@ import {
   Shield, Users, BookOpen, Settings, BarChart3, LogOut, FileText, DollarSign,
   Gift, Newspaper, MessageCircle, GraduationCap, Sword, Palette, Briefcase,
   CalendarDays, Mail, ClipboardList, CheckCircle, Lock, Upload, Search, Menu,
-  Home, ChevronRight, Activity, AlertTriangle, School,
+  Home, ChevronRight, Activity, AlertTriangle, School, Clock, UserPlus,
 } from 'lucide-react';
 import UserManagement from '@/components/admin/UserManagement';
 import ExamControl from '@/components/admin/ExamControl';
@@ -59,7 +59,6 @@ import {
   filterAdminUsers,
   mergeAuthActivity,
 } from '@/lib/adminUserActivity';
-import { Clock, UserPlus } from 'lucide-react';
 
 type NavItem = { key: string; label: string; icon: any };
 type NavSection = { label: string; items: NavItem[] };
