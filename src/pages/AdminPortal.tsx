@@ -191,6 +191,7 @@ export default function AdminPortal() {
 
     knownUserIds.current = new Set(enrichedUsers.map((person: any) => person.id));
     setUsers(enrichedUsers);
+    setStats((current) => ({ ...current, totalUsers: enrichedUsers.length }));
     return enrichedUsers;
   }, [toast]);
 
