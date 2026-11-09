@@ -511,8 +511,8 @@ export default function UserManagement({ users: initialUsers, onRefresh }: UserM
               </SelectContent>
             </Select>
             <Select value={accountFilter} onValueChange={(value) => setAccountFilter(value as AccountFilter)}>
-              <SelectTrigger aria-label="Filter by account status" className="bg-slate-700 border-slate-600 text-white"><SelectValue placeholder="Account status" /></SelectTrigger>
-              <SelectContent><SelectItem value="all">All account statuses</SelectItem><SelectItem value="active">Not suspended</SelectItem><SelectItem value="suspended">Suspended</SelectItem></SelectContent>
+              <SelectTrigger aria-label="Filter by suspension status" className="bg-slate-700 border-slate-600 text-white"><SelectValue placeholder="Suspension status" /></SelectTrigger>
+              <SelectContent><SelectItem value="all">All suspension statuses</SelectItem><SelectItem value="active">Not suspended</SelectItem><SelectItem value="suspended">Suspended</SelectItem></SelectContent>
             </Select>
             <Select value={verificationFilter} onValueChange={(value) => setVerificationFilter(value as VerificationFilter)}>
               <SelectTrigger aria-label="Filter by verification status" className="bg-slate-700 border-slate-600 text-white"><SelectValue placeholder="Verification" /></SelectTrigger>
