@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Cell, Pie, LineChart, Line } from 'recharts';
-import { countUsersLoggedInWithinDays } from '@/lib/adminUserActivity';
+import { countUsersLoggedInWithinDays, mergeAuthActivity } from '@/lib/adminUserActivity';
 
 const COLORS = ['#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#8b5cf6', '#06b6d4'];
 
@@ -44,13 +44,14 @@ export default function AnalyticsHub() {
 
     const channel = supabase
       .channel('schema-db-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => fetchAnalyticsData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'attempts' }, () => fetchAnalyticsData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'results' }, () => fetchAnalyticsData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => fetchAnalyticsData())
       .subscribe();
+    const refreshInterval = window.setInterval(() => fetchAnalyticsData(), 60_000);
 
     return () => {
+      window.clearInterval(refreshInterval);
       supabase.removeChannel(channel);
     };
   }, []);
@@ -61,7 +62,7 @@ export default function AnalyticsHub() {
 
       // Fetch comprehensive live analytics data
       const [
-        usersResp,
+        profilesResp,
         examsResp,
         attemptsResp,
         resultsResp,
@@ -70,7 +71,7 @@ export default function AnalyticsHub() {
         subjectsResp,
         authActivityResp,
       ] = await Promise.all([
-        supabase.from('users').select('id, created_at, country').order('created_at', { ascending: false }),
+        supabase.from('users').select('id, auth_user_id, created_at, country').order('created_at', { ascending: false }),
         supabase.from('exams').select('id, title, type, created_at, is_published'),
         supabase.from('attempts').select('id, status, started_at, submitted_at, user_id, exam_id').order('started_at', { ascending: false }),
         supabase.from('results').select('*').order('created_at', { ascending: false }),
@@ -80,6 +81,12 @@ export default function AnalyticsHub() {
         supabase.functions.invoke('admin-user-activity')
       ]);
       if (authActivityResp.error) console.error('Could not load sign-in activity', authActivityResp.error);
+      const usersResp = {
+        ...profilesResp,
+        data: profilesResp.data
+          ? mergeAuthActivity(profilesResp.data, authActivityResp.data?.users || [])
+          : profilesResp.data,
+      };
 
       // Process user growth data
       const userGrowthData = [];

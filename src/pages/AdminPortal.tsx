@@ -159,9 +159,10 @@ export default function AdminPortal() {
     totalAttempts: 0,
     suspiciousActivities: 0,
   });
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<Array<Record<string, any>>>([]);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const knownUserIds = useRef<Set<string> | null>(null);
+  const knownEnrollmentDates = useRef<Map<string, string>>(new Map());
 
   const refreshUserDirectory = useCallback(async (announceNewUsers = false) => {
     const { data: profiles, error: profilesError } = await supabase.rpc('get_users_masked');
@@ -170,13 +171,15 @@ export default function AdminPortal() {
     const { data: activityData, error: activityError } = await supabase.functions.invoke('admin-user-activity');
     if (activityError) console.error('Could not load sign-in activity', activityError);
 
-    const enrichedUsers = activityError
+    const enrichedUsers: Array<Record<string, any>> = activityError
       ? profiles || []
       : mergeAuthActivity(profiles || [], activityData?.users || []);
 
+    const currentEnrollmentDates = new Map<string, string>();
     if (announceNewUsers && knownUserIds.current) {
       const newEnrollments = enrichedUsers.filter((person: any) =>
-        !knownUserIds.current?.has(person.id) &&
+        (!knownUserIds.current?.has(person.id) ||
+          knownEnrollmentDates.current.get(person.id) !== (person.auth_created_at || person.created_at)) &&
         countUsersJoinedWithinHours([person], 24) > 0,
       );
       if (newEnrollments.length > 0) {
@@ -190,6 +193,10 @@ export default function AdminPortal() {
     }
 
     knownUserIds.current = new Set(enrichedUsers.map((person: any) => person.id));
+    for (const person of enrichedUsers) {
+      currentEnrollmentDates.set(person.id, person.auth_created_at || person.created_at || '');
+    }
+    knownEnrollmentDates.current = currentEnrollmentDates;
     setUsers(enrichedUsers);
     setStats((current) => ({ ...current, totalUsers: enrichedUsers.length }));
     return enrichedUsers;

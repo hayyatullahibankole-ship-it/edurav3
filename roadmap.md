@@ -1,4 +1,4 @@
-- [ ] Add a protected, read-only lookup for admin user enrollment and login timestamps.
-- [ ] Add recent enrollment visibility, user filters, and filtered exports.
-- [ ] Correct analytics labels and add login-based activity.
-- [ ] Add and run focused activity/filter tests; check preview diagnostics.
+- [x] Add a protected, read-only lookup for admin user enrollment and login timestamps.
+- [x] Add recent enrollment visibility, user filters, and filtered exports.
+- [x] Correct analytics labels and add login-based activity.
+- [x] Add and run focused activity/filter tests; check preview diagnostics.
