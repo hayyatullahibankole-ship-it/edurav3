@@ -159,7 +159,7 @@ export default function AdminPortal() {
     totalAttempts: 0,
     suspiciousActivities: 0,
   });
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<Array<Record<string, any>>>([]);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const knownUserIds = useRef<Set<string> | null>(null);
   const knownEnrollmentDates = useRef<Map<string, string>>(new Map());
@@ -171,7 +171,7 @@ export default function AdminPortal() {
     const { data: activityData, error: activityError } = await supabase.functions.invoke('admin-user-activity');
     if (activityError) console.error('Could not load sign-in activity', activityError);
 
-    const enrichedUsers = activityError
+    const enrichedUsers: Array<Record<string, any>> = activityError
       ? profiles || []
       : mergeAuthActivity(profiles || [], activityData?.users || []);
 
