@@ -44,13 +44,14 @@ export default function AnalyticsHub() {
 
     const channel = supabase
       .channel('schema-db-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => fetchAnalyticsData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'attempts' }, () => fetchAnalyticsData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'results' }, () => fetchAnalyticsData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => fetchAnalyticsData())
       .subscribe();
+    const refreshInterval = window.setInterval(() => fetchAnalyticsData(), 60_000);
 
     return () => {
+      window.clearInterval(refreshInterval);
       supabase.removeChannel(channel);
     };
   }, []);

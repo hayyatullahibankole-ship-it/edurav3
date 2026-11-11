@@ -53,16 +53,16 @@ Deno.serve(async (req) => {
       if (!data || data.length < profilePageSize) break;
     }
 
+    const linkedIds = [...linkedAuthIds];
     const users = [];
-    const authPageSize = 1000;
-    for (let page = 1; ; page += 1) {
-      const { data, error } = await adminClient.auth.admin.listUsers({ page, perPage: authPageSize });
-      if (error) throw error;
-      for (const authUser of data.users) {
-        if (linkedAuthIds.has(authUser.id)) users.push(projectAuthActivity(authUser));
+    const batchSize = 20;
+    for (let offset = 0; offset < linkedIds.length; offset += batchSize) {
+      const batch = linkedIds.slice(offset, offset + batchSize);
+      const results = await Promise.all(batch.map((id) => adminClient.auth.admin.getUserById(id)));
+      for (const result of results) {
+        if (result.error) throw result.error;
+        if (result.data.user) users.push(projectAuthActivity(result.data.user));
       }
-      if (data.users.length < authPageSize) break;
-      if (page >= 1000) throw new Error('User activity pagination limit exceeded');
     }
 
     return jsonResponse({ users });
