@@ -2,3 +2,4 @@
 - [x] Add recent enrollment visibility, user filters, and filtered exports.
 - [x] Correct analytics labels and add login-based activity.
 - [x] Add and run focused activity/filter tests; check preview diagnostics.
+- [ ] Remove automatic 30-day signup access; let admins choose off, 3 days, or 7 days, and restrict manual free-access grants to 3 or 7 days.
